@@ -1,40 +1,44 @@
 ---
-import { readdirSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import MixCard from '../components/MixCard.astro';
 import '../styles/global.css';
 
-const AUDIO_EXTS = ['.mp3'];
-const IMAGE_EXTS  = ['.jpg', '.jpeg', '.png', '.webp'];
+const IMAGE_EXTS = ['.jpg', '.jpeg', '.png', '.webp'];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-// Scan /public/mixes at build time
-const dir = path.join(process.cwd(), 'public/mixes');
-let files: string[] = [];
-try { files = readdirSync(dir) as string[]; } catch {}
+// Read mixes.json — source of truth for audio URLs
+const manifestPath = path.join(process.cwd(), 'public/mixes.json');
+let manifest: { id: string; audioUrl: string }[] = [];
+try { manifest = JSON.parse(readFileSync(manifestPath, 'utf-8')); } catch {}
 
-// Group by stem
-const stems = new Map<string, { audio?: string; image?: string }>();
-for (const file of files) {
-  if (file.startsWith('.')) continue; // skip .gitkeep etc.
+// Scan public/mixes/ for artwork
+const mixesDir = path.join(process.cwd(), 'public/mixes');
+let artworkFiles: string[] = [];
+try { artworkFiles = readdirSync(mixesDir) as string[]; } catch {}
+
+const artworkMap = new Map<string, string>();
+for (const file of artworkFiles) {
+  if (file.startsWith('.')) continue;
   const ext  = path.extname(file).toLowerCase();
   const stem = path.basename(file, ext);
-  if (!stems.has(stem)) stems.set(stem, {});
-  const entry = stems.get(stem)!;
-  if (AUDIO_EXTS.includes(ext) && !entry.audio) entry.audio = file;
-  if (IMAGE_EXTS.includes(ext) && !entry.image) entry.image = file;
+  if (IMAGE_EXTS.includes(ext) && !artworkMap.has(stem)) {
+    artworkMap.set(stem, file);
+  }
 }
 
-// Build valid pairs only
+// Build valid mixes — need both a manifest entry and artwork
 type Mix = { id: string; order: number | null; label: string; audioSrc: string; artworkSrc: string };
 const mixes: Mix[] = [];
 
-for (const [stem, { audio, image }] of stems) {
-  if (!audio || !image) continue;
-  const match = stem.match(/^(\d+)/);
+for (const { id, audioUrl } of manifest) {
+  if (!audioUrl || audioUrl.includes('PASTE_ARCHIVE')) continue; // skip placeholders
+  const artwork = artworkMap.get(id);
+  if (!artwork) continue; // skip if no matching artwork
+  const match = id.match(/^(\d+)/);
   const order = match ? parseInt(match[1], 10) : null;
-  const label = stem.replace(/^\d+-/, '').replace(/-/g, ' ');
-  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-  mixes.push({ id: stem, order, label, audioSrc: `${base}/mixes/${audio}`, artworkSrc: `${base}/mixes/${image}` });
+  const label = id.replace(/^\d+-/, '').replace(/-/g, ' ');
+  mixes.push({ id, order, label, audioSrc: audioUrl, artworkSrc: `${base}/mixes/${artwork}` });
 }
 
 // Sort descending by numeric prefix

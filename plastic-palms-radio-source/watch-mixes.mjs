@@ -11,11 +11,13 @@ import { exec }  from 'node:child_process';
 import path      from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const mixesDir  = path.join(__dirname, 'public/mixes');
+const __dirname  = path.dirname(fileURLToPath(import.meta.url));
+const mixesDir   = path.join(__dirname, 'public/mixes');
+const manifestPath = path.join(__dirname, 'public/mixes.json');
 
-console.log('Plastic Palms Radio — watching for new mixes...');
-console.log(`Source: ${mixesDir}\n`);
+console.log('Plastic Palms Radio — watching for changes...');
+console.log(`Artwork: ${mixesDir}`);
+console.log(`Manifest: ${manifestPath}\n`);
 
 let building     = false;
 let pendingBuild = false;
@@ -38,9 +40,14 @@ function build() {
   });
 }
 
+// Watch artwork folder for new images
 watch(mixesDir, { recursive: false }, (event, filename) => {
   if (!filename || filename.startsWith('.')) return;
-  // Only react to audio or image files
-  if (!/\.(mp3|jpg|jpeg|png|webp)$/i.test(filename)) return;
+  if (!/\.(jpg|jpeg|png|webp)$/i.test(filename)) return;
+  build();
+});
+
+// Watch mixes.json for URL updates
+watch(manifestPath, () => {
   build();
 });
