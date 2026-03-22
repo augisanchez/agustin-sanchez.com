@@ -72,7 +72,7 @@ mixes.sort((a, b) => (b.order ?? -1) - (a.order ?? -1));
 
     <main>
       <!-- Hidden shared audio element — single instance, source swapped on play -->
-      <audio id="player-audio" preload="none" aria-hidden="true"></audio>
+      <audio id="player-audio" preload="none" crossorigin="anonymous" aria-hidden="true"></audio>
 
       {mixes.length === 0 ? (
         <div class="empty-state">
