@@ -13,5 +13,8 @@ plastic-palms-radio-source/dist/
 plastic-palms-radio-source/.astro/
 plastic-palms-radio-source/node_modules/
 
+# Audio files — too large for GitHub, upload to server separately
+*.mp3
+
 # OS
 .DS_Store
