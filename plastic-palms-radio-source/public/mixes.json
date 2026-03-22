@@ -1,14 +1,14 @@
 [
   {
     "id": "003-AintNoCare",
-    "audioUrl": "PASTE_ARCHIVE_ORG_URL_HERE"
+    "audioUrl": "https://archive.org/download/002-white-rabbit/003-AintNoCare.mp3"
   },
   {
     "id": "002-WhiteRabbit",
-    "audioUrl": "PASTE_ARCHIVE_ORG_URL_HERE"
+    "audioUrl": "https://archive.org/download/002-white-rabbit/002-WhiteRabbit.mp3"
   },
   {
     "id": "001-Thorn",
-    "audioUrl": "PASTE_ARCHIVE_ORG_URL_HERE"
+    "audioUrl": "https://archive.org/download/002-white-rabbit/001-Thorn.mp3"
   }
 ]
