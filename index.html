@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agustin Sanchez — Design Leader</title>
+  <meta name="description" content="Design leader helping organizations move by making complex problems legible.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,500;1,8..60,300;1,8..60,500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <svg class="noise" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <filter id="grain-filter" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="linearRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.68" numOctaves="4" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.33 0.33 0.33 0 0" in="noise"/>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#grain-filter)"/>
+  </svg>
+  <div class="page-bg" id="page-bg" aria-hidden="true"></div>
+
+  <!-- HUD -->
+  <header class="hud" id="hud">
+    <div class="hud__left">
+      <span class="hud__name caption">Agustin Sanchez</span>
+      <span class="caption hud__role">Design Leader</span>
+    </div>
+    <div class="hud__right">
+      <span class="hud__section caption" id="hud-section">—</span>
+    </div>
+  </header>
+
+  <main id="main-content">
+
+    <!-- ============================================================
+         GROUP 1: PAPER — Hero
+         ============================================================ -->
+    <section class="color-group"
+      data-bg="#F4F2EE" data-theme="light"
+      data-tone="MIAMI" data-label="—">
+
+      <div class="panel panel--hero">
+        <div class="panel__content panel__content--hero">
+          <canvas id="hero-canvas" aria-hidden="true"></canvas>
+          <h1 class="hero-headline" aria-label="Agustin Sanchez.">
+            <div class="line-mask"><span class="display-xl">AGUSTIN</span></div>
+            <div class="line-mask"><span class="display-xl">SANCHEZ.</span></div>
+          </h1>
+          <div class="hero-sub" id="hero-strip">
+            <div class="strip-rule"></div>
+            <div class="strip-cols">
+              <p class="essay">Production is becoming a commodity. What remains scarce is judgment — knowing which problem matters, how to frame it for a room that needs to act, and when to push past the comfortable answer.</p>
+              <p class="essay">Product strategy. AI-amplified delivery.<br>Twenty-something years operating in an ever-evolving landscape.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ============================================================
+         GROUP 2: PAPER — The Gap (thesis)
+         ============================================================ -->
+    <section class="color-group"
+      data-bg="#F4F2EE" data-theme="light"
+      data-tone="THE GAP" data-label="The Gap">
+
+      <div class="color-buffer"></div>
+
+      <div class="panel panel--principle" id="p-gap">
+        <div class="panel__content panel__content--principle">
+          <span class="caption principle-label">The Gap</span>
+          <div class="principle-headline">
+            <div class="line-mask"><span class="display-l">MOST ORGS DON'T</span></div>
+            <div class="line-mask"><span class="display-l">HAVE A DESIGN</span></div>
+            <div class="line-mask"><span class="display-l">PROBLEM.</span></div>
+          </div>
+          <div class="principle-subhead">
+            <div class="line-mask"><span class="display-m accent-red">THEY HAVE A</span></div>
+            <div class="line-mask"><span class="display-m accent-red">TRANSLATION PROBLEM.</span></div>
+          </div>
+          <p class="essay principle-body principle-body--narrow">The artifact is not the deliverable. The decision is the deliverable. That's the gap most design organizations are sitting in, and it's the one I've spent twenty years learning how to close.</p>
+          <p class="essay org-intro-note">The next question is always the harder one: where exactly does it live?</p>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ============================================================
+         GROUP 3: MINT — Leadership
+         ONE panel: label + headline left, body text right, image bottom-left
+         ============================================================ -->
+    <section class="color-group"
+      data-bg="#5DE2C3" data-theme="light"
+      data-tone="CRAFT + STRATEGY" data-label="The Work">
+
+      <div class="color-buffer"></div>
+
+      <div class="panel panel--leadership">
+        <div class="panel__content panel__content--leadership">
+
+          <div class="leadership-left">
+            <div class="leadership-top">
+              <span class="caption intro-label">The Work</span>
+              <h2 class="leadership-headline" aria-label="Clarity is a business outcome.">
+                <div class="line-mask"><span class="display-l">CLARITY IS A</span></div>
+                <div class="line-mask"><span class="display-l">BUSINESS</span></div>
+                <div class="line-mask"><span class="display-l">OUTCOME.</span></div>
+              </h2>
+            </div>
+            <img class="leadership-image" src="leadership.jpg" alt="Agustin Sanchez in his studio" />
+          </div>
+
+          <div class="leadership-right">
+            <p class="essay body-para" id="leadership-p1">When the problem is well-framed, organizations move with conviction. Priorities are defensible. Resources go to the right place. The people building know what they're optimizing for. The people funding it know what success looks like.</p>
+            <p class="essay body-para" id="leadership-p2">That clarity doesn't emerge on its own. Someone has to look at a complicated situation and turn it into something the organization can act on. That's the translation work. And it determines more about the outcome than anything that happens in the build.</p>
+            <p class="essay body-para" id="leadership-p3">Twenty years of that work teaches you what a well-framed problem looks like. And what it costs when the frame is wrong.</p>
+            <p class="essay org-intro-note">The most important decisions happen before anyone opens a tool.</p>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ============================================================
+         GROUP 3: INK — Organizational Work
+         TWO panels: intro statement, then two-line headline
+         ============================================================ -->
+    <section class="color-group"
+      data-bg="#111111" data-theme="dark"
+      data-tone="SYSTEMS" data-label="Organizational Work">
+
+      <div class="color-buffer"></div>
+
+      <!-- Panel 1: Entry statement -->
+      <div class="panel panel--org-intro">
+        <div class="panel__content panel__content--org-intro">
+          <span class="caption org-label">Organizational Work</span>
+          <h2 class="org-intro-lines" aria-label="Most organizations stall at the same moment.">
+            <div class="line-mask"><span class="display-xl">MOST</span></div>
+            <div class="line-mask"><span class="display-xl">ORGANIZATIONS</span></div>
+            <div class="line-mask"><span class="display-xl">STALL AT THE</span></div>
+            <div class="line-mask"><span class="display-xl">SAME MOMENT.</span></div>
+          </h2>
+          <p class="essay org-intro-note">When priorities get committed before the problem is clear.</p>
+        </div>
+      </div>
+
+      <!-- Panel 2: The two-line diagnosis -->
+      <div class="panel panel--org-statement">
+        <div class="panel__content panel__content--org-statement">
+          <div class="org-diagnosis">
+            <div class="org-lines org-lines--muted">
+              <div class="line-mask"><span class="org-hl">ORGANIZATIONS DON'T STALL</span></div>
+              <div class="line-mask"><span class="org-hl">BECAUSE OF BAD IDEAS.</span></div>
+            </div>
+            <div class="org-lines org-lines--accent">
+              <div class="line-mask"><span class="org-hl accent-red">THEY STALL WHEN</span></div>
+              <div class="line-mask"><span class="org-hl accent-red">ALIGNMENT BREAKS DOWN.</span></div>
+            </div>
+          </div>
+          <p class="essay org-intro-note">Making that breakdown visible — before it becomes a roadmap problem — is where this work begins.</p>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ============================================================
+         GROUP 4: PAPER — Beliefs
+         ONE panel: headline top-left, two-col principles below with divider
+         ============================================================ -->
+    <section class="color-group"
+      data-bg="#F4F2EE" data-theme="light"
+      data-tone="BELIEFS" data-label="Principles">
+
+      <div class="color-buffer"></div>
+
+      <div class="panel panel--beliefs-full">
+        <div class="panel__content panel__content--beliefs-full">
+
+          <div class="beliefs-header">
+            <span class="caption intro-label">Principles</span>
+            <h2 class="beliefs-headline" aria-label="The things that don't change.">
+              <div class="line-mask"><span class="display-l">THE THINGS THAT</span></div>
+              <div class="line-mask"><span class="display-l accent-red">DON'T CHANGE.</span></div>
+            </h2>
+          </div>
+
+          <div class="beliefs-principles">
+            <div class="belief-col" id="p-craft">
+              <div class="principle-headline">
+                <div class="line-mask"><span class="display-s">The tools will change.</span></div>
+                <div class="line-mask"><span class="display-s">Your craft doesn't have to.</span></div>
+              </div>
+              <p class="essay principle-body">The question has never been how fast you can produce — it's whether you know which one is worth keeping. Craft isn't about execution speed. It's the ability to recognize the right answer when you're looking at it. That's the one thing that doesn't get compressed away.</p>
+            </div>
+
+            <div class="beliefs-divider" aria-hidden="true"></div>
+
+            <div class="belief-col" id="p-courage">
+              <div class="principle-headline">
+                <div class="line-mask"><span class="display-s">THE BEST ANSWERS LIVE IN</span></div>
+                <div class="line-mask"><span class="display-s">UNCOMFORTABLE PLACES.</span></div>
+              </div>
+              <p class="essay principle-body">The real answer usually requires someone to say something that makes the room go quiet. That discomfort is signal. Courage mostly looks like precision: being specific about what's true when no one else will be.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ============================================================
+         GROUP 5: INK — Validated Delivery
+         TWO panels: belief statement + Signal-Based Decision System
+         ============================================================ -->
+    <section class="color-group"
+      data-bg="#111111" data-theme="dark"
+      data-tone="DELIVERY" data-label="Delivery">
+
+      <div class="color-buffer"></div>
+
+      <!-- Panel A: Belief statement -->
+      <div class="panel panel--principle" id="p-delivery">
+        <div class="panel__content panel__content--principle">
+          <span class="caption principle-label">Delivery</span>
+          <div class="principle-headline">
+            <div class="line-mask"><span class="display-l">Where belief</span></div>
+            <div class="line-mask"><span class="display-l">becomes practice.</span></div>
+          </div>
+          <div class="principle-subhead">
+            <div class="line-mask"><span class="display-m accent-red">AI compresses the cycle.</span></div>
+            <div class="line-mask"><span class="display-m accent-red">Not the thinking.</span></div>
+          </div>
+          <p class="essay principle-body principle-body--narrow">Most delivery failures are signal failures — teams building toward an answer that was never validated. AI-amplified delivery runs the same rigor at a fraction of the cost. Each phase answers a question before the next one begins.</p>
+        </div>
+      </div>
+
+      <!-- Panel B: Signal-Based Decision System -->
+      <div class="panel panel--framework" id="p-framework">
+        <div class="panel__content panel__content--principle">
+          <span class="caption principle-label">Signal Based Decision System</span>
+          <div class="principle-headline">
+            <div class="line-mask"><span class="display-m">5 Phases. 3 Signals. 2 Gates.</span></div>
+          </div>
+          <p class="essay principle-body principle-body--narrow">Each phase answers a specific question before the next begins — compressing cycle time without compressing the thinking.</p>
+          <div class="delivery-table">
+            <div class="delivery-phase">
+              <span class="caption c-mid delivery-phase__num">01</span>
+              <span class="display-s delivery-phase__name">Align &amp; Frame</span>
+              <span class="body c-mid delivery-phase__intent">Establish informed starting point</span>
+            </div>
+            <div class="delivery-phase delivery-phase--gate">
+              <span class="caption c-mid delivery-phase__num">02</span>
+              <span class="display-s delivery-phase__name">Diverge</span>
+              <span class="body delivery-phase__intent"><span class="gate-marker">⚡</span> Viability Filter — eliminate weak ideas early</span>
+            </div>
+            <div class="delivery-phase">
+              <span class="caption c-mid delivery-phase__num">03</span>
+              <span class="display-s delivery-phase__name">Converge</span>
+              <span class="body c-mid delivery-phase__intent">Strengthen best options</span>
+            </div>
+            <div class="delivery-phase delivery-phase--gate">
+              <span class="caption c-mid delivery-phase__num">04</span>
+              <span class="display-s delivery-phase__name">Deep Validation</span>
+              <span class="body delivery-phase__intent"><span class="gate-marker">⚡</span> Decision Gate — Go / Adjust / Kill</span>
+            </div>
+            <div class="delivery-phase">
+              <span class="caption c-mid delivery-phase__num">05</span>
+              <span class="display-s delivery-phase__name">MVP &amp; Live Signal</span>
+              <span class="body c-mid delivery-phase__intent">Inform next iteration</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel C: AI Process Matrix -->
+      <div class="panel panel--ai-matrix" id="p-ai-matrix">
+        <div class="panel__content panel__content--ai-matrix">
+          <div class="ai-frame">
+
+            <header class="ai-frame__hd">
+              <span class="caption principle-label">AI-Amplified Delivery</span>
+              <p class="ai-frame__thesis">Risk resolves earlier. The gates stay. The timeline compresses.</p>
+            </header>
+
+            <div class="ai-matrix-scroll">
+              <div class="ai-matrix">
+
+                <!-- Phase header row -->
+                <div class="ai-m__corner"></div>
+                <div class="ai-m__ph">
+                  <span class="ai-m__pnum">01</span>
+                  <span class="ai-m__pname">Align &amp; Frame</span>
+                </div>
+                <div class="ai-m__ph ai-m__ph--gate">
+                  <span class="ai-m__pnum">02</span>
+                  <span class="ai-m__pname">Diverge</span>
+                  <span class="ai-m__gate-tag">Gate 01 · Viability</span>
+                </div>
+                <div class="ai-m__ph">
+                  <span class="ai-m__pnum">03</span>
+                  <span class="ai-m__pname">Converge</span>
+                </div>
+                <div class="ai-m__ph ai-m__ph--gate">
+                  <span class="ai-m__pnum">04</span>
+                  <span class="ai-m__pname">Deep Validation</span>
+                  <span class="ai-m__gate-tag">Gate 02 · Go / Adjust / Kill</span>
+                </div>
+                <div class="ai-m__ph">
+                  <span class="ai-m__pnum">05</span>
+                  <span class="ai-m__pname">MVP &amp; Live Signal</span>
+                </div>
+
+                <!-- Strategy row -->
+                <div class="ai-m__disc">Strategy</div>
+                <div class="ai-m__cell ai-m__cell--h">Problem framing</div>
+                <div class="ai-m__cell ai-m__cell--h ai-m__cell--gate">Bet sizing</div>
+                <div class="ai-m__cell ai-m__cell--ai">Scenario modeling</div>
+                <div class="ai-m__cell ai-m__cell--h ai-m__cell--gate">Signal reading</div>
+                <div class="ai-m__cell ai-m__cell--h">Launch decision</div>
+
+                <!-- Design row -->
+                <div class="ai-m__disc">Design</div>
+                <div class="ai-m__cell ai-m__cell--ai">Research synthesis</div>
+                <div class="ai-m__cell ai-m__cell--h ai-m__cell--gate">Direction setting</div>
+                <div class="ai-m__cell ai-m__cell--ai">Concept generation</div>
+                <div class="ai-m__cell ai-m__cell--ai ai-m__cell--gate">Testing synthesis</div>
+                <div class="ai-m__cell ai-m__cell--ai">Production QA</div>
+
+                <!-- Engineering row -->
+                <div class="ai-m__disc">Engineering</div>
+                <div class="ai-m__cell ai-m__cell--h">Feasibility scoping</div>
+                <div class="ai-m__cell ai-m__cell--h ai-m__cell--gate">Architecture review</div>
+                <div class="ai-m__cell ai-m__cell--ai">Rapid prototyping</div>
+                <div class="ai-m__cell ai-m__cell--h ai-m__cell--gate">Integration review</div>
+                <div class="ai-m__cell ai-m__cell--ai">Build &amp; deploy</div>
+
+              </div>
+            </div>
+
+            <footer class="ai-frame__legend">
+              <div class="ai-legend__item ai-legend__item--h">
+                <span class="ai-legend__swatch"></span>Human judgment
+              </div>
+              <div class="ai-legend__item ai-legend__item--ai">
+                <span class="ai-legend__swatch"></span>AI-accelerated
+              </div>
+            </footer>
+
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ============================================================
+         GROUP 6: YELLOW — Curiosity
+         ONE panel: label, XL headline, short body below
+         ============================================================ -->
+    <section class="color-group"
+      data-bg="#FFD500" data-theme="light"
+      data-tone="BELIEFS" data-label="Curiosity">
+
+      <div class="color-buffer"></div>
+
+      <div class="panel panel--principle" id="p-curiosity">
+        <div class="panel__content panel__content--principle">
+          <span class="caption principle-label">Curiosity</span>
+          <div class="principle-headline principle-headline--xl">
+            <div class="line-mask"><span class="display-l">THE FAST ANSWER</span></div>
+            <div class="line-mask"><span class="display-l">IS USUALLY</span></div>
+            <div class="line-mask"><span class="display-l">THE WRONG ONE.</span></div>
+          </div>
+          <p class="essay principle-body principle-body--narrow">The most valuable thing I can bring into a problem space is the willingness to sit with it longer than feels productive. The question usually has more in it than the answer does — and the organizations that let that process run make fewer expensive corrections later.</p>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ============================================================
+         GROUP 7: BLUE — Projects + Footer
+         ONE section, no color change. Sticky panel: headline + table.
+         Footer flows naturally below — same blue background.
+         ============================================================ -->
+    <section class="color-group color-group--projects"
+      data-bg="#0044CC" data-theme="dark"
+      data-tone="WORK" data-label="Presence">
+
+      <div class="color-buffer"></div>
+
+      <div class="projects-section">
+
+        <div class="projects-header">
+          <div class="projects-headline">
+            <div class="line-mask"><span class="display-m">WHERE THE THINKING LIVES.</span></div>
+          </div>
+        </div>
+
+        <div class="projects-table" id="projects-table">
+
+          <a href="https://byagustin.substack.com" target="_blank" rel="noopener noreferrer" class="project-row">
+            <span class="caption c-mid project-row__num">01</span>
+            <span class="display-s project-row__name">Articles</span>
+            <span class="body c-mid project-row__desc">Writing on design, strategy, and where they meet</span>
+            <span class="project-row__arrow" aria-hidden="true">→</span>
+          </a>
+
+          <a href="https://thephotographicjournal.com" target="_blank" rel="noopener noreferrer" class="project-row">
+            <span class="caption c-mid project-row__num">02</span>
+            <span class="display-s project-row__name">The Photographic Journal</span>
+            <span class="body c-mid project-row__desc">Publishing interviews, photo essays, and features.</span>
+            <span class="project-row__arrow" aria-hidden="true">→</span>
+          </a>
+
+          <a href="/plastic-palms-radio" target="_blank" rel="noopener noreferrer" class="project-row">
+            <span class="caption c-mid project-row__num">03</span>
+            <span class="display-s project-row__name">Plastic Palms Radio</span>
+            <span class="body c-mid project-row__desc">An archive of DJ sets streamed on Twitch.tv</span>
+            <span class="project-row__arrow" aria-hidden="true">→</span>
+          </a>
+
+          <a href="https://www.instagram.com/augi_sanchez" target="_blank" rel="noopener noreferrer" class="project-row">
+            <span class="caption c-mid project-row__num">04</span>
+            <span class="display-s project-row__name">Instagram</span>
+            <span class="body c-mid project-row__desc">Photography and everyday life at @augi_sanchez</span>
+            <span class="project-row__arrow" aria-hidden="true">→</span>
+          </a>
+
+          <a href="https://www.linkedin.com/in/agustinsanchez" target="_blank" rel="noopener noreferrer" class="project-row">
+            <span class="caption c-mid project-row__num">05</span>
+            <span class="display-s project-row__name">LinkedIn</span>
+            <span class="body c-mid project-row__desc">Work history and professional background</span>
+            <span class="project-row__arrow" aria-hidden="true">→</span>
+          </a>
+
+        </div>
+
+        <div class="contact-block">
+          <div class="projects-header">
+            <div class="projects-headline">
+              <div class="line-mask"><span class="display-m">GET IN TOUCH.</span></div>
+            </div>
+          </div>
+          <p class="body contact-block__prompt">If you want to work together, send a message.</p>
+          <form
+            class="contact-form"
+            action="https://formspree.io/f/mreyvyqa"
+            method="POST"
+            id="contact-form"
+          >
+            <input class="contact-form__field" type="text" name="name" placeholder="Name" required autocomplete="name" />
+            <textarea class="contact-form__field contact-form__field--area" name="message" placeholder="Message" required rows="4"></textarea>
+            <button class="contact-form__submit" type="submit">Send →</button>
+          </form>
+          <p class="body contact-form__thanks" id="contact-thanks" aria-live="polite" hidden>Message sent. I'll be in touch.</p>
+        </div>
+
+      </div>
+
+      <footer class="footer">
+        <div class="footer__inner">
+          <div class="footer__cols">
+            <div class="footer__left">
+              <span class="body" style="font-weight:500;">Agustin Sanchez</span>
+              <span class="caption c-mid">Design Leader · Miami</span>
+            </div>
+            <div class="footer__right">
+              <p class="essay c-mid footer__personal">Most of the good stuff happened in the revision.</p>
+              <span class="caption c-mid">© 2026 · Made in Miami</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+    </section>
+
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+  <script src="main.js"></script>
+  <script>
+    const form   = document.getElementById('contact-form');
+    const thanks = document.getElementById('contact-thanks');
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('button[type="submit"]');
+        btn.textContent = 'Sending…';
+        btn.disabled = true;
+        try {
+          const res = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { 'Accept': 'application/json' }
+          });
+          if (res.ok) {
+            form.hidden = true;
+            thanks.hidden = false;
+          } else {
+            btn.textContent = 'Try again →';
+            btn.disabled = false;
+          }
+        } catch {
+          btn.textContent = 'Try again →';
+          btn.disabled = false;
+        }
+      });
+    }
+  </script>
+</body>
+</html>

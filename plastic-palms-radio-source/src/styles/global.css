@@ -1,0 +1,369 @@
+/* ============================================================
+   Plastic Palms Radio — Global Styles
+   Light theme mirrored from agustin-sanchez.com
+   ============================================================ */
+
+/* ---- Tokens ---- */
+:root {
+  --ink:       #111111;
+  --paper:     #F4F2EE;
+  --warm-grey: #DADAD6;
+  --mid:       rgba(17, 17, 17, 0.4);
+  --red:       #E8351A;
+  --divider:   rgba(17, 17, 17, 0.1);
+
+  --pad-x:    clamp(24px, 6vw, 96px);
+  --gap:      clamp(16px, 2.5vw, 32px);
+  --header-h: 108px;
+}
+
+/* ---- Reset ---- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: auto; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100svh;
+  overflow-x: hidden;
+}
+
+img { display: block; max-width: 100%; }
+a   { color: inherit; text-decoration: none; }
+
+/* ---- Noise texture overlay (matches main site) ---- */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
+
+/* ---- Skip link ---- */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--pad-x);
+  z-index: 1000;
+  padding: 10px 18px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 0 0 2px 2px;
+  text-decoration: none;
+}
+.skip-link:focus { top: 0; }
+
+/* ---- Focus ---- */
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---- Header ---- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--header-h);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 var(--pad-x);
+  border-bottom: 1px solid var(--divider);
+  background: var(--paper);
+}
+
+.site-header__back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--ink);
+  transition: opacity 0.2s ease;
+}
+.site-header__back:hover { opacity: 0.5; }
+
+.site-header__back-arrow {
+  font-size: 14px;
+  line-height: 1;
+  color: var(--mid);
+}
+
+.site-header__back-name {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+.site-header__logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-header__logo img {
+  height: 64px;
+  width: auto;
+  display: block;
+}
+
+.site-header__spacer {
+  /* mirrors back-link column for perfect logo centering */
+}
+
+/* ---- Empty state ---- */
+.empty-state {
+  padding: 120px var(--pad-x);
+  color: var(--mid);
+}
+
+.empty-state p {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 300;
+  font-size: clamp(15px, 1.1vw, 18px);
+  line-height: 1.7;
+}
+
+.empty-state__hint { margin-top: 16px; font-size: 12px; letter-spacing: 0.06em; }
+
+.empty-state code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  background: rgba(17, 17, 17, 0.06);
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+/* ---- Grid ---- */
+.mix-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--gap);
+  padding: var(--gap) var(--pad-x);
+}
+
+/* ---- Card ---- */
+.mix-card {
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.mix-card:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 0;
+  z-index: 2;
+}
+
+/* Artwork wrapper — 9:16 portrait */
+.card__artwork {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  background: var(--warm-grey);
+  border-radius: 16px;
+  box-shadow:
+    0 4px 8px rgba(17, 17, 17, 0.08),
+    0 8px 24px rgba(17, 17, 17, 0.12);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.mix-card:hover .card__artwork,
+.mix-card:focus-visible .card__artwork {
+  box-shadow:
+    0 24px 48px rgba(17, 17, 17, 0.22),
+    0 48px 96px rgba(17, 17, 17, 0.24);
+  transform: translateY(-16px);
+}
+
+.card__artwork img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: filter 0.3s ease;
+}
+
+.mix-card:hover .card__artwork img,
+.mix-card:focus-visible .card__artwork img {
+  filter: brightness(0.88);
+}
+
+.mix-card[data-active="true"] .card__artwork img {
+  filter: brightness(0.45);
+}
+
+/* Active card: elevated + red ring */
+.mix-card[data-active="true"] .card__artwork {
+  transform: translateY(-16px);
+  box-shadow:
+    inset 0 0 0 4px var(--red),
+    0 24px 48px rgba(17, 17, 17, 0.22),
+    0 48px 96px rgba(17, 17, 17, 0.24);
+}
+
+/* ---- Overlay ---- */
+.card__overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.mix-card:hover .card__overlay,
+.mix-card:focus-visible .card__overlay { opacity: 1; }
+.mix-card[data-active="true"] .card__overlay { opacity: 1; }
+
+/* ---- Play / pause button — proportional to card width, always visible ---- */
+.card__btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  width: 36%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(244, 242, 238, 0.12);
+  border: 1.5px solid rgba(244, 242, 238, 0.45);
+  border-radius: 50%;
+  color: var(--paper);
+  cursor: pointer;
+  pointer-events: none;
+  opacity: 1;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Active + playing only gets the red treatment — all other states look identical */
+.mix-card[data-active="true"][data-playing="true"] .card__btn {
+  background: rgba(232, 53, 26, 0.3);
+  border-color: var(--red);
+}
+
+.icon {
+  width: 45%;
+  height: 45%;
+}
+
+.icon-pause { display: none; }
+.mix-card[data-playing="true"] .icon-play  { display: none; }
+.mix-card[data-playing="true"] .icon-pause { display: block; }
+
+/* ---- Bottom of card: waveform left, time right ---- */
+.card__bottom {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.waveform {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.card__time {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: clamp(13px, 1.4vw, 17px);
+  letter-spacing: 0.06em;
+  color: rgba(244, 242, 238, 0.9);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.mix-card[data-active="true"] .card__time { opacity: 1; }
+
+.waveform__bar {
+  width: 4px;
+  border-radius: 9999px; /* full pill */
+  background: var(--paper);
+  height: 6px;
+  /* CSS fallback animation — JS overrides height when audio plays */
+  animation: bar-bounce 0.8s ease-in-out infinite alternate;
+  animation-play-state: paused;
+  transition: height 0.06s ease;
+}
+
+.waveform__bar:nth-child(1) { animation-delay: 0s;     animation-duration: 0.9s; }
+.waveform__bar:nth-child(2) { animation-delay: 0.12s;  animation-duration: 0.75s; }
+.waveform__bar:nth-child(3) { animation-delay: 0.24s;  animation-duration: 0.85s; }
+.waveform__bar:nth-child(4) { animation-delay: 0.36s;  animation-duration: 0.7s; }
+.waveform__bar:nth-child(5) { animation-delay: 0.18s;  animation-duration: 0.95s; }
+
+.mix-card[data-playing="true"] .waveform__bar { animation-play-state: running; }
+
+/* Inactive card: hide waveform */
+.mix-card[data-active="false"] .waveform { opacity: 0; }
+/* Active + paused: bars faint and static */
+.mix-card[data-active="true"][data-playing="false"] .waveform { opacity: 0.45; }
+/* Active + playing: full */
+.mix-card[data-active="true"][data-playing="true"] .waveform { opacity: 1; }
+
+@keyframes bar-bounce {
+  from { height: 4px; }
+  to   { height: 20px; }
+}
+
+/* ---- Mix number ---- */
+.card__number {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(244, 242, 238, 0.5);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.mix-card:hover .card__number,
+.mix-card:focus-visible .card__number,
+.mix-card[data-active="true"] .card__number { opacity: 1; }
+
+@media (min-width: 1024px) {
+  .mix-grid {
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  }
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .waveform__bar { animation: none !important; transition: none; }
+  .card__artwork { transition: none; transform: none !important; }
+  .card__artwork img { transition: none; }
+  .card__overlay { transition: none; }
+}

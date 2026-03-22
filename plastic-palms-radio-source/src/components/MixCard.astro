@@ -1,0 +1,69 @@
+---
+interface Props {
+  id: string;
+  label: string;
+  audioSrc: string;
+  artworkSrc: string;
+  order: number | null;
+}
+
+const { id, label, audioSrc, artworkSrc, order } = Astro.props;
+const displayLabel = label.charAt(0).toUpperCase() + label.slice(1);
+---
+
+<article
+  class="mix-card"
+  role="listitem"
+  tabindex="0"
+  data-id={id}
+  data-src={audioSrc}
+  data-artwork-src={artworkSrc}
+  data-title={displayLabel}
+  data-active="false"
+  data-playing="false"
+  aria-label={`Mix: ${displayLabel}`}
+>
+  <div class="card__artwork">
+    <img
+      src={artworkSrc}
+      alt={displayLabel}
+      loading="lazy"
+      decoding="async"
+      draggable="false"
+    />
+
+    <!-- Button: independent of overlay, always visible -->
+    <button class="card__btn" data-btn tabindex="-1" aria-label={`Play ${displayLabel}`}>
+      <svg class="icon icon-play" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+      <svg class="icon icon-pause" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M6 19h4V5H6zm8-14v14h4V5z"/>
+      </svg>
+    </button>
+
+    <!-- Overlay: image dim + waveform + time -->
+    <div class="card__overlay" aria-hidden="true">
+      <div class="card__bottom">
+        <div class="waveform">
+          <span class="waveform__bar"></span>
+          <span class="waveform__bar"></span>
+          <span class="waveform__bar"></span>
+          <span class="waveform__bar"></span>
+          <span class="waveform__bar"></span>
+        </div>
+        <div class="card__time">
+          <span class="card__time-current">0:00</span>
+          <span class="card__time-sep"> / </span>
+          <span class="card__time-total">--:--</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {order !== null && (
+    <span class="card__number" aria-hidden="true">
+      {String(order).padStart(3, '0')}
+    </span>
+  )}
+</article>

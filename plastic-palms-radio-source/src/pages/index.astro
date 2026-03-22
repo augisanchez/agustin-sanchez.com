@@ -1,0 +1,260 @@
+---
+import { readdirSync } from 'node:fs';
+import path from 'node:path';
+import MixCard from '../components/MixCard.astro';
+import '../styles/global.css';
+
+const AUDIO_EXTS = ['.mp3'];
+const IMAGE_EXTS  = ['.jpg', '.jpeg', '.png', '.webp'];
+
+// Scan /public/mixes at build time
+const dir = path.join(process.cwd(), 'public/mixes');
+let files: string[] = [];
+try { files = readdirSync(dir) as string[]; } catch {}
+
+// Group by stem
+const stems = new Map<string, { audio?: string; image?: string }>();
+for (const file of files) {
+  if (file.startsWith('.')) continue; // skip .gitkeep etc.
+  const ext  = path.extname(file).toLowerCase();
+  const stem = path.basename(file, ext);
+  if (!stems.has(stem)) stems.set(stem, {});
+  const entry = stems.get(stem)!;
+  if (AUDIO_EXTS.includes(ext) && !entry.audio) entry.audio = file;
+  if (IMAGE_EXTS.includes(ext) && !entry.image) entry.image = file;
+}
+
+// Build valid pairs only
+type Mix = { id: string; order: number | null; label: string; audioSrc: string; artworkSrc: string };
+const mixes: Mix[] = [];
+
+for (const [stem, { audio, image }] of stems) {
+  if (!audio || !image) continue;
+  const match = stem.match(/^(\d+)/);
+  const order = match ? parseInt(match[1], 10) : null;
+  const label = stem.replace(/^\d+-/, '').replace(/-/g, ' ');
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  mixes.push({ id: stem, order, label, audioSrc: `${base}/mixes/${audio}`, artworkSrc: `${base}/mixes/${image}` });
+}
+
+// Sort descending by numeric prefix
+mixes.sort((a, b) => (b.order ?? -1) - (a.order ?? -1));
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Plastic Palms Radio — DJ mix archive" />
+    <title>Plastic Palms Radio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=IBM+Plex+Sans:wght@300;500&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <a class="skip-link" href="#mix-grid">Skip to mixes</a>
+
+    <header class="site-header">
+      <a class="site-header__back" href="/" aria-label="Back to agustin-sanchez.com">
+        <span class="site-header__back-arrow" aria-hidden="true">←</span>
+        <span class="site-header__back-name">Agustin Sanchez</span>
+      </a>
+      <a class="site-header__logo" href={import.meta.env.BASE_URL} aria-label="Plastic Palms Radio home">
+        <img src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/logo.png`} alt="Plastic Palms Radio" />
+      </a>
+      <div class="site-header__spacer" aria-hidden="true"></div>
+    </header>
+
+    <main>
+      <!-- Hidden shared audio element — single instance, source swapped on play -->
+      <audio id="player-audio" preload="none" aria-hidden="true"></audio>
+
+      {mixes.length === 0 ? (
+        <div class="empty-state">
+          <p>No mixes yet.</p>
+          <p class="empty-state__hint">Drop <code>.mp3</code> + artwork into <code>/public/mixes/</code></p>
+        </div>
+      ) : (
+        <div class="mix-grid" id="mix-grid" role="list">
+          {mixes.map((mix) => (
+            <MixCard
+              id={mix.id}
+              label={mix.label}
+              audioSrc={mix.audioSrc}
+              artworkSrc={mix.artworkSrc}
+              order={mix.order}
+            />
+          ))}
+        </div>
+      )}
+    </main>
+
+
+    <script>
+      // ============================================================
+      // Plastic Palms Radio — Player
+      // Single shared <audio>. State from data-* attrs + audio events.
+      // Dynamic waveform via Web Audio API AnalyserNode.
+      // ============================================================
+
+      const audio = document.getElementById('player-audio') as HTMLAudioElement;
+      const grid  = document.getElementById('mix-grid');
+
+      // ---- Web Audio API — dynamic waveform ----
+      let audioCtx: AudioContext | null = null;
+      let analyser: AnalyserNode | null = null;
+      let freqData: Uint8Array | null   = null;
+      let waveRaf: number | null        = null;
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function initAnalyser() {
+        if (audioCtx) return;
+        audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const source = audioCtx.createMediaElementSource(audio);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 64; // → 32 bins, lightweight
+        analyser.smoothingTimeConstant = 0.78;
+        freqData = new Uint8Array(analyser.frequencyBinCount);
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+      }
+
+      function bandAvg(start: number, end: number): number {
+        if (!freqData) return 0;
+        let sum = 0;
+        for (let i = start; i <= end; i++) sum += freqData[i];
+        return sum / (end - start + 1);
+      }
+
+      function tickWaveform() {
+        waveRaf = requestAnimationFrame(tickWaveform);
+        if (!analyser || !freqData) return;
+        analyser.getByteFrequencyData(freqData);
+
+        // 5 bars → 5 frequency bands spread across the spectrum
+        const bands = [
+          bandAvg(0,  2),   // sub-bass
+          bandAvg(3,  5),   // bass
+          bandAvg(6,  10),  // low-mid
+          bandAvg(11, 17),  // mid
+          bandAvg(18, 26),  // upper-mid / hi
+        ];
+
+        const bars = document.querySelectorAll<HTMLElement>(
+          '.mix-card[data-active="true"] .waveform__bar'
+        );
+
+        bars.forEach((bar, i) => {
+          const normalized = bands[i] / 255;
+          const h = 4 + normalized * 20; // 4px min → 24px max
+          bar.style.height = `${h}px`;
+          bar.style.animation = 'none'; // JS drives height, not CSS
+        });
+      }
+
+      function startWaveform() {
+        if (reducedMotion) return;
+        if (waveRaf !== null) cancelAnimationFrame(waveRaf);
+        tickWaveform();
+      }
+
+      function stopWaveform() {
+        if (waveRaf !== null) { cancelAnimationFrame(waveRaf); waveRaf = null; }
+        document.querySelectorAll<HTMLElement>('.waveform__bar').forEach(bar => {
+          bar.style.height = '6px';
+          bar.style.animation = '';
+        });
+      }
+
+      // ---- Time display ----
+      function formatTime(s: number): string {
+        if (!isFinite(s) || isNaN(s)) return '--:--';
+        const m = Math.floor(s / 60);
+        const sec = Math.floor(s % 60);
+        return `${m}:${sec.toString().padStart(2, '0')}`;
+      }
+
+      function updateTimeDisplay() {
+        const active = document.querySelector<HTMLElement>('.mix-card[data-active="true"]');
+        if (!active) return;
+        const curr = active.querySelector<HTMLElement>('.card__time-current');
+        const tot  = active.querySelector<HTMLElement>('.card__time-total');
+        if (curr) curr.textContent = formatTime(audio.currentTime);
+        if (tot)  tot.textContent  = formatTime(audio.duration);
+      }
+
+      function resetTimeDisplay(card: HTMLElement) {
+        const curr = card.querySelector<HTMLElement>('.card__time-current');
+        const tot  = card.querySelector<HTMLElement>('.card__time-total');
+        if (curr) curr.textContent = '0:00';
+        if (tot)  tot.textContent  = '--:--';
+      }
+
+      // ---- Sync card states ----
+      function syncCards(activeId: string | null, playing: boolean) {
+        document.querySelectorAll<HTMLElement>('.mix-card').forEach(card => {
+          const mine = card.dataset.id === activeId;
+          card.dataset.active  = mine ? 'true' : 'false';
+          card.dataset.playing = mine && playing ? 'true' : 'false';
+          const btn = card.querySelector<HTMLButtonElement>('[data-btn]');
+          const title = card.dataset.title ?? '';
+          if (btn) btn.setAttribute('aria-label', mine && playing ? `Pause ${title}` : `Play ${title}`);
+        });
+      }
+
+      // ---- Grid click (event delegation) ----
+      grid?.addEventListener('click', (e: MouseEvent) => {
+        const card = (e.target as Element).closest<HTMLElement>('.mix-card');
+        if (!card) return;
+        const { id, src } = card.dataset as { id?: string; src?: string };
+        if (!id || !src) return;
+
+        if (card.dataset.active === 'true') {
+          audio.paused ? audio.play().catch(() => {}) : audio.pause();
+        } else {
+          audio.pause();
+          // Reset time on previously active card
+          document.querySelectorAll<HTMLElement>('.mix-card').forEach(c => resetTimeDisplay(c));
+          audio.src = src;
+          syncCards(id, true);
+          audio.play().catch(() => syncCards(id, false));
+        }
+      });
+
+      // ---- Keyboard: Enter / Space ----
+      grid?.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        const card = (e.target as Element).closest<HTMLElement>('.mix-card');
+        if (!card) return;
+        e.preventDefault();
+        card.click();
+      });
+
+      // ---- Audio events (source of truth) ----
+      audio.addEventListener('play', () => {
+        initAnalyser();
+        if (audioCtx?.state === 'suspended') audioCtx.resume();
+        startWaveform();
+        const active = document.querySelector<HTMLElement>('.mix-card[data-active="true"]');
+        if (active) syncCards(active.dataset.id ?? null, true);
+      });
+
+      audio.addEventListener('pause', () => {
+        stopWaveform();
+        const active = document.querySelector<HTMLElement>('.mix-card[data-active="true"]');
+        if (active) syncCards(active.dataset.id ?? null, false);
+      });
+
+      audio.addEventListener('timeupdate',     updateTimeDisplay);
+      audio.addEventListener('loadedmetadata', updateTimeDisplay);
+      audio.addEventListener('durationchange', updateTimeDisplay);
+
+      audio.addEventListener('ended', () => {
+        stopWaveform();
+        const active = document.querySelector<HTMLElement>('.mix-card[data-active="true"]');
+        if (active) active.dataset.playing = 'false';
+      });
+    </script>
+  </body>
+</html>

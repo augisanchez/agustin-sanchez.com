@@ -1,0 +1,1049 @@
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+
+:root {
+  --ink:   #111111;
+  --paper: #F4F2EE;
+  --mid:   #333331;   /* darkened: achieves 7:1 on paper, mint, and yellow */
+
+  --pad-x: clamp(32px, 6vw, 96px);
+
+  /* Contextual tokens — override per theme */
+  --c-text:    var(--ink);
+  --c-mid:     var(--mid);
+  --c-accent:  #C52B10;   /* accessible red on light backgrounds — 5.1:1 on paper (large text AAA) */
+  --c-divider: rgba(17, 17, 17, 0.12);
+}
+
+[data-theme="dark"] {
+  --c-text:    var(--paper);
+  --c-mid:     rgba(244, 242, 238, 0.82);  /* raised from 0.55 — achieves 7:1 on ink */
+  --c-accent:  #F03A1C;                     /* accessible red on dark backgrounds — 4.8:1 on ink (large text AAA) */
+  --c-divider: rgba(244, 242, 238, 0.15);
+  color: var(--paper);
+}
+
+/* Blue section: mid-luminance bg needs full-weight secondary text for AAA */
+[data-bg="#0044CC"] {
+  --c-mid: var(--paper);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html { scroll-behavior: auto; }
+
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  color: var(--ink);
+  background-color: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+/* Skip navigation — visually hidden until focused */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--pad-x);
+  z-index: 1000;
+  padding: 12px 20px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 0 0 4px 4px;
+  transition: top 0.15s ease;
+}
+.skip-link:focus { top: 0; }
+
+/* Focus indicators — visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+[data-theme="dark"] :focus-visible {
+  outline-color: var(--paper);
+}
+.project-row:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 0;
+}
+
+/* ============================================================
+   NOISE TEXTURE
+   ============================================================ */
+
+.noise {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0.13;
+}
+
+/* ============================================================
+   PAGE BACKGROUND
+   Fixed layer — GSAP drives all color transitions.
+   ============================================================ */
+
+.page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-color: var(--paper);
+  pointer-events: none;
+}
+
+.color-group {
+  background: transparent;
+  position: relative;
+}
+
+/* COLOR BUFFER — empty scroll space so bg finishes transitioning
+   before sticky content starts pinning */
+.color-buffer {
+  height: 40vh;
+  pointer-events: none;
+}
+
+/* ============================================================
+   TYPOGRAPHY SCALE
+   ============================================================ */
+
+.display-xl {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: clamp(56px, 12vw, 200px);
+  line-height: 0.88;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+  display: block;
+}
+
+.display-l {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: clamp(40px, 7.5vw, 130px);
+  line-height: 0.91;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  display: block;
+}
+
+.display-m {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: clamp(28px, 4.5vw, 76px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.display-s {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: clamp(17px, 2.2vw, 40px);
+  line-height: 1.05;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+}
+
+.org-hl {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: clamp(32px, 6vw, 104px);
+  line-height: 0.91;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  display: block;
+}
+
+.body-l {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 300;
+  font-size: clamp(17px, 1.7vw, 26px);
+  line-height: 1.75;
+}
+
+.body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 300;
+  font-size: clamp(15px, 1.3vw, 21px);
+  line-height: 1.7;
+}
+
+.caption {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.essay {
+  font-family: 'Source Serif 4', serif;
+  font-weight: 500;
+  font-style: normal;
+  font-size: clamp(18px, 1.7vw, 28px);
+  line-height: 1.8;
+}
+
+.accent-red { color: var(--c-accent); }
+.c-mid      { color: var(--c-mid); }
+
+/* ============================================================
+   LINE MASK — headline reveal container
+   ============================================================ */
+
+.line-mask {
+  display: block;
+  overflow: hidden;
+}
+
+.line-mask span {
+  display: block;
+  will-change: transform;
+}
+
+/* ============================================================
+   HUD
+   ============================================================ */
+
+.hud {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 900;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px var(--pad-x);
+  pointer-events: none;
+  opacity: 0;
+  transition: color 0.4s ease;
+}
+
+.hud__left {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.hud__name,
+.hud__tone,
+.hud__role,
+.hud__section { transition: color 0.35s ease; }
+
+.hud__name {
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hud__tone,
+.hud__role,
+.hud__section {
+  color: var(--mid);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hud--dark .hud__name    { color: var(--paper); }
+.hud--dark .hud__tone    { color: rgba(244, 242, 238, 0.72); }
+.hud--dark .hud__role    { color: rgba(244, 242, 238, 0.72); }
+.hud--dark .hud__section { color: rgba(244, 242, 238, 0.72); }
+
+/* ============================================================
+   PANEL SYSTEM
+
+   .panel          = tall scroll container (height = dwell time)
+   .panel__content = sticky inner, pins at 100vh while scrolling
+   ============================================================ */
+
+.panel {
+  position: relative;
+}
+
+.panel__content {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(80px, 12vh, 140px) var(--pad-x);
+  will-change: transform, filter;
+  filter: blur(0px);
+}
+
+/* ============================================================
+   01 — HERO PANEL
+   Bottom-aligned: headline fills upper area, sub-strip at bottom
+   ============================================================ */
+
+.panel--hero { height: 100svh; }
+
+.panel__content--hero {
+  position: relative;
+  justify-content: flex-end;
+  gap: clamp(20px, 3vh, 36px);
+  padding-bottom: clamp(48px, 8vh, 96px);
+}
+
+#hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  background: transparent;
+}
+
+.hero-headline {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-sub {
+  width: 100%;
+}
+
+.strip-rule {
+  height: 1px;
+  background: var(--c-divider);
+  margin-bottom: clamp(20px, 3vh, 36px);
+}
+
+.strip-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--pad-x);
+}
+
+.strip-cols p { max-width: none; }
+
+/* ============================================================
+   01b — CLARITY STATEMENT PANEL
+   Same paper section as identity hero, no color change
+   ============================================================ */
+
+.panel--statement { height: 160vh; }
+
+.panel__content--statement {
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.statement-headline {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   02 — LEADERSHIP PANEL
+   Two columns: label+headline+image left / body text right
+   ============================================================ */
+
+.panel--leadership { height: 160vh; }
+
+.panel__content--leadership {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: clamp(48px, 7vw, 96px);
+  align-items: stretch;
+  padding-top: clamp(80px, 12vh, 140px);
+  padding-bottom: clamp(60px, 10vh, 100px);
+}
+
+.leadership-left {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.leadership-top {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.intro-label {
+  display: block;
+  color: var(--c-mid);
+  margin-bottom: clamp(16px, 2.5vh, 28px);
+  will-change: opacity;
+}
+
+.leadership-headline {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Image fills remaining left-col space after headline */
+.leadership-image {
+  flex: 1;
+  min-height: clamp(160px, 26vh, 380px);
+  margin-top: clamp(24px, 4vh, 48px);
+  width: 100%;
+  object-fit: cover;
+  object-position: 50% 28%;
+  border-radius: 8px;
+  display: block;
+}
+
+.leadership-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: clamp(20px, 3vh, 32px);
+  padding-bottom: clamp(8px, 1.5vh, 20px);
+}
+
+.body-para {
+  will-change: transform, opacity;
+}
+
+/* ============================================================
+   03 — ORG WORK PANELS (two panels)
+   ============================================================ */
+
+/* Panel 1: Entry — label + XL headline, bottom-aligned */
+.panel--org-intro { height: 160vh; } /* already correct */
+
+.panel__content--org-intro {
+  justify-content: flex-end;
+  padding-bottom: clamp(80px, 14vh, 160px);
+}
+
+.org-label {
+  display: block;
+  color: var(--c-mid);
+  margin-bottom: clamp(16px, 2.5vh, 28px);
+}
+
+.org-intro-lines {
+  display: flex;
+  flex-direction: column;
+}
+
+.org-intro-note {
+  color: var(--c-mid);
+  margin-top: clamp(20px, 3vh, 32px);
+}
+
+/* Panel 2: Diagnosis — two-line statement, vertically centered */
+.panel--org-statement { height: 160vh; }
+
+.panel__content--org-statement {
+  justify-content: center;
+}
+
+.org-diagnosis {
+  display: flex;
+  flex-direction: column;
+}
+
+.org-lines {
+  display: flex;
+  flex-direction: column;
+}
+
+.org-lines--muted .org-hl {
+  color: var(--paper);
+}
+
+.org-lines--accent { margin-top: 0.1em; }
+
+/* ============================================================
+   04 — BELIEFS PANEL
+   ONE panel: headline top-left, two-col principles + divider below
+   ============================================================ */
+
+.panel--beliefs-full { height: 160vh; }
+
+.panel__content--beliefs-full {
+  justify-content: center;
+  padding-top: 0;
+  gap: clamp(48px, 7vh, 80px);
+}
+
+.beliefs-header {
+  display: flex;
+  flex-direction: column;
+}
+
+.beliefs-headline {
+  display: flex;
+  flex-direction: column;
+}
+
+.beliefs-principles {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 0 clamp(32px, 5vw, 72px);
+  align-items: start;
+  width: 100%;
+}
+
+.beliefs-divider {
+  background: var(--c-divider);
+  align-self: stretch;
+}
+
+.beliefs-statement {
+  font-size: clamp(22px, 2.2vw, 36px);
+  line-height: 1.55;
+  max-width: 26ch;
+}
+
+.belief-col {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   05 + 06 — PRINCIPLE PANELS (Curiosity, The Gap)
+   ============================================================ */
+
+.panel--principle { height: 160vh; }
+
+.panel__content--principle {
+  justify-content: flex-start;
+  padding-top: clamp(80px, 14vh, 160px);
+}
+
+#p-delivery .panel__content--principle,
+#p-framework .panel__content,
+#p-curiosity .panel__content--principle {
+  justify-content: center;
+  padding-top: 0;
+}
+
+.principle-label {
+  display: block;
+  color: var(--c-mid);
+  margin-bottom: clamp(16px, 2.5vh, 28px);
+}
+
+.principle-headline {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: clamp(20px, 3vh, 40px);
+}
+
+.principle-headline--xl {
+  margin-bottom: clamp(24px, 4vh, 48px);
+}
+
+.principle-subhead {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: clamp(20px, 3vh, 40px);
+}
+
+.principle-body {
+  will-change: transform, opacity;
+}
+
+.principle-body--narrow {
+  max-width: none;
+}
+
+/* ============================================================
+   05b — VALIDATED DELIVERY — Signal-Based Decision System
+   ============================================================ */
+
+.panel--framework { height: 160vh; }
+
+.delivery-table {
+  width: 100%;
+  border-top: 1px solid var(--c-divider);
+  margin-top: clamp(24px, 4vh, 48px);
+}
+
+.delivery-phase {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: baseline;
+  gap: clamp(12px, 2.5vw, 40px);
+  padding: clamp(14px, 2.2vh, 24px) 0;
+  border-bottom: 1px solid var(--c-divider);
+}
+
+.delivery-phase__intent {
+  text-align: right;
+}
+
+.delivery-phase--gate .delivery-phase__intent {
+  color: var(--c-accent);
+}
+
+.gate-marker {
+  margin-right: 0.3em;
+}
+
+/* ============================================================
+   06b — AI PROCESS MATRIX
+   Panel C of the Delivery section. Dark background, 6-column
+   CSS Grid. Human-judgment cells filled, AI cells outlined.
+   Red right-border on gate columns.
+   ============================================================ */
+
+.panel--ai-matrix { height: 220vh; }
+
+.panel__content--ai-matrix {
+  justify-content: center;
+  padding: clamp(48px, 7vh, 96px) clamp(32px, 6vw, 80px);
+}
+
+.ai-frame {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(28px, 4vh, 52px);
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.ai-frame__hd {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ai-frame__thesis {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: clamp(13px, 1.2vw, 17px);
+  font-weight: 300;
+  color: var(--paper);
+  opacity: 0.5;
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+  max-width: 52ch;
+}
+
+/* Scrollable wrapper for small screens */
+.ai-matrix-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 6-col grid: [label] + 5 phases */
+.ai-matrix {
+  display: grid;
+  grid-template-columns: 90px repeat(5, 1fr);
+  grid-auto-rows: auto;
+  gap: 2px;
+  min-width: 560px;
+}
+
+/* ── Phase header cells ── */
+.ai-m__corner { /* empty top-left */ }
+
+.ai-m__ph {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 14px 16px 18px;
+  border-bottom: 1px solid rgba(244, 242, 238, 0.10);
+  position: relative;
+}
+
+.ai-m__ph--gate {
+  border-right: 1.5px solid var(--c-accent);
+}
+
+.ai-m__pnum {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: clamp(9px, 0.8vw, 11px);
+  color: var(--c-mid);
+  letter-spacing: 0.1em;
+}
+
+.ai-m__pname {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: clamp(11px, 1vw, 13px);
+  font-weight: 600;
+  color: var(--paper);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  line-height: 1.3;
+}
+
+.ai-m__gate-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: clamp(9px, 0.75vw, 10px);
+  color: var(--c-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+/* ── Discipline label cells ── */
+.ai-m__disc {
+  display: flex;
+  align-items: center;
+  padding: 14px 0;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: clamp(10px, 0.85vw, 12px);
+  font-weight: 600;
+  color: var(--paper);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-top: 1px solid rgba(244, 242, 238, 0.07);
+  opacity: 0.65;
+}
+
+/* ── Activity cells ── */
+.ai-m__cell {
+  padding: 14px 16px 16px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: clamp(11px, 1vw, 13px);
+  font-weight: 400;
+  line-height: 1.45;
+  border-top: 1px solid rgba(244, 242, 238, 0.07);
+  border-right: 1px solid rgba(244, 242, 238, 0.04);
+}
+
+/* Human: filled, full weight */
+.ai-m__cell--h {
+  background: rgba(244, 242, 238, 0.09);
+  color: var(--paper);
+  font-weight: 500;
+}
+
+/* AI: no fill, dimmed — visually "lighter" */
+.ai-m__cell--ai {
+  background: transparent;
+  color: rgba(244, 242, 238, 0.38);
+}
+
+/* Gate column marker: red right border */
+.ai-m__cell--gate {
+  border-right: 1.5px solid rgba(197, 43, 16, 0.45);
+}
+
+/* ── Legend ── */
+.ai-frame__legend {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.ai-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: clamp(10px, 0.9vw, 12px);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--paper);
+  opacity: 0.45;
+}
+
+.ai-legend__swatch {
+  width: 20px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.ai-legend__item--h .ai-legend__swatch {
+  background: rgba(244, 242, 238, 0.55);
+}
+
+.ai-legend__item--ai .ai-legend__swatch {
+  background: transparent;
+  border: 1px solid rgba(244, 242, 238, 0.28);
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .ai-m__ph,
+  .ai-m__disc,
+  .ai-m__cell { opacity: 1 !important; transform: none !important; }
+}
+
+/* ============================================================
+   07 — PROJECTS + FOOTER
+   Normal scroll flow — no stickiness.
+   ============================================================ */
+
+.projects-section {
+  padding: clamp(80px, 12vh, 140px) var(--pad-x) clamp(48px, 8vh, 80px);
+}
+
+.projects-header {
+  margin-bottom: clamp(24px, 4vh, 48px);
+}
+
+
+.projects-headline {
+  display: flex;
+  flex-direction: column;
+  margin-top: clamp(10px, 1.5vh, 20px);
+  margin-bottom: clamp(24px, 4vh, 48px);
+  max-width: 100%;
+}
+
+@media (min-width: 769px) {
+  .projects-headline { max-width: 50vw; }
+}
+
+.projects-table {
+  width: 100%;
+  border-top: 1px solid var(--c-divider);
+}
+
+.project-row {
+  display: grid;
+  grid-template-columns: 55px 1fr auto 44px;
+  align-items: center;
+  gap: clamp(12px, 2.5vw, 40px);
+  padding: clamp(18px, 2.8vh, 32px) 0;
+  border-bottom: 1px solid var(--c-divider);
+  position: relative;
+  cursor: pointer;
+  will-change: opacity;
+}
+
+.project-row__desc {
+  text-align: right;
+}
+
+.project-row__arrow {
+  text-align: right;
+  font-size: 1.1em;
+  display: block;
+  will-change: transform;
+}
+
+/* Row hover */
+.project-row::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--paper) 8%, transparent);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+.project-row:hover::before { opacity: 1; }
+
+/* Footer */
+.footer {
+  padding: clamp(60px, 10vh, 100px) var(--pad-x) clamp(48px, 8vh, 80px);
+}
+
+.footer__cols {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.footer__left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.footer__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.footer__personal {
+  will-change: transform, opacity;
+}
+
+.contact-block {
+  padding: clamp(120px, 18vh, 200px) 0 clamp(32px, 5vh, 56px);
+  margin-bottom: clamp(8px, 1vh, 16px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(24px, 4vh, 48px);
+}
+
+/* Zero out nested header/headline margins — gap handles all spacing */
+.contact-block .projects-header  { margin-bottom: 0; }
+.contact-block .projects-headline { margin-top: 0; margin-bottom: 0; }
+
+.contact-block__prompt {
+  color: color-mix(in srgb, var(--paper) 55%, transparent);
+}
+
+/* ---- Contact form ---- */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 480px;
+}
+
+.contact-form__field {
+  background: var(--paper);
+  border: 1px solid var(--paper);
+  border-radius: 4px;
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: clamp(14px, 1.1vw, 16px);
+  font-weight: 300;
+  padding: 12px 16px;
+  outline: none;
+  transition: box-shadow 0.2s ease;
+  width: 100%;
+}
+
+.contact-form__field::placeholder {
+  color: rgba(17, 17, 17, 0.45);
+}
+
+.contact-form__field:focus {
+  box-shadow: 0 0 0 3px rgba(244, 242, 238, 0.5);
+}
+
+.contact-form__field--area { resize: vertical; min-height: 100px; }
+
+.contact-form__submit {
+  align-self: flex-start;
+  background: var(--paper);
+  border: none;
+  border-radius: 4px;
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: clamp(13px, 1vw, 15px);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.contact-form__submit:hover  { opacity: 0.8; }
+.contact-form__submit:disabled { opacity: 0.45; cursor: default; }
+
+.contact-form__thanks {
+  color: color-mix(in srgb, var(--paper) 70%, transparent);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (min-width: 769px) {
+  .principle-body--narrow { max-width: 50vw; }
+}
+
+@media (max-width: 768px) {
+
+  .hud {
+    padding: 14px var(--pad-x);
+  }
+
+  .hud__role { display: none; }
+
+  .panel__content {
+    padding-top: clamp(56px, 8vh, 80px);
+    padding-bottom: clamp(32px, 5vh, 56px);
+  }
+
+  .color-buffer { height: 28vh; }
+
+  .strip-cols {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .panel__content--leadership {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .leadership-image { display: none; }
+
+  .beliefs-principles {
+    grid-template-columns: 1fr;
+    gap: 40px 0;
+  }
+
+  .beliefs-divider { display: none; }
+
+  .delivery-phase {
+    grid-template-columns: 32px 1fr;
+  }
+
+  .delivery-phase__intent { display: none; }
+
+  .project-row {
+    grid-template-columns: 44px 1fr 32px;
+  }
+
+  .project-row__desc { display: none; }
+
+  .footer__cols {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .footer__right { align-items: flex-start; }
+
+}
+
+/* ============================================================
+   REDUCED MOTION — disable animations for users who prefer it
+   GSAP is also paused via JS when this preference is detected.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Ensure sticky panel content is always fully visible */
+  .panel__content {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+
+  /* Ensure line-mask content is always visible */
+  .line-mask span {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  /* Remove smooth scroll */
+  html { scroll-behavior: auto; }
+}
