@@ -409,8 +409,8 @@ img { display: block; max-width: 100%; }
   min-height: clamp(160px, 26vh, 380px);
   margin-top: clamp(24px, 4vh, 48px);
   width: 100%;
-  object-fit: cover;
-  object-position: 50% 28%;
+  object-fit: contain;
+  object-position: 50% 100%;
   border-radius: 8px;
   display: block;
 }
