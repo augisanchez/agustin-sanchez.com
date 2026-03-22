@@ -1020,6 +1020,105 @@ img { display: block; max-width: 100%; }
 }
 
 /* ============================================================
+   SHORT VIEWPORT — 16:9 screens, Windows laptops, 1080p
+   Reduces vertical padding and spacing so panels fit without
+   clipping. Targets viewports ≤ 800px tall (e.g. 1080p with
+   browser chrome ≈ 950px → Windows 125% DPI ≈ 760px).
+   ============================================================ */
+
+@media (max-height: 800px) {
+
+  /* Base panel padding — main driver of clip on short screens */
+  .panel__content {
+    padding-top: clamp(40px, 6vh, 80px);
+    padding-bottom: clamp(28px, 4vh, 60px);
+  }
+
+  /* Leadership — has its own overrides */
+  .panel__content--leadership {
+    padding-top: clamp(40px, 6vh, 80px);
+    padding-bottom: clamp(28px, 4vh, 56px);
+    gap: clamp(28px, 4vw, 64px);
+  }
+
+  .leadership-image {
+    min-height: clamp(100px, 16vh, 220px);
+    margin-top: clamp(16px, 2.5vh, 32px);
+  }
+
+  .leadership-right {
+    gap: clamp(10px, 1.5vh, 18px);
+  }
+
+  /* Org intro — bottom-aligned, reduce bottom push */
+  .panel__content--org-intro {
+    padding-bottom: clamp(40px, 7vh, 96px);
+  }
+
+  /* Beliefs — reduce gap between header and grid */
+  .panel__content--beliefs-full {
+    gap: clamp(24px, 3.5vh, 48px);
+  }
+
+  /* Principle — top-aligned panels */
+  .panel__content--principle {
+    padding-top: clamp(40px, 7vh, 96px);
+  }
+
+  /* AI Matrix */
+  .panel__content--ai-matrix {
+    padding: clamp(24px, 3.5vh, 52px) clamp(32px, 6vw, 80px);
+  }
+
+  .ai-frame {
+    gap: clamp(14px, 2vh, 28px);
+  }
+
+  .ai-m__ph,
+  .ai-m__cell {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  /* Delivery table rows */
+  .delivery-phase {
+    padding-top: clamp(8px, 1.2vh, 16px);
+    padding-bottom: clamp(8px, 1.2vh, 16px);
+  }
+
+  /* Spacing between label → headline → body in principle panels */
+  .intro-label,
+  .org-label,
+  .principle-label {
+    margin-bottom: clamp(10px, 1.4vh, 20px);
+  }
+
+  .principle-headline {
+    margin-bottom: clamp(10px, 1.6vh, 24px);
+  }
+
+  .principle-headline--xl {
+    margin-bottom: clamp(12px, 1.8vh, 28px);
+  }
+
+  .principle-subhead {
+    margin-bottom: clamp(10px, 1.6vh, 24px);
+  }
+
+  .org-intro-note {
+    margin-top: clamp(12px, 1.8vh, 24px);
+  }
+
+  /* Strip rule gap in hero */
+  .strip-rule {
+    margin-bottom: clamp(12px, 1.8vh, 24px);
+  }
+
+  /* Color buffer — less scroll dwell between sections */
+  .color-buffer { height: 24vh; }
+}
+
+/* ============================================================
    REDUCED MOTION — disable animations for users who prefer it
    GSAP is also paused via JS when this preference is detected.
    ============================================================ */

@@ -360,6 +360,74 @@ body::after {
   }
 }
 
+/* ---- Mobile: 2×2 grid, tighter spacing ---- */
+@media (max-width: 767px) {
+  :root {
+    --header-h: 68px;
+    --pad-x: clamp(16px, 4vw, 24px);
+    --gap: 12px;
+  }
+
+  .site-header__logo img {
+    height: 44px;
+  }
+
+  .mix-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--gap);
+    padding: var(--gap) var(--pad-x);
+  }
+
+  /* Card number: slightly smaller on mobile */
+  .card__number {
+    font-size: 9px;
+    top: 8px;
+    right: 8px;
+  }
+
+  /* Bottom overlay: tighter insets */
+  .card__bottom {
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+  }
+
+  /* Time display: smaller on narrow cards */
+  .card__time {
+    font-size: 11px;
+  }
+}
+
+/* ---- Touch devices: remove hover effects ---- */
+@media (hover: none) {
+  /* No lift or shadow change on hover — active state handles feedback */
+  .mix-card:hover .card__artwork {
+    transform: none;
+    box-shadow:
+      0 4px 8px rgba(17, 17, 17, 0.08),
+      0 8px 24px rgba(17, 17, 17, 0.12);
+  }
+
+  .mix-card:hover .card__artwork img {
+    filter: none;
+  }
+
+  /* Overlay stays hidden on hover — only appears on active */
+  .mix-card:hover .card__overlay {
+    opacity: 0;
+  }
+
+  /* Card number stays hidden on hover — only appears on active */
+  .mix-card:hover .card__number {
+    opacity: 0;
+  }
+
+  /* Back link — no opacity change */
+  .site-header__back:hover {
+    opacity: 1;
+  }
+}
+
 /* ---- Reduced motion ---- */
 @media (prefers-reduced-motion: reduce) {
   .waveform__bar { animation: none !important; transition: none; }
