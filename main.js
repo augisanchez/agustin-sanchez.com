@@ -645,154 +645,90 @@ gsap.to('.footer__personal', {
 });
 
 /* ============================================================
-   14. HERO CANVAS WAVE — WebGL SDF light ribbon
-   Two overlapping sine-wave ribbons rendered via SDF glow.
-   Orange (#FF6930 family). Mouse-interactive with lerped spring.
+   14. HERO GRID — Canvas 2D dot field with cursor proximity
+   A fine grid of ink-coloured dots fills the hero canvas.
+   At rest they breathe at ~7% opacity. As the cursor moves
+   near a dot it scales up, brightens, and shifts toward red
+   (#C52B10) via a smoothstep proximity field (radius 200 px).
+   A soft halo ring amplifies the glow for nearby dots —
+   echoing the Stitch/Google grid aesthetic but keyed to the
+   site's ink/paper/red palette.
    Pauses via IntersectionObserver when hero is off-screen.
-   Skipped if prefers-reduced-motion or WebGL unavailable.
+   Skipped if prefers-reduced-motion.
    ============================================================ */
 
-(function initHeroWave() {
+(function initHeroGrid() {
   if (prefersReducedMotion) return;
 
   const canvas = document.getElementById('hero-canvas');
   if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
 
-  const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
-  if (!gl) return;
+  /* ---- Palette — ink #1A1814, red #C52B10 ---- */
+  const INK = [26, 24, 20];
+  const RED = [197, 43, 16];
 
-  /* ---- Vertex shader: full-screen quad pass-through ---- */
-  const vertSrc = `
-    attribute vec2 a_pos;
-    void main() {
-      gl_Position = vec4(a_pos, 0.0, 1.0);
+  /* ---- Grid configuration ---- */
+  const CELL        = 44;      // logical px between grid intersections
+  const R_REST      = 1.1;     // dot radius at rest (logical px)
+  const R_MAX       = 2.9;     // dot radius at full cursor proximity
+  const A_REST      = 0.07;    // opacity at rest
+  const A_MAX       = 0.52;    // opacity at full cursor proximity
+  const INFLUENCE   = 200;     // cursor influence radius (logical px)
+  const BREATHE_AMP = 0.018;   // breathing alpha amplitude (±)
+  const BREATHE_SPD = 0.00044; // breathing angular speed (rad/ms)
+
+  let W, H, dots = [], dpr;
+
+  /* ---- Build dot array on resize ---- */
+  function buildGrid() {
+    dpr = Math.min(devicePixelRatio, 2);
+    W   = canvas.clientWidth;
+    H   = canvas.clientHeight;
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // draw in logical coords
+
+    const offX = (W % CELL) * 0.5;
+    const offY = (H % CELL) * 0.5;
+    dots = [];
+    const cols = Math.ceil(W / CELL) + 1;
+    const rows = Math.ceil(H / CELL) + 1;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        dots.push({
+          x:     offX + c * CELL,
+          y:     offY + r * CELL,
+          phase: Math.random() * Math.PI * 2, // staggered breathing
+        });
+      }
     }
-  `;
-
-  /* ---- Fragment shader: 2D SDF wave with glow ---- */
-  const fragSrc = `
-    precision highp float;
-
-    uniform float u_time;
-    uniform vec2  u_resolution;
-    uniform vec2  u_mouse;
-
-    float hash(vec2 p) {
-      return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-    }
-
-    void main() {
-      vec2 uv = gl_FragCoord.xy / u_resolution;
-
-      /* Aspect-corrected centred coordinates */
-      float aspect = u_resolution.x / u_resolution.y;
-      vec2 p;
-      p.x = (uv.x - 0.5) * aspect;
-      p.y = (1.0 - uv.y) - 0.5;
-
-      /* Mouse in same space */
-      vec2 m;
-      m.x = (u_mouse.x / u_resolution.x - 0.5) * aspect;
-      m.y = (1.0 - u_mouse.y / u_resolution.y) - 0.5;
-
-      /* Wave paths — mouse shifts Y centre */
-      float mi = m.y * 0.25;
-      float w1 = sin(p.x * 4.5 + u_time * 0.7)  * 0.06
-               + sin(p.x * 2.2 - u_time * 0.35) * 0.04
-               + mi;
-      float w2 = sin(p.x * 3.0 + u_time * 1.0 + 1.6) * 0.04
-               + sin(p.x * 7.0 - u_time * 0.55) * 0.02
-               + mi * 0.5;
-
-      /* SDF glow — primary + secondary ribbon */
-      float d1   = abs(p.y - w1);
-      float d2   = abs(p.y - w2);
-      float glow = 0.0035 / (d1 + 0.008)
-                 + 0.0015 / (d2 + 0.012);
-      glow = clamp(glow, 0.0, 1.0);
-
-      /* Orange (#FF6930) + analog film grain */
-      vec3 col = vec3(1.0, 0.412, 0.188) * glow;
-      col += hash(uv * 800.0 + u_time) * 0.035 * glow;
-
-      gl_FragColor = vec4(col, glow * 0.88);
-    }
-  `;
-
-  /* ---- Compile helpers ---- */
-  function compileShader(type, src) {
-    const sh = gl.createShader(type);
-    gl.shaderSource(sh, src);
-    gl.compileShader(sh);
-    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
-      console.warn('Hero wave shader error:', gl.getShaderInfoLog(sh));
-      gl.deleteShader(sh);
-      return null;
-    }
-    return sh;
   }
 
-  const vert = compileShader(gl.VERTEX_SHADER,   vertSrc);
-  const frag = compileShader(gl.FRAGMENT_SHADER, fragSrc);
-  if (!vert || !frag) return;
+  new ResizeObserver(buildGrid).observe(canvas);
+  buildGrid();
 
-  const prog = gl.createProgram();
-  gl.attachShader(prog, vert);
-  gl.attachShader(prog, frag);
-  gl.linkProgram(prog);
-  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
-    console.warn('Hero wave link error:', gl.getProgramInfoLog(prog));
-    return;
+  /* ---- Mouse tracking (window-level: canvas has pointer-events:none) ---- */
+  const mouse   = { x: -9999, y: -9999 };
+  const mSmooth = { x: -9999, y: -9999 };
+
+  if (!isMobile) {
+    window.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      if (e.clientX >= rect.left && e.clientX <= rect.right &&
+          e.clientY >= rect.top  && e.clientY <= rect.bottom) {
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+      } else {
+        mouse.x = -9999;
+        mouse.y = -9999;
+      }
+    });
   }
-  gl.useProgram(prog);
 
-  /* ---- Full-screen quad (two triangles) ---- */
-  const buf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-    -1, -1,   1, -1,  -1,  1,
-     1, -1,   1,  1,  -1,  1,
-  ]), gl.STATIC_DRAW);
-
-  const aPos = gl.getAttribLocation(prog, 'a_pos');
-  gl.enableVertexAttribArray(aPos);
-  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
-
-  /* ---- Uniform locations ---- */
-  const u_time = gl.getUniformLocation(prog, 'u_time');
-  const u_res  = gl.getUniformLocation(prog, 'u_resolution');
-  const u_mouse = gl.getUniformLocation(prog, 'u_mouse');
-
-  /* ---- Blending: premultiplied alpha ---- */
-  gl.enable(gl.BLEND);
-  gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-
-  /* ---- State ---- */
-  const mouse       = { x: 0, y: 0 };
-  const mouseTarget = { x: 0, y: 0 };
-  let raf     = null;
-  let visible = true;
-  let t0      = null;
-
-  /* ---- Resize ---- */
-  function resize() {
-    const dpr = Math.min(devicePixelRatio, 2);
-    canvas.width  = canvas.clientWidth  * dpr;
-    canvas.height = canvas.clientHeight * dpr;
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.useProgram(prog);
-    gl.uniform2f(u_res, canvas.width, canvas.height);
-  }
-  new ResizeObserver(resize).observe(canvas);
-  resize();
-
-  /* ---- Mouse ---- */
-  window.addEventListener('mousemove', (e) => {
-    mouseTarget.x = e.clientX;
-    mouseTarget.y = e.clientY;
-  });
-
-  /* ---- IntersectionObserver: pause RAF when hero off-screen ---- */
+  /* ---- IntersectionObserver: pause RAF when hero is off-screen ---- */
+  let raf = null, visible = true, t0 = null;
   const heroPanel = canvas.closest('.panel--hero');
   if (heroPanel) {
     new IntersectionObserver((entries) => {
@@ -806,18 +742,49 @@ gsap.to('.footer__personal', {
     raf = requestAnimationFrame(render);
     if (!visible) return;
     if (!t0) t0 = ts;
+    const t = (ts - t0) * BREATHE_SPD;
 
-    /* Lerp mouse toward cursor (5% per frame ≈ spring lag) */
-    mouse.x += (mouseTarget.x - mouse.x) * 0.05;
-    mouse.y += (mouseTarget.y - mouse.y) * 0.05;
+    /* Smooth cursor spring (7% lerp ≈ 100 ms lag) */
+    const k = 0.07;
+    mSmooth.x += (mouse.x - mSmooth.x) * k;
+    mSmooth.y += (mouse.y - mSmooth.y) * k;
 
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    ctx.clearRect(0, 0, W, H);
 
-    gl.useProgram(prog);
-    gl.uniform1f(u_time,  (ts - t0) * 0.001);
-    gl.uniform2f(u_mouse, mouse.x, mouse.y);
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    for (const d of dots) {
+      /* Breathing pulse — staggered per dot */
+      const breath = Math.sin(t + d.phase) * BREATHE_AMP;
+
+      /* Cursor proximity — smoothstep falloff */
+      const dx   = d.x - mSmooth.x;
+      const dy   = d.y - mSmooth.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const raw  = Math.max(0, 1 - dist / INFLUENCE);
+      const prox = raw * raw * (3 - 2 * raw); // smoothstep
+
+      /* Final visual values */
+      const alpha  = Math.min(A_REST + breath + prox * (A_MAX - A_REST), 1);
+      const radius = R_REST + prox * (R_MAX - R_REST);
+
+      /* Color: lerp ink → red as prox increases */
+      const r = Math.round(INK[0] + prox * (RED[0] - INK[0]));
+      const g = Math.round(INK[1] + prox * (RED[1] - INK[1]));
+      const b = Math.round(INK[2] + prox * (RED[2] - INK[2]));
+
+      /* Core dot */
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+      ctx.fill();
+
+      /* Soft halo glow for proximate dots (Stitch-like bloom) */
+      if (prox > 0.12) {
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, radius * 3.8, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r},${g},${b},${prox * 0.09})`;
+        ctx.fill();
+      }
+    }
   }
 
   raf = requestAnimationFrame(render);

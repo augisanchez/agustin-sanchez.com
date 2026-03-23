@@ -138,7 +138,7 @@ img { display: block; max-width: 100%; }
 /* COLOR BUFFER — empty scroll space so bg finishes transitioning
    before sticky content starts pinning */
 .color-buffer {
-  height: 40vh;
+  height: 60vh;
   pointer-events: none;
 }
 
@@ -1266,7 +1266,7 @@ img { display: block; max-width: 100%; }
   }
 
   /* Color buffer — less scroll dwell between sections */
-  .color-buffer { height: 24vh; }
+  .color-buffer { height: 40vh; }
 }
 
 /* ============================================================
