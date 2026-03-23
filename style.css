@@ -635,10 +635,10 @@ img { display: block; max-width: 100%; }
 /* 6-col grid: [label] + 5 phases */
 .ai-matrix {
   display: grid;
-  grid-template-columns: 112px repeat(5, 1fr);
+  grid-template-columns: 128px repeat(5, 1fr);
   grid-auto-rows: auto;
   gap: 0;
-  min-width: 560px;
+  min-width: 580px;
 }
 
 /* ── Phase header cells ── */
@@ -694,7 +694,8 @@ img { display: block; max-width: 100%; }
   font-weight: 600;
   color: var(--paper);
   text-transform: uppercase;
-  letter-spacing: 0.08em; /* reduced from 0.12em — gives Engineering room in 112px col */
+  letter-spacing: 0.06em;
+  white-space: nowrap;
   border-top: 1px solid var(--c-divider);
   overflow: hidden;
   opacity: 0.75;
@@ -723,7 +724,7 @@ img { display: block; max-width: 100%; }
 /* AI: no fill, dimmed — visually "lighter" */
 .ai-m__cell--ai {
   background: transparent;
-  color: rgba(244, 242, 238, 0.65); /* 7.57:1 on ink — AAA small text */
+  color: rgba(244, 242, 238, 0.75); /* 9.65:1 on ink — AAA comfortable margin */
 }
 
 /* Gate column marker: red right border */
@@ -999,6 +1000,20 @@ img { display: block; max-width: 100%; }
   }
 
   .footer__right { align-items: flex-start; }
+
+  /* Compression Map: reduce cell padding on mobile so the table breathes at 580px min-width */
+  .ai-m__ph {
+    padding: 10px 8px 12px;
+    gap: 3px;
+  }
+
+  .ai-m__cell {
+    padding: 10px 8px;
+  }
+
+  .ai-m__disc {
+    padding: 10px 0;
+  }
 
 }
 
