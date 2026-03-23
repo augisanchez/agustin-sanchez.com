@@ -15,9 +15,10 @@ gsap.registerPlugin(ScrollTrigger);
    ============================================================ */
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-// Touch devices: phones, all iPad orientations, and any coarse-pointer
-// device (touchscreen laptops, Surface, etc.) regardless of width.
-const isMobile            = window.matchMedia('(max-width: 1024px), (pointer: coarse)').matches;
+// Phone-only flag — tablets (iPad, Surface) get full desktop treatment:
+// Lenis smooth scroll, GSAP scrub bg transitions, sticky panels, and
+// all animations. Only phones (≤768px) fall back to native scroll.
+const isMobile            = window.matchMedia('(max-width: 768px)').matches;
 
 /* ============================================================
    1. LENIS — weighted smooth scroll
@@ -41,12 +42,12 @@ if (prefersReducedMotion) {
 
 /* ============================================================
    2. PAGE BACKGROUND — color transitions
-   Desktop: scrub-driven against tall sticky panel dwell height.
-   Touch (phone + iPad): each section owns its background-color
-   directly. This guarantees the correct bg is visible as soon
-   as the section enters the viewport — before any content —
-   because the section's padding-top is blank colored space.
-   No scrub, no IntersectionObserver race conditions.
+   Desktop + tablet: GSAP scrub tied to sticky panel dwell height.
+   Transitions begin at 'top 85%' and complete by 'top 15%' —
+   the color-buffer gap ensures bg is always ahead of content.
+   Phone: scroll-driven CSS transition on page-bg. Sections stay
+   transparent; a passive scroll listener picks the active section
+   and updates page-bg color; CSS handles the 0.7s animation.
    ============================================================ */
 
 const pageBg = document.getElementById('page-bg');

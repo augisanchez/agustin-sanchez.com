@@ -981,9 +981,16 @@ img { display: block; max-width: 100%; }
    all content is immediately visible without GSAP initial states.
    ============================================================ */
 
-@media (max-width: 1024px), (pointer: coarse) {
+/* ============================================================
+   PHONE — structural overrides (≤768px only)
+   Tablets and iPads (>768px) get the full desktop treatment:
+   Lenis smooth scroll, GSAP scrub, sticky panels, animations.
+   Phones use native scroll, CSS bg transitions, document flow.
+   ============================================================ */
 
-  /* ─── Kill sticky panel system ─── */
+@media (max-width: 768px) {
+
+  /* ─── Kill sticky panel system on phones ─── */
   .panel { height: auto !important; }
 
   .panel__content {
@@ -991,10 +998,6 @@ img { display: block; max-width: 100%; }
     height: auto !important;
     overflow: visible !important;
     min-height: 0 !important;
-    /* More generous vertical breathing room — base desktop value was
-       tuned for 100svh sticky containers, not natural document flow */
-    padding-top:    clamp(100px, 15vh, 180px);
-    padding-bottom: clamp(100px, 15vh, 180px);
   }
 
   /* Hero stays full-height */
@@ -1005,23 +1008,35 @@ img { display: block; max-width: 100%; }
     overflow: hidden !important;
   }
 
-  /* color-buffer is desktop-only (sticky panel transition timing).
-     Sections own their background directly on touch devices. */
+  /* color-buffer is part of the desktop sticky timing system —
+     phones use document flow so the gap is not needed */
   .color-buffer { display: none; }
 
-  /* ─── Typography — bigger body, full width ─── */
-  .essay {
-    font-size: clamp(19px, 2.2vw, 21px);
-    line-height: 1.75;
+  /* ─── Override GSAP initial states — phones skip animations ─── */
+  .panel__content,
+  .intro-label, .org-label, .principle-label,
+  .leadership-headline, .org-intro-lines, .beliefs-headline,
+  .principle-headline, .principle-subhead, .principle-body,
+  .org-diagnosis, .ai-frame,
+  .body-para, .org-intro-note,
+  .ai-m__ph, .ai-m__disc, .ai-m__cell {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
   }
 
+  .line-mask span {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  /* ─── Typography — full width on phone ─── */
   .principle-body--narrow,
   .projects-headline { max-width: none !important; }
 
   /* ─── HUD ─── */
   .hud { padding: 14px var(--pad-x); }
   .hud__role    { display: none; }
-  /* Section label hidden — overlaps section intro-labels during scroll */
   .hud__section { display: none; }
 
 }
