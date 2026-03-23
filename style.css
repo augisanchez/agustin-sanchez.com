@@ -635,7 +635,7 @@ img { display: block; max-width: 100%; }
 /* 6-col grid: [label] + 5 phases */
 .ai-matrix {
   display: grid;
-  grid-template-columns: 128px repeat(5, 1fr);
+  grid-template-columns: 142px repeat(5, 1fr);
   grid-auto-rows: auto;
   gap: 0;
   min-width: 580px;
@@ -949,16 +949,64 @@ img { display: block; max-width: 100%; }
 
 @media (max-width: 768px) {
 
+  /* ─── Kill sticky panel system — natural document flow ───
+     Desktop uses .panel (tall dwell container) + .panel__content
+     (sticky 100svh pin). On mobile these create hard-to-read
+     viewport overflows and text overlap between adjacent panels.
+     Strip all of it: panels become normal block elements. ─── */
+
+  .panel { height: auto !important; }
+
+  .panel__content {
+    position: relative !important;
+    height: auto !important;
+    overflow: visible !important;
+    min-height: 0 !important;
+    padding-top: clamp(72px, 10vh, 96px);
+    padding-bottom: clamp(56px, 8vh, 80px);
+  }
+
+  /* Hero is the one panel that stays full-height */
+  .panel--hero { height: 100svh !important; }
+  .panel__content--hero {
+    position: relative !important;
+    height: 100svh !important;
+    overflow: hidden !important; /* clip the canvas */
+  }
+
+  /* ─── Override GSAP initial opacity: 0 / transform states ───
+     GSAP sets these inline before animations fire. With natural
+     scroll on mobile we don't animate — everything is visible
+     immediately. !important overrides GSAP inline styles. ─── */
+  .panel__content,
+  .intro-label, .org-label, .principle-label,
+  .leadership-headline .line-mask span,
+  .org-intro-lines .line-mask span,
+  .org-lines--muted .line-mask span,
+  .org-lines--accent .line-mask span,
+  .beliefs-headline .line-mask span,
+  .body-para, .org-intro-note,
+  .belief-col .principle-label,
+  .belief-col .principle-headline .line-mask span,
+  .belief-col .principle-body,
+  .projects-headline .line-mask span,
+  .project-row,
+  .principle-headline .line-mask span,
+  .principle-subhead .line-mask span,
+  .principle-body, .delivery-phase,
+  .ai-m__ph, .ai-m__disc, .ai-m__cell,
+  .ai-frame__legend,
+  .footer__personal {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
   .hud {
     padding: 14px var(--pad-x);
   }
 
   .hud__role { display: none; }
-
-  .panel__content {
-    padding-top: clamp(56px, 8vh, 80px);
-    padding-bottom: clamp(32px, 5vh, 56px);
-  }
 
   .color-buffer { height: 28vh; }
 
@@ -1001,10 +1049,12 @@ img { display: block; max-width: 100%; }
 
   .footer__right { align-items: flex-start; }
 
-  /* Gate tag is too long to fit in ~90px columns — red border still marks the gate visually */
+  /* Gate tag is too long to fit in narrow columns */
   .ai-m__gate-tag { display: none; }
 
-  /* Compression Map: reduce cell padding on mobile so the table breathes at 580px min-width */
+  /* Compression Map: wider min-width so cell text doesn't wrap awkwardly */
+  .ai-matrix { min-width: 680px; }
+
   .ai-m__ph {
     padding: 10px 8px 12px;
     gap: 3px;

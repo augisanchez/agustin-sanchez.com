@@ -15,15 +15,16 @@ gsap.registerPlugin(ScrollTrigger);
    ============================================================ */
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isMobile            = window.matchMedia('(max-width: 768px)').matches;
 
 /* ============================================================
    1. LENIS — weighted smooth scroll
    ============================================================ */
 
 const lenis = new Lenis({
-  lerp: 0.08,
-  smoothWheel: true,
-  orientation: 'vertical',
+  lerp:          isMobile ? 1    : 0.08,  // native scroll on mobile
+  smoothWheel:   !isMobile,
+  orientation:   'vertical',
   wheelMultiplier: 0.85,
 });
 
@@ -553,9 +554,12 @@ if (aiMatrixPanel && !prefersReducedMotion) {
    13. PANEL EXIT — fade + blur all sticky panels on scroll-out
    Scrub-driven, bidirectional. Fires during the final portion
    of each panel's scroll travel as content retreats upward.
+   Mobile: skipped — panels are natural block elements (no dwell
+   height), so scrub timings are meaningless and content would
+   flash-fade incorrectly.
    ============================================================ */
 
-document.querySelectorAll('.panel').forEach((panel) => {
+if (!isMobile) document.querySelectorAll('.panel').forEach((panel) => {
   const content = panel.querySelector('.panel__content');
   if (!content) return;
 
