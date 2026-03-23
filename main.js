@@ -274,7 +274,7 @@ if (leaderPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: leaderPanel, start: 'top bottom', end: 'top top',
-      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+      scrub: true,
     },
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
@@ -297,7 +297,7 @@ if (orgIntroPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: orgIntroPanel, start: 'top bottom', end: 'top top',
-      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+      scrub: true,
     },
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
@@ -317,7 +317,7 @@ if (orgStatPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: orgStatPanel, start: 'top bottom', end: 'top top',
-      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+      scrub: true,
     },
   });
   if (mutedSpans.length)  tl.from(mutedSpans,  { yPercent: 110, duration: 0.8, ease: 'power3.out', stagger: 0.07 });
@@ -342,7 +342,7 @@ if (beliefsPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: beliefsPanel, start: 'top bottom', end: 'top top',
-      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+      scrub: true,
     },
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
@@ -373,7 +373,7 @@ if (curiosityPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: curiosityPanel, start: 'top bottom', end: 'top top',
-      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+      scrub: true,
     },
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
@@ -396,7 +396,7 @@ if (gapPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: gapPanel, start: 'top bottom', end: 'top top',
-      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+      scrub: true,
     },
   });
   if (label)          tl.to(label,     { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
@@ -416,7 +416,7 @@ if (projectsSection) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: projectsSection, start: 'top 85%', end: 'top 20%',
-      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+      scrub: true,
     },
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
@@ -468,7 +468,7 @@ if (deliveryPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: deliveryPanel, start: 'top bottom', end: 'top top',
-      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+      scrub: true,
     },
   });
   if (label)           tl.to(label,     { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
@@ -490,7 +490,7 @@ if (frameworkPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: frameworkPanel, start: 'top bottom', end: 'top top',
-      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+      scrub: true,
     },
   });
   if (label)          tl.to(label,    { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
@@ -522,7 +522,7 @@ if (aiMatrixPanel && !prefersReducedMotion) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: aiMatrixPanel, start: 'top bottom', end: 'top top',
-      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+      scrub: true,
     },
   });
   if (eyebrow)           tl.to(eyebrow,    { opacity: 0.75, duration: 0.3, ease: 'power2.out' });
