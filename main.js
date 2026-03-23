@@ -681,7 +681,7 @@ gsap.to('.footer__personal', {
                  + 0.0015 / (d2 + 0.012);
       glow = clamp(glow, 0.0, 1.0);
 
-      /* Red colour (#C52B10) + analog film grain */
+      /* Orange (#FF6930) + analog film grain */
       vec3 col = vec3(1.0, 0.412, 0.188) * glow;
       col += hash(uv * 800.0 + u_time) * 0.035 * glow;
 
