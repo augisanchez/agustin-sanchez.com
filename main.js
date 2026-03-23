@@ -39,9 +39,21 @@ if (prefersReducedMotion) {
 
 /* ============================================================
    2. PAGE BACKGROUND — scrub-driven color transitions
+   Mobile: skip transitions entirely. Each section owns its bg
+   color directly so no gap can show through between panels.
    ============================================================ */
 
 const pageBg = document.getElementById('page-bg');
+
+// Mobile — stamp background-color directly on each panel.
+// page-bg transitions rely on the tall dwell height of sticky
+// panels; without that, the fixed bg layer lags behind the
+// actual scroll position, leaving white gaps.
+if (isMobile) {
+  document.querySelectorAll('[data-bg]').forEach((el) => {
+    el.style.backgroundColor = el.dataset.bg;
+  });
+}
 
 // Build ordered list of all [data-bg] sections
 const bgSections = Array.from(document.querySelectorAll('[data-bg]'));

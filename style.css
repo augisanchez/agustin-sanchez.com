@@ -1008,7 +1008,8 @@ img { display: block; max-width: 100%; }
 
   .hud__role { display: none; }
 
-  .color-buffer { height: 28vh; }
+  /* color-buffer is only needed for sticky transition timing — hide on mobile */
+  .color-buffer { display: none; }
 
   .strip-cols {
     grid-template-columns: 1fr;
