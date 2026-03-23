@@ -345,6 +345,176 @@ body::after {
   }
 }
 
+/* ---- Hamburger button ---- */
+.site-header__menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--mid);
+  transition: color 0.2s ease;
+}
+.site-header__menu-btn:hover { color: var(--ink); }
+
+/* ---- Nav panel ---- */
+.nav-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+}
+
+.nav-panel[aria-hidden="false"] {
+  pointer-events: auto;
+}
+
+.nav-panel__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 17, 17, 0);
+  transition: background 0.3s ease;
+}
+
+.nav-panel[aria-hidden="false"] .nav-panel__backdrop {
+  background: rgba(17, 17, 17, 0.4);
+}
+
+.nav-panel__drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: min(400px, 100vw);
+  height: 100%;
+  background: var(--ink);
+  color: var(--paper);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.nav-panel[aria-hidden="false"] .nav-panel__drawer {
+  transform: translateX(0);
+}
+
+.nav-panel__close {
+  position: absolute;
+  top: 20px;
+  right: clamp(20px, 5vw, 32px);
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: rgba(244, 242, 238, 0.5);
+  transition: color 0.2s ease;
+}
+.nav-panel__close:hover { color: var(--paper); }
+
+.nav-panel__content {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 72px clamp(24px, 6vw, 48px) 48px;
+}
+
+.nav-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.nav-section--top {
+  gap: 6px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid rgba(244, 242, 238, 0.1);
+}
+
+.nav-tagline {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--paper);
+  letter-spacing: -0.01em;
+}
+
+.nav-sub {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  color: rgba(244, 242, 238, 0.55);
+  line-height: 1.5;
+}
+
+.nav-label {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(244, 242, 238, 0.35);
+}
+
+.nav-body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  color: rgba(244, 242, 238, 0.7);
+  line-height: 1.7;
+}
+
+.nav-shows {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.nav-shows li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(244, 242, 238, 0.07);
+}
+
+.nav-shows li:first-child { border-top: 1px solid rgba(244, 242, 238, 0.07); }
+
+.nav-show__name {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--paper);
+}
+
+.nav-show__desc {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  color: rgba(244, 242, 238, 0.4);
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nav-links a {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 400;
+  font-size: 13px;
+  color: rgba(244, 242, 238, 0.6);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.nav-links a:hover { color: var(--paper); }
+
 /* ---- Mobile: 2×2 grid, tighter spacing ---- */
 @media (max-width: 767px) {
   :root {
