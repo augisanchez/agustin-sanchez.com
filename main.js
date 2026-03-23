@@ -42,15 +42,13 @@ if (prefersReducedMotion) {
 
 /* ============================================================
    2. PAGE BACKGROUND — color transitions
-   Desktop + tablet: GSAP scrub tied to sticky panel dwell height.
-   Transitions begin at 'top 85%' and complete by 'top 15%' —
-   the color-buffer gap ensures bg is always ahead of content.
-   Phone: scroll-driven CSS transition on page-bg. Sections stay
+   Desktop + tablet: GSAP scrub drives background-color on body.
+   Phone: scroll-driven CSS transition on body. Sections stay
    transparent; a passive scroll listener picks the active section
-   and updates page-bg color; CSS handles the 0.7s animation.
+   and updates body background-color; CSS handles the 0.7s ease.
    ============================================================ */
 
-const pageBg = document.getElementById('page-bg');
+const pageBg = document.body;
 
 // Build ordered list of all [data-bg] sections
 const bgSections = Array.from(document.querySelectorAll('[data-bg]'));
@@ -140,7 +138,7 @@ if (!isMobile) {
   const allPanels    = Array.from(document.querySelectorAll('.panel:not(.panel--hero)'));
 
   const LERP_FAST   = 0.09;  // panel edges + buffer zones
-  const LERP_SLOW   = 0.035; // panel centre — maximum mass
+  const LERP_SLOW   = 0.05;  // panel centre — maximum mass
   const MULT_NORMAL = 0.85;
   const MULT_BUFFER = 2.0;
 
@@ -250,256 +248,188 @@ gsap.from('#hero-strip', {
 });
 
 /* ============================================================
-   6. LEADERSHIP PANEL BUILD-ON
-   Label → headline lines → body text (right col stagger)
+   6–11. TEXT BUILD-ONS — scroll-scrubbed single timelines
+   Each panel gets ONE gsap.timeline with scrub: true.
+   scroll position IS the playhead — 1:1, no lag.
+   Range: top-of-panel at viewport bottom → top-of-panel at
+   viewport top (the full approach phase, ~100 vh of travel).
+   onLeave locks the timeline at progress 1 and kills the
+   trigger so the text stays visible on scroll-back (Option B).
    ============================================================ */
 
+/* ── 6. Leadership ── */
 const leaderPanel = document.querySelector('.panel--leadership');
 if (leaderPanel) {
-  const trigger = { trigger: leaderPanel, start: 'top 40%', toggleActions: 'restart none none reset' };
-  const label   = leaderPanel.querySelector('.intro-label');
-  const spans   = leaderPanel.querySelectorAll('.leadership-headline .line-mask span');
-  const paras   = leaderPanel.querySelectorAll('.body-para');
-  const photo   = leaderPanel.querySelector('.leadership-image');
+  const label = leaderPanel.querySelector('.intro-label');
+  const spans = leaderPanel.querySelectorAll('.leadership-headline .line-mask span');
+  const paras = leaderPanel.querySelectorAll('.body-para');
+  const photo = leaderPanel.querySelector('.leadership-image');
+  const note  = leaderPanel.querySelector('.org-intro-note');
 
-  if (label) {
-    gsap.set(label, { opacity: 0 });
-    gsap.to(label, { opacity: 0.55, duration: 0.55, ease: 'power2.out', scrollTrigger: trigger });
-  }
-  if (photo) {
-    gsap.set(photo, { opacity: 0, scale: 1.03 });
-    gsap.to(photo, { opacity: 1, scale: 1, duration: 1.2, ease: 'power3.out', delay: 0.2, scrollTrigger: trigger });
-  }
-  if (spans.length) {
-    gsap.from(spans, {
-      yPercent: 110, duration: 0.9, ease: 'power3.out', stagger: 0.07, delay: 0.12,
-      scrollTrigger: trigger,
-    });
-  }
-  if (paras.length) {
-    gsap.set(paras, { opacity: 0, y: 24 });
-    gsap.to(paras, {
-      opacity: 1, y: 0, duration: 1.0, ease: 'power3.out', stagger: 0.18, delay: 0.4,
-      scrollTrigger: trigger,
-    });
-  }
-  const leaderNote = leaderPanel.querySelector('.org-intro-note');
-  if (leaderNote) {
-    gsap.set(leaderNote, { opacity: 0, y: 14 });
-    gsap.to(leaderNote, { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', delay: 1.1, scrollTrigger: trigger });
-  }
+  if (label) gsap.set(label, { opacity: 0 });
+  if (photo) gsap.set(photo, { opacity: 0, scale: 1.03 });
+  if (paras.length) gsap.set(paras, { opacity: 0, y: 24 });
+  if (note)  gsap.set(note,  { opacity: 0, y: 14 });
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: leaderPanel, start: 'top bottom', end: 'top top',
+      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+    },
+  });
+  if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
+  if (photo) tl.to(photo, { opacity: 1, scale: 1, duration: 0.9, ease: 'power3.out' }, '<+0.08');
+  if (spans.length) tl.from(spans, { yPercent: 110, duration: 0.8, ease: 'power3.out', stagger: 0.06 }, '<+0.08');
+  if (paras.length) tl.to(paras, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.12 }, '<+0.28');
+  if (note)  tl.to(note,  { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.25');
 }
 
-/* ============================================================
-   7. ORG WORK — two panel build-ons
-   ============================================================ */
-
-// Panel 1: label + XL headline
+/* ── 7a. Org intro ── */
 const orgIntroPanel = document.querySelector('.panel--org-intro');
 if (orgIntroPanel) {
-  const trigger = { trigger: orgIntroPanel, start: 'top 40%', toggleActions: 'restart none none reset' };
-  const label   = orgIntroPanel.querySelector('.org-label');
-  const spans   = orgIntroPanel.querySelectorAll('.org-intro-lines .line-mask span');
+  const label = orgIntroPanel.querySelector('.org-label');
+  const spans = orgIntroPanel.querySelectorAll('.org-intro-lines .line-mask span');
+  const note  = orgIntroPanel.querySelector('.org-intro-note');
 
-  if (label) {
-    gsap.set(label, { opacity: 0 });
-    gsap.to(label, { opacity: 0.55, duration: 0.55, ease: 'power2.out', scrollTrigger: trigger });
-  }
-  if (spans.length) {
-    gsap.from(spans, {
-      yPercent: 110, duration: 1.0, ease: 'power3.out', stagger: 0.09, delay: 0.12,
-      scrollTrigger: trigger,
-    });
-  }
-  const orgIntroNote = orgIntroPanel.querySelector('.org-intro-note');
-  if (orgIntroNote) {
-    gsap.set(orgIntroNote, { opacity: 0, y: 14 });
-    gsap.to(orgIntroNote, { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', delay: 0.5, scrollTrigger: trigger });
-  }
+  if (label) gsap.set(label, { opacity: 0 });
+  if (note)  gsap.set(note,  { opacity: 0, y: 14 });
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: orgIntroPanel, start: 'top bottom', end: 'top top',
+      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+    },
+  });
+  if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
+  if (spans.length) tl.from(spans, { yPercent: 110, duration: 0.9, ease: 'power3.out', stagger: 0.08 }, '<+0.1');
+  if (note)  tl.to(note,  { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.35');
 }
 
-// Panel 2: muted lines, then red lines
+/* ── 7b. Org statement ── */
 const orgStatPanel = document.querySelector('.panel--org-statement');
 if (orgStatPanel) {
-  const trigger      = { trigger: orgStatPanel, start: 'top 40%', toggleActions: 'restart none none reset' };
-  const mutedSpans   = orgStatPanel.querySelectorAll('.org-lines--muted .line-mask span');
-  const accentSpans  = orgStatPanel.querySelectorAll('.org-lines--accent .line-mask span');
+  const mutedSpans  = orgStatPanel.querySelectorAll('.org-lines--muted .line-mask span');
+  const accentSpans = orgStatPanel.querySelectorAll('.org-lines--accent .line-mask span');
+  const notes       = orgStatPanel.querySelectorAll('.org-intro-note');
 
-  if (mutedSpans.length) {
-    gsap.from(mutedSpans, {
-      yPercent: 110, duration: 0.95, ease: 'power3.out', stagger: 0.08,
-      scrollTrigger: trigger,
-    });
-  }
-  if (accentSpans.length) {
-    gsap.from(accentSpans, {
-      yPercent: 110, duration: 0.95, ease: 'power3.out', stagger: 0.08, delay: 0.3,
-      scrollTrigger: trigger,
-    });
-  }
-  const orgStatNotes = orgStatPanel.querySelectorAll('.org-intro-note');
-  if (orgStatNotes.length) {
-    gsap.set(orgStatNotes, { opacity: 0, y: 14 });
-    gsap.to(orgStatNotes, { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', stagger: 0.15, delay: 0.65, scrollTrigger: trigger });
-  }
+  if (notes.length) gsap.set(notes, { opacity: 0, y: 14 });
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: orgStatPanel, start: 'top bottom', end: 'top top',
+      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+    },
+  });
+  if (mutedSpans.length)  tl.from(mutedSpans,  { yPercent: 110, duration: 0.8, ease: 'power3.out', stagger: 0.07 });
+  if (accentSpans.length) tl.from(accentSpans, { yPercent: 110, duration: 0.8, ease: 'power3.out', stagger: 0.07 }, '<+0.22');
+  if (notes.length)       tl.to(notes,         { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.1 }, '<+0.22');
 }
 
-/* ============================================================
-   8. BELIEFS PANEL BUILD-ON
-   Label → headline → both columns together (slight offset)
-   ============================================================ */
-
+/* ── 8. Beliefs ── */
 const beliefsPanel = document.querySelector('.panel--beliefs-full');
 if (beliefsPanel) {
-  const trigger = { trigger: beliefsPanel, start: 'top 40%', toggleActions: 'restart none none reset' };
   const label   = beliefsPanel.querySelector('.intro-label');
   const hlSpans = beliefsPanel.querySelectorAll('.beliefs-headline .line-mask span');
 
-  if (label) {
-    gsap.set(label, { opacity: 0 });
-    gsap.to(label, { opacity: 0.55, duration: 0.55, ease: 'power2.out', scrollTrigger: trigger });
-  }
-  if (hlSpans.length) {
-    gsap.from(hlSpans, {
-      yPercent: 110, duration: 0.9, ease: 'power3.out', stagger: 0.07, delay: 0.1,
-      scrollTrigger: trigger,
-    });
-  }
+  if (label) gsap.set(label, { opacity: 0 });
+  beliefsPanel.querySelectorAll('.belief-col').forEach(col => {
+    const cl = col.querySelector('.principle-label');
+    const cb = col.querySelector('.principle-body');
+    if (cl) gsap.set(cl, { opacity: 0 });
+    if (cb) gsap.set(cb, { opacity: 0, y: 18 });
+  });
 
-  // Both columns build on together with a small offset
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: beliefsPanel, start: 'top bottom', end: 'top top',
+      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+    },
+  });
+  if (label) tl.to(label, { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
+  if (hlSpans.length) tl.from(hlSpans, { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.055 }, '<+0.08');
+
   beliefsPanel.querySelectorAll('.belief-col').forEach((col, i) => {
-    const colLabel   = col.querySelector('.principle-label');
-    const colSpans   = col.querySelectorAll('.principle-headline .line-mask span');
-    const colBody    = col.querySelector('.principle-body');
-    const offset     = i * 0.1;
-
-    if (colLabel) {
-      gsap.set(colLabel, { opacity: 0 });
-      gsap.to(colLabel, {
-        opacity: 0.55, duration: 0.5, ease: 'power2.out',
-        delay: 0.45 + offset, scrollTrigger: trigger,
-      });
-    }
-    if (colSpans.length) {
-      gsap.from(colSpans, {
-        yPercent: 110, duration: 0.85, ease: 'power3.out', stagger: 0.06,
-        delay: 0.55 + offset, scrollTrigger: trigger,
-      });
-    }
-    if (colBody) {
-      gsap.set(colBody, { opacity: 0, y: 18 });
-      gsap.to(colBody, {
-        opacity: 1, y: 0, duration: 1.0, ease: 'power3.out',
-        delay: 0.85 + offset, scrollTrigger: trigger,
-      });
-    }
+    const colLabel = col.querySelector('.principle-label');
+    const colSpans = col.querySelectorAll('.principle-headline .line-mask span');
+    const colBody  = col.querySelector('.principle-body');
+    const pos      = `<+${i === 0 ? 0.2 : 0.06}`;
+    if (colLabel) tl.to(colLabel, { opacity: 0.55, duration: 0.3, ease: 'power2.out' }, pos);
+    if (colSpans.length) tl.from(colSpans, { yPercent: 110, duration: 0.65, ease: 'power3.out', stagger: 0.045 }, '<+0.08');
+    if (colBody)  tl.to(colBody, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.18');
   });
 }
 
-/* ============================================================
-   9. CURIOSITY PANEL BUILD-ON
-   ============================================================ */
-
+/* ── 9. Curiosity ── */
 const curiosityPanel = document.getElementById('p-curiosity');
 if (curiosityPanel) {
-  const trigger = { trigger: curiosityPanel, start: 'top 40%', toggleActions: 'restart none none reset' };
-  const label   = curiosityPanel.querySelector('.principle-label');
-  const spans   = curiosityPanel.querySelectorAll('.principle-headline .line-mask span');
-  const body    = curiosityPanel.querySelector('.principle-body');
+  const label = curiosityPanel.querySelector('.principle-label');
+  const spans = curiosityPanel.querySelectorAll('.principle-headline .line-mask span');
+  const body  = curiosityPanel.querySelector('.principle-body');
+  const xl    = curiosityPanel.querySelector('.principle-headline--xl');
 
-  if (label) {
-    gsap.set(label, { opacity: 0 });
-    gsap.to(label, { opacity: 0.55, duration: 0.55, ease: 'power2.out', scrollTrigger: trigger });
-  }
+  if (label) gsap.set(label, { opacity: 0 });
+  if (body)  gsap.set(body,  { opacity: 0, y: 18 });
 
-  // Scale pulse on the XL block
-  gsap.from(curiosityPanel.querySelector('.principle-headline--xl'), {
-    scale: 1.02, duration: 1.4, ease: 'power3.out', scrollTrigger: trigger,
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: curiosityPanel, start: 'top bottom', end: 'top top',
+      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+    },
   });
-
-  if (spans.length) {
-    gsap.from(spans, {
-      yPercent: 110, duration: 0.9, ease: 'power3.out', stagger: 0.072, delay: 0.1,
-      scrollTrigger: trigger,
-    });
-  }
-  if (body) {
-    gsap.set(body, { opacity: 0, y: 18 });
-    gsap.to(body, {
-      opacity: 1, y: 0, duration: 1.0, ease: 'power3.out', delay: 0.35,
-      scrollTrigger: trigger,
-    });
-  }
+  if (label) tl.to(label, { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
+  if (xl)    tl.from(xl,  { scale: 1.02, duration: 1.0, ease: 'power3.out' }, '<');
+  if (spans.length) tl.from(spans, { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.06 }, '<+0.08');
+  if (body)  tl.to(body, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '<+0.25');
 }
 
-/* ============================================================
-   10. THE GAP PANEL BUILD-ON
-   ============================================================ */
-
+/* ── 10. The Gap ── */
 const gapPanel = document.getElementById('p-gap');
 if (gapPanel) {
-  const trigger  = { trigger: gapPanel, start: 'top 40%', toggleActions: 'restart none none reset' };
   const label    = gapPanel.querySelector('.principle-label');
   const hlSpans  = gapPanel.querySelectorAll('.principle-headline .line-mask span');
   const subSpans = gapPanel.querySelectorAll('.principle-subhead .line-mask span');
   const body     = gapPanel.querySelector('.principle-body');
 
-  if (label) {
-    gsap.set(label, { opacity: 0 });
-    gsap.to(label, { opacity: 0.55, duration: 0.55, ease: 'power2.out', scrollTrigger: trigger });
-  }
-  if (hlSpans.length) {
-    gsap.from(hlSpans, {
-      yPercent: 110, duration: 0.9, ease: 'power3.out', stagger: 0.07, delay: 0.1,
-      scrollTrigger: trigger,
-    });
-  }
-  if (subSpans.length) {
-    gsap.from(subSpans, {
-      yPercent: 110, duration: 0.88, ease: 'power3.out', stagger: 0.065, delay: 0.35,
-      scrollTrigger: trigger,
-    });
-  }
-  if (body) {
-    gsap.set(body, { opacity: 0, y: 18 });
-    gsap.to(body, {
-      opacity: 1, y: 0, duration: 1.0, ease: 'power3.out', delay: 0.55,
-      scrollTrigger: trigger,
-    });
-  }
+  if (label) gsap.set(label, { opacity: 0 });
+  if (body)  gsap.set(body,  { opacity: 0, y: 18 });
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: gapPanel, start: 'top bottom', end: 'top top',
+      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+    },
+  });
+  if (label)          tl.to(label,     { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
+  if (hlSpans.length) tl.from(hlSpans, { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.06 }, '<+0.08');
+  if (subSpans.length) tl.from(subSpans, { yPercent: 110, duration: 0.7, ease: 'power3.out', stagger: 0.055 }, '<+0.2');
+  if (body)           tl.to(body,      { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
 }
 
-/* ============================================================
-   11. PROJECTS — headline build-on + staggered rows
-   Normal scroll, no sticky panel
-   ============================================================ */
-
+/* ── 11. Projects headline (non-sticky) ── */
 const projectsSection = document.querySelector('.projects-section');
 if (projectsSection) {
-  const trigger       = { trigger: projectsSection, start: 'top 60%', toggleActions: 'restart none none reset' };
   const label         = projectsSection.querySelector('.intro-label');
   const headlineSpans = projectsSection.querySelectorAll('.projects-headline .line-mask span');
 
-  if (label) {
-    gsap.set(label, { opacity: 0 });
-    gsap.to(label, { opacity: 0.55, duration: 0.55, ease: 'power2.out', scrollTrigger: trigger });
-  }
-  if (headlineSpans.length) {
-    gsap.from(headlineSpans, {
-      yPercent: 110, duration: 0.9, ease: 'power3.out', stagger: 0.07, delay: 0.1,
-      scrollTrigger: trigger,
-    });
-  }
+  if (label) gsap.set(label, { opacity: 0 });
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: projectsSection, start: 'top 85%', end: 'top 20%',
+      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+    },
+  });
+  if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
+  if (headlineSpans.length) tl.from(headlineSpans, { yPercent: 110, duration: 0.8, ease: 'power3.out', stagger: 0.07 }, '<+0.1');
 }
 
-// Project rows stagger
+// Project rows — keep toggle (normal-flow list, not a sticky panel)
 gsap.set('.project-row', { opacity: 0, y: 14 });
 gsap.to('.project-row', {
   opacity: 1, y: 0,
-  duration: 0.75, ease: 'power3.out', stagger: 0.085, delay: 0.3,
+  duration: 0.75, ease: 'power3.out', stagger: 0.085,
   scrollTrigger: {
-    trigger: '.projects-table',
-    start: 'top 75%',
+    trigger: '.projects-table', start: 'top 80%',
     toggleActions: 'restart none none reset',
   },
 });
@@ -524,82 +454,55 @@ document.querySelectorAll('.project-row').forEach((row) => {
   });
 });
 
-/* ============================================================
-   11b. VALIDATED DELIVERY — Panel A (belief statement)
-   ============================================================ */
-
+/* ── 11b. Delivery Panel A ── */
 const deliveryPanel = document.getElementById('p-delivery');
 if (deliveryPanel) {
-  const trigger  = { trigger: deliveryPanel, start: 'top 40%', toggleActions: 'restart none none reset' };
   const label    = deliveryPanel.querySelector('.principle-label');
   const hlSpans  = deliveryPanel.querySelectorAll('.principle-headline .line-mask span');
   const subSpans = deliveryPanel.querySelectorAll('.principle-subhead .line-mask span');
   const body     = deliveryPanel.querySelector('.principle-body');
 
-  if (label) {
-    gsap.set(label, { opacity: 0 });
-    gsap.to(label, { opacity: 0.55, duration: 0.55, ease: 'power2.out', scrollTrigger: trigger });
-  }
-  if (hlSpans.length) {
-    gsap.from(hlSpans, {
-      yPercent: 110, duration: 0.9, ease: 'power3.out', stagger: 0.07, delay: 0.1,
-      scrollTrigger: trigger,
-    });
-  }
-  if (subSpans.length) {
-    gsap.from(subSpans, {
-      yPercent: 110, duration: 0.88, ease: 'power3.out', stagger: 0.065, delay: 0.35,
-      scrollTrigger: trigger,
-    });
-  }
-  if (body) {
-    gsap.set(body, { opacity: 0, y: 18 });
-    gsap.to(body, {
-      opacity: 1, y: 0, duration: 1.0, ease: 'power3.out', delay: 0.55,
-      scrollTrigger: trigger,
-    });
-  }
+  if (label) gsap.set(label, { opacity: 0 });
+  if (body)  gsap.set(body,  { opacity: 0, y: 18 });
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: deliveryPanel, start: 'top bottom', end: 'top top',
+      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+    },
+  });
+  if (label)           tl.to(label,     { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
+  if (hlSpans.length)  tl.from(hlSpans, { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.06 }, '<+0.08');
+  if (subSpans.length) tl.from(subSpans, { yPercent: 110, duration: 0.7, ease: 'power3.out', stagger: 0.055 }, '<+0.2');
+  if (body)            tl.to(body,      { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
 }
 
-/* ============================================================
-   11c. VALIDATED DELIVERY — Panel B (Signal-Based Decision System)
-   ============================================================ */
-
+/* ── 11c. Delivery Panel B ── */
 const frameworkPanel = document.getElementById('p-framework');
 if (frameworkPanel) {
-  const trigger  = { trigger: frameworkPanel, start: 'top 40%', toggleActions: 'restart none none reset' };
-  const label    = frameworkPanel.querySelector('.principle-label');
-  const hlSpans  = frameworkPanel.querySelectorAll('.principle-headline .line-mask span');
-  const phases   = frameworkPanel.querySelectorAll('.delivery-phase');
+  const label   = frameworkPanel.querySelector('.principle-label');
+  const hlSpans = frameworkPanel.querySelectorAll('.principle-headline .line-mask span');
+  const phases  = frameworkPanel.querySelectorAll('.delivery-phase');
 
-  if (label) {
-    gsap.set(label, { opacity: 0 });
-    gsap.to(label, { opacity: 0.55, duration: 0.55, ease: 'power2.out', scrollTrigger: trigger });
-  }
-  if (hlSpans.length) {
-    gsap.from(hlSpans, {
-      yPercent: 110, duration: 0.9, ease: 'power3.out', stagger: 0.07, delay: 0.1,
-      scrollTrigger: trigger,
-    });
-  }
-  if (phases.length) {
-    gsap.set(phases, { opacity: 0, y: 12 });
-    gsap.to(phases, {
-      opacity: 1, y: 0, duration: 0.75, ease: 'power3.out', stagger: 0.09, delay: 0.45,
-      scrollTrigger: trigger,
-    });
-  }
+  if (label) gsap.set(label, { opacity: 0 });
+  if (phases.length) gsap.set(phases, { opacity: 0, y: 12 });
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: frameworkPanel, start: 'top bottom', end: 'top top',
+      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+    },
+  });
+  if (label)          tl.to(label,    { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
+  if (hlSpans.length) tl.from(hlSpans, { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.06 }, '<+0.08');
+  if (phases.length)  tl.to(phases,   { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out', stagger: 0.08 }, '<+0.25');
 }
 
-/* ============================================================
-   12b. AI PROCESS MATRIX — staggered build-on
-   Phase headers animate first, then each discipline row
-   cascades in. Human cells reach full opacity; AI cells land
-   at 0.38 (dimmed) to reinforce the visual language.
-   ============================================================ */
+/* ── 12b. AI Matrix ──
+   AI cells use CSS color opacity for dimming (not GSAP) to preserve
+   AAA contrast. GSAP animates element opacity 0→1 only.          */
 const aiMatrixPanel = document.getElementById('p-ai-matrix');
 if (aiMatrixPanel && !prefersReducedMotion) {
-  const trigger    = { trigger: aiMatrixPanel, start: 'top 45%', toggleActions: 'restart none none reset' };
   const eyebrow    = aiMatrixPanel.querySelector('.principle-label');
   const thesis     = aiMatrixPanel.querySelector('.ai-frame__thesis');
   const phHeaders  = aiMatrixPanel.querySelectorAll('.ai-m__ph');
@@ -608,43 +511,27 @@ if (aiMatrixPanel && !prefersReducedMotion) {
   const aiCells    = aiMatrixPanel.querySelectorAll('.ai-m__cell--ai');
   const legend     = aiMatrixPanel.querySelector('.ai-frame__legend');
 
-  // Eyebrow — 0.75 element opacity on var(--paper) gives ~9.65:1 on ink, AAA
-  if (eyebrow) {
-    gsap.set(eyebrow, { opacity: 0 });
-    gsap.to(eyebrow, { opacity: 0.75, duration: 0.5, ease: 'power2.out', scrollTrigger: trigger });
-  }
-  // Thesis — query updated; element no longer uses .ai-frame__thesis so this is a no-op guard
-  if (thesis) {
-    gsap.set(thesis, { opacity: 0, y: 6 });
-    gsap.to(thesis, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.1, scrollTrigger: trigger });
-  }
-  // Phase header columns — slide up, staggered L→R
-  if (phHeaders.length) {
-    gsap.set(phHeaders, { opacity: 0, y: 10 });
-    gsap.to(phHeaders, { opacity: 1, y: 0, duration: 0.55, ease: 'power2.out', stagger: 0.07, delay: 0.25, scrollTrigger: trigger });
-  }
-  // Discipline labels — 0.75 opacity on var(--paper) = ~9.65:1 on ink, AAA
-  if (discLabels.length) {
-    gsap.set(discLabels, { opacity: 0 });
-    gsap.to(discLabels, { opacity: 0.75, duration: 0.5, ease: 'power2.out', stagger: 0.18, delay: 0.55, scrollTrigger: trigger });
-  }
-  // Human cells — full weight, staggered across grid
-  if (hCells.length) {
-    gsap.set(hCells, { opacity: 0, y: 6 });
-    gsap.to(hCells, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', stagger: 0.05, delay: 0.6, scrollTrigger: trigger });
-  }
-  // AI cells — animate to opacity: 1; CSS color rgba(244,242,238,0.75) handles the visual
-  // dimming (9.65:1 on ink). Stacking GSAP opacity on top of CSS color opacity caused
-  // effective alpha of 0.285 which produced a contrast ratio of ~1.7:1, failing AAA.
-  if (aiCells.length) {
-    gsap.set(aiCells, { opacity: 0, y: 6 });
-    gsap.to(aiCells, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', stagger: 0.05, delay: 0.7, scrollTrigger: trigger });
-  }
-  // Legend
-  if (legend) {
-    gsap.set(legend, { opacity: 0 });
-    gsap.to(legend, { opacity: 1, duration: 0.5, ease: 'power2.out', delay: 1.1, scrollTrigger: trigger });
-  }
+  if (eyebrow) gsap.set(eyebrow, { opacity: 0 });
+  if (thesis)  gsap.set(thesis,  { opacity: 0, y: 6 });
+  if (phHeaders.length)  gsap.set(phHeaders,  { opacity: 0, y: 10 });
+  if (discLabels.length) gsap.set(discLabels, { opacity: 0 });
+  if (hCells.length)     gsap.set(hCells,     { opacity: 0, y: 6 });
+  if (aiCells.length)    gsap.set(aiCells,    { opacity: 0, y: 6 });
+  if (legend)            gsap.set(legend,     { opacity: 0 });
+
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: aiMatrixPanel, start: 'top bottom', end: 'top top',
+      scrub: true, onLeave: self => { tl.progress(1); self.kill(false); },
+    },
+  });
+  if (eyebrow)           tl.to(eyebrow,    { opacity: 0.75, duration: 0.3, ease: 'power2.out' });
+  if (thesis)            tl.to(thesis,     { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' }, '<+0.08');
+  if (phHeaders.length)  tl.to(phHeaders,  { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out', stagger: 0.06 }, '<+0.15');
+  if (discLabels.length) tl.to(discLabels, { opacity: 0.75, duration: 0.35, ease: 'power2.out', stagger: 0.12 }, '<+0.15');
+  if (hCells.length)     tl.to(hCells,     { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', stagger: 0.04 }, '<+0.1');
+  if (aiCells.length)    tl.to(aiCells,    { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', stagger: 0.04 }, '<+0.05');
+  if (legend)            tl.to(legend,     { opacity: 1, duration: 0.3, ease: 'power2.out' }, '<+0.15');
 }
 
 /* ============================================================

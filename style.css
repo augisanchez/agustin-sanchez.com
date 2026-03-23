@@ -117,18 +117,7 @@ img { display: block; max-width: 100%; }
   opacity: 0.13;
 }
 
-/* ============================================================
-   PAGE BACKGROUND
-   Fixed layer — GSAP drives all color transitions.
-   ============================================================ */
-
-.page-bg {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background-color: var(--paper);
-  pointer-events: none;
-}
+/* PAGE BACKGROUND — GSAP drives background-color on body directly. */
 
 .color-group {
   background: transparent;
