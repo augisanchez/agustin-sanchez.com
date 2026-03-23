@@ -510,35 +510,37 @@ if (aiMatrixPanel && !prefersReducedMotion) {
   const aiCells    = aiMatrixPanel.querySelectorAll('.ai-m__cell--ai');
   const legend     = aiMatrixPanel.querySelector('.ai-frame__legend');
 
-  // Eyebrow
+  // Eyebrow — 0.75 element opacity on var(--paper) gives ~9.65:1 on ink, AAA
   if (eyebrow) {
     gsap.set(eyebrow, { opacity: 0 });
-    gsap.to(eyebrow, { opacity: 0.55, duration: 0.5, ease: 'power2.out', scrollTrigger: trigger });
+    gsap.to(eyebrow, { opacity: 0.75, duration: 0.5, ease: 'power2.out', scrollTrigger: trigger });
   }
-  // Thesis
+  // Thesis — query updated; element no longer uses .ai-frame__thesis so this is a no-op guard
   if (thesis) {
     gsap.set(thesis, { opacity: 0, y: 6 });
-    gsap.to(thesis, { opacity: 0.5, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.1, scrollTrigger: trigger });
+    gsap.to(thesis, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.1, scrollTrigger: trigger });
   }
   // Phase header columns — slide up, staggered L→R
   if (phHeaders.length) {
     gsap.set(phHeaders, { opacity: 0, y: 10 });
     gsap.to(phHeaders, { opacity: 1, y: 0, duration: 0.55, ease: 'power2.out', stagger: 0.07, delay: 0.25, scrollTrigger: trigger });
   }
-  // Discipline labels — cascade by row
+  // Discipline labels — 0.75 opacity on var(--paper) = ~9.65:1 on ink, AAA
   if (discLabels.length) {
     gsap.set(discLabels, { opacity: 0 });
-    gsap.to(discLabels, { opacity: 0.65, duration: 0.5, ease: 'power2.out', stagger: 0.18, delay: 0.55, scrollTrigger: trigger });
+    gsap.to(discLabels, { opacity: 0.75, duration: 0.5, ease: 'power2.out', stagger: 0.18, delay: 0.55, scrollTrigger: trigger });
   }
   // Human cells — full weight, staggered across grid
   if (hCells.length) {
     gsap.set(hCells, { opacity: 0, y: 6 });
     gsap.to(hCells, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', stagger: 0.05, delay: 0.6, scrollTrigger: trigger });
   }
-  // AI cells — land at 0.38 (dimmed), slightly later
+  // AI cells — animate to opacity: 1; CSS color rgba(244,242,238,0.75) handles the visual
+  // dimming (9.65:1 on ink). Stacking GSAP opacity on top of CSS color opacity caused
+  // effective alpha of 0.285 which produced a contrast ratio of ~1.7:1, failing AAA.
   if (aiCells.length) {
     gsap.set(aiCells, { opacity: 0, y: 6 });
-    gsap.to(aiCells, { opacity: 0.38, y: 0, duration: 0.5, ease: 'power2.out', stagger: 0.05, delay: 0.7, scrollTrigger: trigger });
+    gsap.to(aiCells, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', stagger: 0.05, delay: 0.7, scrollTrigger: trigger });
   }
   // Legend
   if (legend) {
