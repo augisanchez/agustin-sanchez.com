@@ -792,3 +792,14 @@ gsap.to('.footer__personal', {
 
   raf = requestAnimationFrame(render);
 })();
+
+/* ============================================================
+   15. SCROLL TRIGGER REFRESH
+   Called after fonts + images are loaded so element dimensions
+   are stable. On touch, ensures any triggers already past their
+   start point on page load fire their onEnter immediately.
+   ============================================================ */
+
+window.addEventListener('load', () => {
+  ScrollTrigger.refresh(true);
+});

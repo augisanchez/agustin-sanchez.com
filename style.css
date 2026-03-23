@@ -311,6 +311,7 @@ img { display: block; max-width: 100%; }
 
 .panel__content--hero {
   position: relative;
+  z-index: 1;       /* text + strip above hero-canvas (z-index: 0) */
   justify-content: flex-end;
   gap: clamp(20px, 3vh, 36px);
   padding-bottom: clamp(48px, 8vh, 96px);
@@ -321,7 +322,7 @@ img { display: block; max-width: 100%; }
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: -1;
+  z-index: 0;       /* sits above page-bg (-2), below panel__content (z-index: 1) */
   pointer-events: none;
   background: transparent;
 }
@@ -972,8 +973,7 @@ img { display: block; max-width: 100%; }
     height: auto !important;
     overflow: visible !important;
     min-height: 0 !important;
-    padding-top:    clamp(72px, 10vh, 96px);
-    padding-bottom: clamp(72px, 10vh, 96px);
+    /* Padding: use base clamp(80px, 12vh, 140px) — generous on all touch sizes */
   }
 
   /* Hero stays full-height */
@@ -987,35 +987,6 @@ img { display: block; max-width: 100%; }
   /* color-buffer is desktop-only (sticky panel transition timing).
      Sections own their background directly on touch devices. */
   .color-buffer { display: none; }
-
-  /* ─── Override ALL GSAP initial states ───
-     GSAP sets opacity:0 / transform on elements before ScrollTrigger
-     fires. On touch devices with natural scroll, some triggers never
-     fire (element already in view on load) leaving content invisible.
-     !important overrides GSAP inline styles — everything is visible. ─── */
-  .panel__content,
-  .intro-label, .org-label, .principle-label,
-  .leadership-headline .line-mask span,
-  .org-intro-lines .line-mask span,
-  .org-lines--muted .line-mask span,
-  .org-lines--accent .line-mask span,
-  .beliefs-headline .line-mask span,
-  .body-para, .org-intro-note,
-  .belief-col .principle-label,
-  .belief-col .principle-headline .line-mask span,
-  .belief-col .principle-body,
-  .projects-headline .line-mask span,
-  .project-row,
-  .principle-headline .line-mask span,
-  .principle-subhead .line-mask span,
-  .principle-body, .delivery-phase,
-  .ai-m__ph, .ai-m__disc, .ai-m__cell,
-  .ai-frame__legend,
-  .footer__personal {
-    opacity: 1 !important;
-    transform: none !important;
-    filter: none !important;
-  }
 
   /* ─── Typography — bigger body, full width ─── */
   .essay {
