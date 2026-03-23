@@ -737,12 +737,13 @@ gsap.to('.footer__personal', {
   const WAVE_FX      = 0.016; // spatial freq X
   const WAVE_FY      = 0.011; // spatial freq Y (different → diagonal travel)
 
-  const PUSH_RADIUS  = 85;    // repulsion influence (px)
-  const PUSH_STR     = 1.4;   // repulsion force magnitude
-  const SPRING_K     = 0.10;  // spring stiffness (return to rest)
-  const DAMPING      = 0.82;  // velocity retention per frame
+  const PUSH_RADIUS  = 140;   // repulsion influence (px) — wider field
+  const PUSH_STR     = 2.5;   // repulsion force magnitude
+  const SPRING_K     = 0.08;  // spring stiffness (return to rest)
+  const DAMPING      = 0.83;  // velocity retention per frame
 
   const FADE_RADIUS  = 145;   // opacity fade zone (larger than push)
+  const VFADE_START  = 0.55;  // vertical fade begins at this fraction of H
 
   let W, H, dots = [], dpr;
 
@@ -845,16 +846,36 @@ gsap.to('.footer__personal', {
 
     for (const d of dots) {
 
-      /* ── Physics: repulsion from each pointer ── */
+      /* ── Physics: repulsion from each pointer ──
+         Force MAGNITUDE uses rest-position distance so the field
+         is constant while the cursor is stationary — dots reach a
+         stable equilibrium and stay there (persistent mass effect).
+         Force DIRECTION uses current position so the push always
+         points away from the cursor and doesn't cause artifacts. */
       for (const p of pointers.values()) {
-        const dx   = d.x - p.sx;
-        const dy   = d.y - p.sy;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < PUSH_RADIUS && dist > 0.5) {
-          const t0 = 1 - dist / PUSH_RADIUS;          // 0→1 as dist→0
+        const rdx      = d.rx - p.sx;
+        const rdy      = d.ry - p.sy;
+        const restDist = Math.sqrt(rdx * rdx + rdy * rdy);
+
+        if (restDist < PUSH_RADIUS) {
+          const t0 = 1 - restDist / PUSH_RADIUS;      // 0→1 as restDist→0
           const f  = t0 * t0 * PUSH_STR;              // quadratic falloff
-          d.vx += (dx / dist) * f;
-          d.vy += (dy / dist) * f;
+
+          // Direction from current position for stability
+          const dx   = d.x - p.sx;
+          const dy   = d.y - p.sy;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist > 0.5) {
+            d.vx += (dx / dist) * f;
+            d.vy += (dy / dist) * f;
+          } else {
+            // Dot exactly at cursor — use rest direction
+            if (restDist > 0.5) {
+              d.vx += (rdx / restDist) * f;
+              d.vy += (rdy / restDist) * f;
+            }
+          }
         }
       }
 
@@ -883,7 +904,11 @@ gsap.to('.footer__personal', {
         if (fade > maxFade) maxFade = fade;
       }
 
-      const alpha = waveA * (1 - maxFade);
+      /* ── Vertical fade — grid dissolves into the next section ── */
+      const yRaw   = Math.max(0, (d.ry / H - VFADE_START) / (1 - VFADE_START));
+      const yFade  = yRaw * yRaw * (3 - 2 * yRaw);   // smoothstep 0→1
+
+      const alpha = waveA * (1 - maxFade) * (1 - yFade);
       if (alpha < 0.005) continue;                    // skip invisible dots
 
       ctx.beginPath();
