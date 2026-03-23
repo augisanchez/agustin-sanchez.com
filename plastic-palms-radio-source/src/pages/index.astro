@@ -61,8 +61,9 @@ mixes.sort((a, b) => (b.order ?? -1) - (a.order ?? -1));
 
     <header class="site-header">
       <a class="site-header__back" href="/" aria-label="Back to agustin-sanchez.com">
-        <span class="site-header__back-arrow" aria-hidden="true">←</span>
-        <span class="site-header__back-name">Agustin Sanchez</span>
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </a>
       <a class="site-header__logo" href={import.meta.env.BASE_URL} aria-label="Plastic Palms Radio home">
         <img src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/logo.png`} alt="Plastic Palms Radio" />

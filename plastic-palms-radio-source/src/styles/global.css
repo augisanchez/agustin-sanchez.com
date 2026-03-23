@@ -93,26 +93,11 @@ body::after {
 .site-header__back {
   display: flex;
   align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  color: var(--ink);
-  transition: opacity 0.2s ease;
-}
-.site-header__back:hover { opacity: 0.5; }
-
-.site-header__back-arrow {
-  font-size: 14px;
-  line-height: 1;
   color: var(--mid);
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
-
-.site-header__back-name {
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 0.01em;
-  color: var(--ink);
-}
+.site-header__back:hover { color: var(--ink); }
 
 .site-header__logo {
   display: flex;
