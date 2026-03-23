@@ -115,35 +115,70 @@ if (!isMobile) {
 }
 
 /* ============================================================
-   2b. COLOR-BUFFER SCROLL ACCELERATION
-   The 60 vh color-buffer gaps between sections are intentional
-   breathing space, but feel slow to scroll through. When Lenis
-   detects the scroll position is inside a buffer zone it
-   temporarily doubles the wheel multiplier so the user crosses
-   the gap quickly. Multiplier resets the moment content begins.
-   Desktop + tablet only (phones use native scroll).
+   2b. SCROLL FEEL — buffer acceleration + section mass
+   Two behaviours work together:
+
+   COLOR BUFFERS (60 vh gaps between sections):
+     Wheel multiplier doubles (2×) so the transition space
+     crosses quickly and feels deliberate, not blank.
+
+   PANEL DEPTH CURVE — ease out in, ease in out:
+     Inside every .panel (except hero) lerp follows a
+     centre-distance curve:
+       edge of panel  → LERP_FAST (light, matches buffer speed)
+       centre of panel → LERP_SLOW (heavy, maximum mass)
+     As you scroll toward the centre lerp decreases → the
+     section decelerates under you (ease-out arrival).
+     As you push away from centre lerp increases → you have
+     to overcome inertia to leave (ease-in departure).
+     This is symmetric: works identically scrolling up or down.
+   Desktop + tablet only.
    ============================================================ */
 
 if (!isMobile) {
   const colorBuffers = Array.from(document.querySelectorAll('.color-buffer'));
+  const allPanels    = Array.from(document.querySelectorAll('.panel:not(.panel--hero)'));
+
+  const LERP_FAST   = 0.09;  // panel edges + buffer zones
+  const LERP_SLOW   = 0.035; // panel centre — maximum mass
   const MULT_NORMAL = 0.85;
   const MULT_BUFFER = 2.0;
 
-  // Cache buffer zones; refresh on resize + load for accuracy
-  let bufferZones = [];
-  function buildBufferZones() {
+  let bufferZones = [], panelZones = [];
+
+  function buildScrollZones() {
     bufferZones = colorBuffers.map(el => ({
       top: el.offsetTop,
       bot: el.offsetTop + el.offsetHeight,
     }));
+    panelZones = allPanels.map(el => ({
+      top:    el.offsetTop,
+      height: el.offsetHeight,
+    }));
   }
-  buildBufferZones();
-  window.addEventListener('resize', buildBufferZones);
-  window.addEventListener('load',   buildBufferZones);
+  buildScrollZones();
+  window.addEventListener('resize', buildScrollZones);
+  window.addEventListener('load',   buildScrollZones);
 
   lenis.on('scroll', ({ scroll }) => {
-    const inBuffer = bufferZones.some(z => scroll >= z.top && scroll <= z.bot);
-    lenis.options.wheelMultiplier = inBuffer ? MULT_BUFFER : MULT_NORMAL;
+    // Buffer zones take priority — move fast through transitions
+    if (bufferZones.some(z => scroll >= z.top && scroll <= z.bot)) {
+      lenis.options.lerp            = LERP_FAST;
+      lenis.options.wheelMultiplier = MULT_BUFFER;
+      return;
+    }
+
+    lenis.options.wheelMultiplier = MULT_NORMAL;
+
+    // Find active panel and apply depth curve
+    const zone = panelZones.find(z => scroll >= z.top && scroll <= z.top + z.height);
+    if (zone) {
+      const progress      = (scroll - zone.top) / zone.height;   // 0→1
+      const distFromCentre = Math.abs(progress - 0.5) * 2;       // 1 at edges, 0 at centre
+      lenis.options.lerp  = LERP_SLOW + distFromCentre * (LERP_FAST - LERP_SLOW);
+    } else {
+      lenis.options.lerp = LERP_FAST;
+    }
   });
 }
 
@@ -191,27 +226,8 @@ document.querySelectorAll('[data-tone]').forEach((el) => {
   });
 });
 
-/* ============================================================
-   4. LENIS VARIABLE WEIGHT
-   Desktop + tablet only. Phones use native scroll (lerp:1) and
-   must never have their lerp overridden by these callbacks.
-   ============================================================ */
-
-if (!isMobile) {
-  ['panel--leadership', 'panel--beliefs-full'].forEach((cls) => {
-    document.querySelectorAll('.' + cls).forEach((panel) => {
-      ScrollTrigger.create({
-        trigger: panel,
-        start: 'top 60%',
-        end:   'bottom 40%',
-        onEnter:     () => { lenis.options.lerp = 0.06; },
-        onLeave:     () => { lenis.options.lerp = 0.08; },
-        onEnterBack: () => { lenis.options.lerp = 0.06; },
-        onLeaveBack: () => { lenis.options.lerp = 0.08; },
-      });
-    });
-  });
-}
+/* Section 4 lerp modulation removed — superseded by the
+   continuous depth curve in section 2b above. */
 
 /* ============================================================
    5. HERO — load animation (identity: AGUSTIN SANCHEZ.)
