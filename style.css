@@ -290,6 +290,9 @@ img { display: block; max-width: 100%; }
   top: 0;
   height: 100svh;
   width: 100%;
+  max-width: 1600px;        /* ultrawide cap — content stays readable on 4K */
+  margin-left: auto;
+  margin-right: auto;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -950,14 +953,16 @@ img { display: block; max-width: 100%; }
 
 /* ============================================================
    TOUCH / TABLET — structural overrides
-   Applies to all touch devices: phones, iPad, iPad Pro portrait.
-   1024px captures iPad Pro 12.9" portrait (1024px) and all smaller.
+   Two conditions, either triggers the full touch treatment:
+   • max-width: 1024px  — phones + iPad Pro 12.9" portrait
+   • pointer: coarse    — any touch device regardless of width
+     (iPad landscape 1366px, Surface, touchscreen laptops)
    These rules kill the sticky panel system that requires precise
    mouse-scroll geometry, restore natural document flow, and ensure
    all content is immediately visible without GSAP initial states.
    ============================================================ */
 
-@media (max-width: 1024px) {
+@media (max-width: 1024px), (pointer: coarse) {
 
   /* ─── Kill sticky panel system ─── */
   .panel { height: auto !important; }
@@ -1112,13 +1117,57 @@ img { display: block; max-width: 100%; }
 }
 
 /* ============================================================
-   SHORT VIEWPORT — 16:9 screens, Windows laptops, 1080p
-   Reduces vertical padding and spacing so panels fit without
-   clipping. Targets viewports ≤ 800px tall (e.g. 1080p with
-   browser chrome ≈ 950px → Windows 125% DPI ≈ 760px).
+   TABLET — 769px to 1024px, natural-scroll touch layout
+   Sits between phone single-column and full desktop sticky.
+   AI Matrix: 5 columns fit without scroll at these widths but
+   cells are narrow — tighten label column + reduce type slightly
+   so text doesn't wrap mid-phrase.
    ============================================================ */
 
-@media (max-height: 800px) {
+@media (min-width: 769px) and (max-width: 1024px) {
+
+  /* Narrower label column frees more space for 5 phase columns */
+  .ai-matrix {
+    grid-template-columns: 110px repeat(5, 1fr);
+    min-width: 0; /* let grid fill container, no forced scroll */
+  }
+
+  /* Slightly smaller type in cells — fits multi-word phrases
+     on one line at the narrower column widths (~100–140px) */
+  .ai-m__pnum  { font-size: 10px; }
+  .ai-m__pname { font-size: 11px; }
+  .ai-m__cell  { font-size: 12px; padding: 10px 10px; }
+  .ai-m__disc  { font-size: 11px; }
+
+  /* Gate tag stays visible on tablet — enough width to show it */
+  .ai-m__gate-tag { display: block; font-size: 10px; }
+
+  /* Leadership — maintain two-column at tablet, tighter gap */
+  .panel__content--leadership {
+    grid-template-columns: 5fr 7fr;
+    gap: clamp(32px, 4vw, 56px);
+  }
+
+  .leadership-image {
+    display: block;  /* restore from phone hide */
+    flex: 1 1 0;
+    height: 0;
+    min-height: clamp(140px, 20vh, 280px);
+    margin-top: clamp(20px, 3vh, 36px);
+  }
+
+}
+
+/* ============================================================
+   SHORT VIEWPORT — 16:9 screens, Windows laptops, 1080p
+   Reduces vertical padding and spacing so sticky panels fit
+   without clipping. Desktop-only: touch devices (≤1024px or
+   coarse pointer) have natural-scroll panels that don't clip,
+   and landscape phones have short viewports that this block
+   would incorrectly override with desktop-sized padding.
+   ============================================================ */
+
+@media (max-height: 800px) and (min-width: 1025px) and (pointer: fine) {
 
   /* Base panel padding — main driver of clip on short screens */
   .panel__content {

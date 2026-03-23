@@ -15,8 +15,9 @@ gsap.registerPlugin(ScrollTrigger);
    ============================================================ */
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-// Touch devices: phones + all iPad Pro variants (portrait 1024px)
-const isMobile            = window.matchMedia('(max-width: 1024px)').matches;
+// Touch devices: phones, all iPad orientations, and any coarse-pointer
+// device (touchscreen laptops, Surface, etc.) regardless of width.
+const isMobile            = window.matchMedia('(max-width: 1024px), (pointer: coarse)').matches;
 
 /* ============================================================
    1. LENIS — weighted smooth scroll
