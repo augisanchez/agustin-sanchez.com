@@ -38,15 +38,15 @@ if (prefersReducedMotion) {
 }
 
 /* ============================================================
-   2. PAGE BACKGROUND — scrub-driven color transitions
-   Mobile: skip transitions entirely. Each section owns its bg
-   color directly so no gap can show through between panels.
+   2. PAGE BACKGROUND — color transitions
+   Desktop: scrub-driven against tall sticky panel dwell height.
+   Mobile:  IntersectionObserver + GSAP tween — scrub relies on
+            the 160vh dwell geometry; on short auto-height panels
+            multiple sections hit the trigger zone simultaneously,
+            causing animation conflicts and jumping colors.
    ============================================================ */
 
 const pageBg = document.getElementById('page-bg');
-
-// page-bg scrub transitions work via viewport position, not dwell height —
-// they run fine on mobile with natural scroll. No special handling needed.
 
 // Build ordered list of all [data-bg] sections
 const bgSections = Array.from(document.querySelectorAll('[data-bg]'));
@@ -54,26 +54,65 @@ const bgSections = Array.from(document.querySelectorAll('[data-bg]'));
 // Set initial color immediately
 if (bgSections.length) gsap.set(pageBg, { backgroundColor: bgSections[0].dataset.bg });
 
-// fromTo: each section transitions FROM the previous section's color TO its own.
-// This makes scrub work correctly in both scroll directions.
-bgSections.forEach((section, i) => {
-  const fromBg = i === 0 ? section.dataset.bg : bgSections[i - 1].dataset.bg;
-  const toBg   = section.dataset.bg;
+if (!isMobile) {
+  // ── Desktop: scrub fromTo per section ──────────────────────
+  bgSections.forEach((section, i) => {
+    const fromBg = i === 0 ? section.dataset.bg : bgSections[i - 1].dataset.bg;
+    const toBg   = section.dataset.bg;
 
-  gsap.fromTo(pageBg,
-    { backgroundColor: fromBg },
-    {
-      backgroundColor: toBg,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: section,
-        start: 'top 85%',
-        end: 'top 15%',
-        scrub: 1,
-      },
+    gsap.fromTo(pageBg,
+      { backgroundColor: fromBg },
+      {
+        backgroundColor: toBg,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: section,
+          start: 'top 85%',
+          end:   'top 15%',
+          scrub: 1,
+        },
+      }
+    );
+  });
+
+} else {
+  // ── Mobile: IntersectionObserver, smooth 0.5s tween ────────
+  // Track intersection ratios for all observed sections so we
+  // always transition to the MOST VISIBLE section's color.
+  const mobileBgMap = new Map();
+
+  const bgObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        mobileBgMap.set(entry.target, entry.intersectionRatio);
+      } else {
+        mobileBgMap.delete(entry.target);
+      }
+    });
+
+    if (!mobileBgMap.size) return;
+
+    // Dominant section = highest intersection ratio in viewport
+    let dominant = null, maxRatio = -1;
+    mobileBgMap.forEach((ratio, el) => {
+      if (ratio > maxRatio) { maxRatio = ratio; dominant = el; }
+    });
+
+    if (dominant) {
+      gsap.to(pageBg, {
+        backgroundColor: dominant.dataset.bg,
+        duration:  0.5,
+        ease:      'power2.inOut',
+        overwrite: true,
+      });
     }
-  );
-});
+  }, {
+    // Fire at each 10% step so dominant section updates smoothly
+    threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+  });
+
+  bgSections.forEach((s) => bgObserver.observe(s));
+}
 
 /* ============================================================
    3. HUD — tone word + section label crossfade + dark mode

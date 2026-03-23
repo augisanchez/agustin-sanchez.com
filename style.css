@@ -963,9 +963,9 @@ img { display: block; max-width: 100%; }
     height: auto !important;
     overflow: visible !important;
     min-height: 0 !important;
-    /* Generous vertical rhythm — sections need room to breathe */
-    padding-top:    clamp(96px, 14vh, 140px);
-    padding-bottom: clamp(96px, 14vh, 140px);
+    /* Vertical rhythm — room to breathe without dead zones */
+    padding-top:    clamp(72px, 10vh, 96px);
+    padding-bottom: clamp(72px, 10vh, 96px);
   }
 
   /* Hero is the one panel that stays full-height */
@@ -1025,10 +1025,15 @@ img { display: block; max-width: 100%; }
 
   .hud__role { display: none; }
 
-  /* color-buffer provides scroll space for bg transition timing.
-     Small on mobile — enough for the scrub to start before
-     content appears, creating a smooth Lenis-driven bg shift. */
-  .color-buffer { height: 64px; }
+  /* color-buffer is desktop-only (needed for scrub timing against
+     sticky dwell height). On mobile, IntersectionObserver fires
+     when sections become visible — no buffer needed. */
+  .color-buffer { display: none; }
+
+  /* HUD section label hidden on mobile — section intro-labels
+     already show the section name, and the fixed overlay causes
+     ghost-text overlap with body copy while scrolling. */
+  .hud__section { display: none; }
 
   .strip-cols {
     grid-template-columns: 1fr;
