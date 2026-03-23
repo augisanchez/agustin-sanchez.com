@@ -115,6 +115,39 @@ if (!isMobile) {
 }
 
 /* ============================================================
+   2b. COLOR-BUFFER SCROLL ACCELERATION
+   The 60 vh color-buffer gaps between sections are intentional
+   breathing space, but feel slow to scroll through. When Lenis
+   detects the scroll position is inside a buffer zone it
+   temporarily doubles the wheel multiplier so the user crosses
+   the gap quickly. Multiplier resets the moment content begins.
+   Desktop + tablet only (phones use native scroll).
+   ============================================================ */
+
+if (!isMobile) {
+  const colorBuffers = Array.from(document.querySelectorAll('.color-buffer'));
+  const MULT_NORMAL = 0.85;
+  const MULT_BUFFER = 2.0;
+
+  // Cache buffer zones; refresh on resize + load for accuracy
+  let bufferZones = [];
+  function buildBufferZones() {
+    bufferZones = colorBuffers.map(el => ({
+      top: el.offsetTop,
+      bot: el.offsetTop + el.offsetHeight,
+    }));
+  }
+  buildBufferZones();
+  window.addEventListener('resize', buildBufferZones);
+  window.addEventListener('load',   buildBufferZones);
+
+  lenis.on('scroll', ({ scroll }) => {
+    const inBuffer = bufferZones.some(z => scroll >= z.top && scroll <= z.bot);
+    lenis.options.wheelMultiplier = inBuffer ? MULT_BUFFER : MULT_NORMAL;
+  });
+}
+
+/* ============================================================
    3. HUD — tone word + section label crossfade + dark mode
    ============================================================ */
 
@@ -645,14 +678,13 @@ gsap.to('.footer__personal', {
 });
 
 /* ============================================================
-   14. HERO GRID — Canvas 2D dot field with cursor proximity
-   A fine grid of ink-coloured dots fills the hero canvas.
-   At rest they breathe at ~7% opacity. As the cursor moves
-   near a dot it scales up, brightens, and shifts toward red
-   (#C52B10) via a smoothstep proximity field (radius 200 px).
-   A soft halo ring amplifies the glow for nearby dots —
-   echoing the Stitch/Google grid aesthetic but keyed to the
-   site's ink/paper/red palette.
+   14. HERO GRID — Canvas 2D dot field with organic wave + pointer
+   Ink-coloured dots (#1A1814) fill the hero canvas. Always
+   visible — an organic layered-sine wave moves across the grid
+   autonomously so the site has life even when the user is idle.
+   Mouse (desktop) and touch (all devices, multi-touch) add a
+   proximity field: nearby dots brighten and grow. No colour
+   shift — pure ink throughout.
    Pauses via IntersectionObserver when hero is off-screen.
    Skipped if prefers-reduced-motion.
    ============================================================ */
@@ -665,30 +697,27 @@ gsap.to('.footer__personal', {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  /* ---- Palette — ink #1A1814, red #C52B10 ---- */
-  const INK = [26, 24, 20];
-  const RED = [197, 43, 16];
+  /* ---- Ink only — #1A1814 ---- */
+  const IR = 26, IG = 24, IB = 20;
 
-  /* ---- Grid configuration ---- */
-  const CELL        = 44;      // logical px between grid intersections
-  const R_REST      = 1.1;     // dot radius at rest (logical px)
-  const R_MAX       = 2.9;     // dot radius at full cursor proximity
-  const A_REST      = 0.07;    // opacity at rest
-  const A_MAX       = 0.52;    // opacity at full cursor proximity
-  const INFLUENCE   = 200;     // cursor influence radius (logical px)
-  const BREATHE_AMP = 0.018;   // breathing alpha amplitude (±)
-  const BREATHE_SPD = 0.00044; // breathing angular speed (rad/ms)
+  /* ---- Grid config ---- */
+  const CELL      = 44;   // px between intersections
+  const R_MIN     = 0.8;  // radius at wave trough
+  const R_MAX     = 3.0;  // radius at full activation
+  const A_MIN     = 0.08; // alpha at trough — grid always visible
+  const A_WAVE    = 0.34; // alpha at autonomous wave peak
+  const A_PTR     = 0.62; // alpha at full pointer proximity
+  const INFLUENCE = 190;  // pointer influence radius (px)
 
   let W, H, dots = [], dpr;
 
-  /* ---- Build dot array on resize ---- */
   function buildGrid() {
     dpr = Math.min(devicePixelRatio, 2);
     W   = canvas.clientWidth;
     H   = canvas.clientHeight;
     canvas.width  = W * dpr;
     canvas.height = H * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // draw in logical coords
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // draw in logical px
 
     const offX = (W % CELL) * 0.5;
     const offY = (H % CELL) * 0.5;
@@ -697,11 +726,7 @@ gsap.to('.footer__personal', {
     const rows = Math.ceil(H / CELL) + 1;
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        dots.push({
-          x:     offX + c * CELL,
-          y:     offY + r * CELL,
-          phase: Math.random() * Math.PI * 2, // staggered breathing
-        });
+        dots.push({ x: offX + c * CELL, y: offY + r * CELL });
       }
     }
   }
@@ -709,25 +734,54 @@ gsap.to('.footer__personal', {
   new ResizeObserver(buildGrid).observe(canvas);
   buildGrid();
 
-  /* ---- Mouse tracking (window-level: canvas has pointer-events:none) ---- */
-  const mouse   = { x: -9999, y: -9999 };
-  const mSmooth = { x: -9999, y: -9999 };
+  /* ---- Unified pointer map — mouse + multi-touch ---- */
+  // Each entry: { x, y, sx, sy } — raw target + smoothed position
+  const pointers = new Map();
 
-  if (!isMobile) {
-    window.addEventListener('mousemove', (e) => {
-      const rect = canvas.getBoundingClientRect();
-      if (e.clientX >= rect.left && e.clientX <= rect.right &&
-          e.clientY >= rect.top  && e.clientY <= rect.bottom) {
-        mouse.x = e.clientX - rect.left;
-        mouse.y = e.clientY - rect.top;
-      } else {
-        mouse.x = -9999;
-        mouse.y = -9999;
-      }
-    });
+  function canvasXY(clientX, clientY) {
+    const r = canvas.getBoundingClientRect();
+    return { x: clientX - r.left, y: clientY - r.top };
+  }
+  function inCanvas(clientX, clientY) {
+    const r = canvas.getBoundingClientRect();
+    return clientX >= r.left && clientX <= r.right &&
+           clientY >= r.top  && clientY <= r.bottom;
   }
 
-  /* ---- IntersectionObserver: pause RAF when hero is off-screen ---- */
+  /* Mouse */
+  window.addEventListener('mousemove', (e) => {
+    if (inCanvas(e.clientX, e.clientY)) {
+      const { x, y } = canvasXY(e.clientX, e.clientY);
+      const p = pointers.get('mouse');
+      if (p) { p.x = x; p.y = y; }
+      else pointers.set('mouse', { x, y, sx: x, sy: y });
+    } else {
+      pointers.delete('mouse');
+    }
+  });
+
+  /* Touch — only track touches that begin within the canvas */
+  window.addEventListener('touchstart', (e) => {
+    for (const t of e.changedTouches) {
+      if (inCanvas(t.clientX, t.clientY)) {
+        const { x, y } = canvasXY(t.clientX, t.clientY);
+        pointers.set(t.identifier, { x, y, sx: x, sy: y });
+      }
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchmove', (e) => {
+    for (const t of e.changedTouches) {
+      const p = pointers.get(t.identifier);
+      if (p) { const { x, y } = canvasXY(t.clientX, t.clientY); p.x = x; p.y = y; }
+    }
+  }, { passive: true });
+
+  const clearTouch = (e) => { for (const t of e.changedTouches) pointers.delete(t.identifier); };
+  window.addEventListener('touchend',    clearTouch, { passive: true });
+  window.addEventListener('touchcancel', clearTouch, { passive: true });
+
+  /* ---- Pause when hero is off-screen ---- */
   let raf = null, visible = true, t0 = null;
   const heroPanel = canvas.closest('.panel--hero');
   if (heroPanel) {
@@ -742,46 +796,57 @@ gsap.to('.footer__personal', {
     raf = requestAnimationFrame(render);
     if (!visible) return;
     if (!t0) t0 = ts;
-    const t = (ts - t0) * BREATHE_SPD;
+    const t = (ts - t0) * 0.001; // seconds
 
-    /* Smooth cursor spring (7% lerp ≈ 100 ms lag) */
-    const k = 0.07;
-    mSmooth.x += (mouse.x - mSmooth.x) * k;
-    mSmooth.y += (mouse.y - mSmooth.y) * k;
+    /* Smooth all pointers */
+    for (const p of pointers.values()) {
+      p.sx += (p.x - p.sx) * 0.07;
+      p.sy += (p.y - p.sy) * 0.07;
+    }
 
     ctx.clearRect(0, 0, W, H);
 
     for (const d of dots) {
-      /* Breathing pulse — staggered per dot */
-      const breath = Math.sin(t + d.phase) * BREATHE_AMP;
+      /* Organic autonomous field — layered sines at different
+         spatial + temporal frequencies create travelling interference
+         patterns that look alive without being distracting */
+      const nx = d.x * 0.012;
+      const ny = d.y * 0.015;
+      const rawWave =
+        0.50
+        + 0.22 * Math.sin(nx       + t * 0.55) * Math.sin(ny       - t * 0.40)
+        + 0.16 * Math.sin(nx * 1.6 - t * 0.28 + ny * 0.9)
+        + 0.12 * Math.sin(nx * 0.5 + ny * 1.3  + t * 0.65);
+      const w = Math.max(0, Math.min(1, rawWave));
 
-      /* Cursor proximity — smoothstep falloff */
-      const dx   = d.x - mSmooth.x;
-      const dy   = d.y - mSmooth.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const raw  = Math.max(0, 1 - dist / INFLUENCE);
-      const prox = raw * raw * (3 - 2 * raw); // smoothstep
+      /* Max proximity from any active pointer */
+      let maxProx = 0;
+      for (const p of pointers.values()) {
+        const dx   = d.x - p.sx;
+        const dy   = d.y - p.sy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const raw  = Math.max(0, 1 - dist / INFLUENCE);
+        const prox = raw * raw * (3 - 2 * raw); // smoothstep
+        if (prox > maxProx) maxProx = prox;
+      }
 
-      /* Final visual values */
-      const alpha  = Math.min(A_REST + breath + prox * (A_MAX - A_REST), 1);
-      const radius = R_REST + prox * (R_MAX - R_REST);
-
-      /* Color: lerp ink → red as prox increases */
-      const r = Math.round(INK[0] + prox * (RED[0] - INK[0]));
-      const g = Math.round(INK[1] + prox * (RED[1] - INK[1]));
-      const b = Math.round(INK[2] + prox * (RED[2] - INK[2]));
+      /* Pointer field overrides wave at full proximity */
+      const baseAlpha = A_MIN + w * (A_WAVE - A_MIN);
+      const alpha     = baseAlpha + maxProx * (A_PTR - baseAlpha);
+      const radius    = R_MIN + (w * 0.4 + maxProx * 0.6) * (R_MAX - R_MIN);
 
       /* Core dot */
       ctx.beginPath();
-      ctx.arc(d.x, d.y, radius, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+      ctx.arc(d.x, d.y, Math.max(0.5, radius), 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${IR},${IG},${IB},${alpha})`;
       ctx.fill();
 
-      /* Soft halo glow for proximate dots (Stitch-like bloom) */
-      if (prox > 0.12) {
+      /* Soft halo on prominently activated dots */
+      if (maxProx > 0.18 || w > 0.72) {
+        const ha = (maxProx * 0.55 + w * 0.12) * 0.085;
         ctx.beginPath();
-        ctx.arc(d.x, d.y, radius * 3.8, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${r},${g},${b},${prox * 0.09})`;
+        ctx.arc(d.x, d.y, radius * 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${IR},${IG},${IB},${ha})`;
         ctx.fill();
       }
     }
