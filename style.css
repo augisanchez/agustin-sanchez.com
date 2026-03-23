@@ -39,6 +39,11 @@
   padding: 0;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
 html { scroll-behavior: auto; }
 
 body {
@@ -70,6 +75,19 @@ img { display: block; max-width: 100%; }
   transition: top 0.15s ease;
 }
 .skip-link:focus { top: 0; }
+
+/* Visually hidden — accessible to screen readers, invisible on screen */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* Focus indicators — visible for keyboard navigation */
 :focus-visible {
@@ -887,7 +905,7 @@ img { display: block; max-width: 100%; }
 .contact-block .projects-headline { margin-top: 0; margin-bottom: 0; }
 
 .contact-block__prompt {
-  color: color-mix(in srgb, var(--paper) 55%, transparent);
+  color: var(--c-mid);
 }
 
 /* ---- Contact form ---- */
@@ -941,7 +959,7 @@ img { display: block; max-width: 100%; }
 .contact-form__submit:disabled { opacity: 0.45; cursor: default; }
 
 .contact-form__thanks {
-  color: color-mix(in srgb, var(--paper) 70%, transparent);
+  color: var(--c-mid);
 }
 
 /* ============================================================
