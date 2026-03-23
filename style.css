@@ -617,7 +617,6 @@ img { display: block; max-width: 100%; }
 
 .panel__content--ai-matrix {
   justify-content: center;
-  padding: clamp(48px, 7vh, 96px) clamp(32px, 6vw, 80px);
 }
 
 .ai-frame {
@@ -625,8 +624,6 @@ img { display: block; max-width: 100%; }
   flex-direction: column;
   gap: clamp(28px, 4vh, 52px);
   width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
 }
 
 .ai-frame__hd {
@@ -1074,10 +1071,6 @@ img { display: block; max-width: 100%; }
   }
 
   /* AI Matrix */
-  .panel__content--ai-matrix {
-    padding: clamp(24px, 3.5vh, 52px) clamp(32px, 6vw, 80px);
-  }
-
   .ai-frame {
     gap: clamp(14px, 2vh, 28px);
   }
