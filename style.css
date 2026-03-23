@@ -1001,6 +1001,9 @@ img { display: block; max-width: 100%; }
 
   .footer__right { align-items: flex-start; }
 
+  /* Gate tag is too long to fit in ~90px columns — red border still marks the gate visually */
+  .ai-m__gate-tag { display: none; }
+
   /* Compression Map: reduce cell padding on mobile so the table breathes at 580px min-width */
   .ai-m__ph {
     padding: 10px 8px 12px;
