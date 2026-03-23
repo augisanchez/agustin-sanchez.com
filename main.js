@@ -694,14 +694,25 @@ gsap.to('.footer__personal', {
 });
 
 /* ============================================================
-   14. HERO GRID — Canvas 2D dot field with organic wave + pointer
-   Ink-coloured dots (#1A1814) fill the hero canvas. Always
-   visible — an organic layered-sine wave moves across the grid
-   autonomously so the site has life even when the user is idle.
-   Mouse (desktop) and touch (all devices, multi-touch) add a
-   proximity field: nearby dots brighten and grow. No colour
-   shift — pure ink throughout.
-   Pauses via IntersectionObserver when hero is off-screen.
+   14. HERO GRID — pinpoint grid, opacity wave, repulsion physics
+   A tight grid of 1 px ink dots fills the canvas.
+   Two systems run simultaneously:
+
+   WAVE — a slow sine wave travels across the grid, cycling
+   each dot's opacity between A_MIN (20%) and A_MAX (33%).
+   The wave is purely visual — dots do not move.
+
+   REPULSION — mouse and touch act as negative-gravity sources.
+   Each dot has rest coordinates (rx, ry) and live coordinates
+   (x, y) driven by spring physics:
+     • Pointer within PUSH_RADIUS → repulsion force pushes dot
+       away, proportional to (1 - dist/radius)²
+     • Spring constant pulls dot back to rest
+     • Velocity damps each frame
+   Fade: within FADE_RADIUS (larger than push) dot opacity is
+   multiplied toward 0, creating a clean void at the pointer
+   that fills back in as the pointer leaves.
+   Dots never grow — radius is fixed at DOT_R throughout.
    Skipped if prefers-reduced-motion.
    ============================================================ */
 
@@ -713,27 +724,36 @@ gsap.to('.footer__personal', {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  /* ---- Ink only — #1A1814 ---- */
+  /* ---- Ink #1A1814 ---- */
   const IR = 26, IG = 24, IB = 20;
 
-  /* ---- Grid config ---- */
-  const CELL      = 44;   // px between intersections
-  const R_MIN     = 0.8;  // radius at wave trough
-  const R_MAX     = 3.0;  // radius at full activation
-  const A_MIN     = 0.08; // alpha at trough — grid always visible
-  const A_WAVE    = 0.34; // alpha at autonomous wave peak
-  const A_PTR     = 0.62; // alpha at full pointer proximity
-  const INFLUENCE = 190;  // pointer influence radius (px)
+  /* ---- Config ---- */
+  const CELL         = 24;    // tight grid — px between dots
+  const DOT_R        = 1.0;   // fixed pinpoint radius (never changes)
+
+  const A_MIN        = 0.20;  // wave trough opacity
+  const A_MAX        = 0.33;  // wave peak opacity
+  const WAVE_SPD     = 0.40;  // wave travel speed (rad/s)
+  const WAVE_FX      = 0.016; // spatial freq X
+  const WAVE_FY      = 0.011; // spatial freq Y (different → diagonal travel)
+
+  const PUSH_RADIUS  = 85;    // repulsion influence (px)
+  const PUSH_STR     = 1.4;   // repulsion force magnitude
+  const SPRING_K     = 0.10;  // spring stiffness (return to rest)
+  const DAMPING      = 0.82;  // velocity retention per frame
+
+  const FADE_RADIUS  = 145;   // opacity fade zone (larger than push)
 
   let W, H, dots = [], dpr;
 
+  /* ---- Build dot grid on resize ---- */
   function buildGrid() {
     dpr = Math.min(devicePixelRatio, 2);
     W   = canvas.clientWidth;
     H   = canvas.clientHeight;
     canvas.width  = W * dpr;
     canvas.height = H * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // draw in logical px
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     const offX = (W % CELL) * 0.5;
     const offY = (H % CELL) * 0.5;
@@ -742,7 +762,10 @@ gsap.to('.footer__personal', {
     const rows = Math.ceil(H / CELL) + 1;
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        dots.push({ x: offX + c * CELL, y: offY + r * CELL });
+        const rx = offX + c * CELL;
+        const ry = offY + r * CELL;
+        /* rx/ry = rest position; x/y = live position; vx/vy = velocity */
+        dots.push({ rx, ry, x: rx, y: ry, vx: 0, vy: 0 });
       }
     }
   }
@@ -750,8 +773,8 @@ gsap.to('.footer__personal', {
   new ResizeObserver(buildGrid).observe(canvas);
   buildGrid();
 
-  /* ---- Unified pointer map — mouse + multi-touch ---- */
-  // Each entry: { x, y, sx, sy } — raw target + smoothed position
+  /* ---- Pointer map — mouse + multi-touch ---- */
+  /* Each entry: { x, y, sx, sy } — raw target + smoothed position */
   const pointers = new Map();
 
   function canvasXY(clientX, clientY) {
@@ -764,7 +787,6 @@ gsap.to('.footer__personal', {
            clientY >= r.top  && clientY <= r.bottom;
   }
 
-  /* Mouse */
   window.addEventListener('mousemove', (e) => {
     if (inCanvas(e.clientX, e.clientY)) {
       const { x, y } = canvasXY(e.clientX, e.clientY);
@@ -776,7 +798,6 @@ gsap.to('.footer__personal', {
     }
   });
 
-  /* Touch — only track touches that begin within the canvas */
   window.addEventListener('touchstart', (e) => {
     for (const t of e.changedTouches) {
       if (inCanvas(t.clientX, t.clientY)) {
@@ -814,57 +835,61 @@ gsap.to('.footer__personal', {
     if (!t0) t0 = ts;
     const t = (ts - t0) * 0.001; // seconds
 
-    /* Smooth all pointers */
+    /* Smooth pointer positions */
     for (const p of pointers.values()) {
-      p.sx += (p.x - p.sx) * 0.07;
-      p.sy += (p.y - p.sy) * 0.07;
+      p.sx += (p.x - p.sx) * 0.12;
+      p.sy += (p.y - p.sy) * 0.12;
     }
 
     ctx.clearRect(0, 0, W, H);
 
     for (const d of dots) {
-      /* Organic autonomous field — layered sines at different
-         spatial + temporal frequencies create travelling interference
-         patterns that look alive without being distracting */
-      const nx = d.x * 0.012;
-      const ny = d.y * 0.015;
-      const rawWave =
-        0.50
-        + 0.22 * Math.sin(nx       + t * 0.55) * Math.sin(ny       - t * 0.40)
-        + 0.16 * Math.sin(nx * 1.6 - t * 0.28 + ny * 0.9)
-        + 0.12 * Math.sin(nx * 0.5 + ny * 1.3  + t * 0.65);
-      const w = Math.max(0, Math.min(1, rawWave));
 
-      /* Max proximity from any active pointer */
-      let maxProx = 0;
+      /* ── Physics: repulsion from each pointer ── */
       for (const p of pointers.values()) {
         const dx   = d.x - p.sx;
         const dy   = d.y - p.sy;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const raw  = Math.max(0, 1 - dist / INFLUENCE);
-        const prox = raw * raw * (3 - 2 * raw); // smoothstep
-        if (prox > maxProx) maxProx = prox;
+        if (dist < PUSH_RADIUS && dist > 0.5) {
+          const t0 = 1 - dist / PUSH_RADIUS;          // 0→1 as dist→0
+          const f  = t0 * t0 * PUSH_STR;              // quadratic falloff
+          d.vx += (dx / dist) * f;
+          d.vy += (dy / dist) * f;
+        }
       }
 
-      /* Pointer field overrides wave at full proximity */
-      const baseAlpha = A_MIN + w * (A_WAVE - A_MIN);
-      const alpha     = baseAlpha + maxProx * (A_PTR - baseAlpha);
-      const radius    = R_MIN + (w * 0.4 + maxProx * 0.6) * (R_MAX - R_MIN);
+      /* ── Spring return to rest ── */
+      d.vx += (d.rx - d.x) * SPRING_K;
+      d.vy += (d.ry - d.y) * SPRING_K;
 
-      /* Core dot */
+      /* ── Damping + integrate ── */
+      d.vx *= DAMPING;
+      d.vy *= DAMPING;
+      d.x  += d.vx;
+      d.y  += d.vy;
+
+      /* ── Wave opacity (keyed to rest position for stable field) ── */
+      const wave  = 0.5 + 0.5 * Math.sin(d.rx * WAVE_FX + d.ry * WAVE_FY + t * WAVE_SPD);
+      const waveA = A_MIN + wave * (A_MAX - A_MIN);
+
+      /* ── Fade: cursor void (use rest position — void stays put) ── */
+      let maxFade = 0;
+      for (const p of pointers.values()) {
+        const dx   = d.rx - p.sx;
+        const dy   = d.ry - p.sy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const raw  = Math.max(0, 1 - dist / FADE_RADIUS);
+        const fade = raw * raw * (3 - 2 * raw);       // smoothstep → clean edge
+        if (fade > maxFade) maxFade = fade;
+      }
+
+      const alpha = waveA * (1 - maxFade);
+      if (alpha < 0.005) continue;                    // skip invisible dots
+
       ctx.beginPath();
-      ctx.arc(d.x, d.y, Math.max(0.5, radius), 0, Math.PI * 2);
+      ctx.arc(d.x, d.y, DOT_R, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(${IR},${IG},${IB},${alpha})`;
       ctx.fill();
-
-      /* Soft halo on prominently activated dots */
-      if (maxProx > 0.18 || w > 0.72) {
-        const ha = (maxProx * 0.55 + w * 0.12) * 0.085;
-        ctx.beginPath();
-        ctx.arc(d.x, d.y, radius * 3.5, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${IR},${IG},${IB},${ha})`;
-        ctx.fill();
-      }
     }
   }
 
