@@ -160,21 +160,25 @@ document.querySelectorAll('[data-tone]').forEach((el) => {
 
 /* ============================================================
    4. LENIS VARIABLE WEIGHT
+   Desktop + tablet only. Phones use native scroll (lerp:1) and
+   must never have their lerp overridden by these callbacks.
    ============================================================ */
 
-['panel--leadership', 'panel--beliefs-full'].forEach((cls) => {
-  document.querySelectorAll('.' + cls).forEach((panel) => {
-    ScrollTrigger.create({
-      trigger: panel,
-      start: 'top 60%',
-      end:   'bottom 40%',
-      onEnter:     () => { lenis.options.lerp = 0.06; },
-      onLeave:     () => { lenis.options.lerp = 0.08; },
-      onEnterBack: () => { lenis.options.lerp = 0.06; },
-      onLeaveBack: () => { lenis.options.lerp = 0.08; },
+if (!isMobile) {
+  ['panel--leadership', 'panel--beliefs-full'].forEach((cls) => {
+    document.querySelectorAll('.' + cls).forEach((panel) => {
+      ScrollTrigger.create({
+        trigger: panel,
+        start: 'top 60%',
+        end:   'bottom 40%',
+        onEnter:     () => { lenis.options.lerp = 0.06; },
+        onLeave:     () => { lenis.options.lerp = 0.08; },
+        onEnterBack: () => { lenis.options.lerp = 0.06; },
+        onLeaveBack: () => { lenis.options.lerp = 0.08; },
+      });
     });
   });
-});
+}
 
 /* ============================================================
    5. HERO — load animation (identity: AGUSTIN SANCHEZ.)
