@@ -15,7 +15,8 @@ gsap.registerPlugin(ScrollTrigger);
    ============================================================ */
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const isMobile            = window.matchMedia('(max-width: 768px)').matches;
+// Touch devices: phones + all iPad Pro variants (portrait 1024px)
+const isMobile            = window.matchMedia('(max-width: 1024px)').matches;
 
 /* ============================================================
    1. LENIS — weighted smooth scroll
@@ -40,10 +41,11 @@ if (prefersReducedMotion) {
 /* ============================================================
    2. PAGE BACKGROUND — color transitions
    Desktop: scrub-driven against tall sticky panel dwell height.
-   Mobile:  IntersectionObserver + GSAP tween — scrub relies on
-            the 160vh dwell geometry; on short auto-height panels
-            multiple sections hit the trigger zone simultaneously,
-            causing animation conflicts and jumping colors.
+   Touch (phone + iPad): each section owns its background-color
+   directly. This guarantees the correct bg is visible as soon
+   as the section enters the viewport — before any content —
+   because the section's padding-top is blank colored space.
+   No scrub, no IntersectionObserver race conditions.
    ============================================================ */
 
 const pageBg = document.getElementById('page-bg');
@@ -51,7 +53,7 @@ const pageBg = document.getElementById('page-bg');
 // Build ordered list of all [data-bg] sections
 const bgSections = Array.from(document.querySelectorAll('[data-bg]'));
 
-// Set initial color immediately
+// Set initial page-bg color immediately (used by desktop scrub + hero area)
 if (bgSections.length) gsap.set(pageBg, { backgroundColor: bgSections[0].dataset.bg });
 
 if (!isMobile) {
@@ -76,42 +78,13 @@ if (!isMobile) {
   });
 
 } else {
-  // ── Mobile: IntersectionObserver, smooth 0.5s tween ────────
-  // Track intersection ratios for all observed sections so we
-  // always transition to the MOST VISIBLE section's color.
-  const mobileBgMap = new Map();
-
-  const bgObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        mobileBgMap.set(entry.target, entry.intersectionRatio);
-      } else {
-        mobileBgMap.delete(entry.target);
-      }
-    });
-
-    if (!mobileBgMap.size) return;
-
-    // Dominant section = highest intersection ratio in viewport
-    let dominant = null, maxRatio = -1;
-    mobileBgMap.forEach((ratio, el) => {
-      if (ratio > maxRatio) { maxRatio = ratio; dominant = el; }
-    });
-
-    if (dominant) {
-      gsap.to(pageBg, {
-        backgroundColor: dominant.dataset.bg,
-        duration:  0.5,
-        ease:      'power2.inOut',
-        overwrite: true,
-      });
-    }
-  }, {
-    // Fire at each 10% step so dominant section updates smoothly
-    threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+  // ── Touch / tablet: stamp bg-color directly on each section ──
+  // Sections become self-contained colored blocks. As the user
+  // scrolls, the section's own padding-top (72px of solid color)
+  // appears before any content — bg always leads content.
+  bgSections.forEach((section) => {
+    section.style.backgroundColor = section.dataset.bg;
   });
-
-  bgSections.forEach((s) => bgObserver.observe(s));
 }
 
 /* ============================================================
