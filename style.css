@@ -991,7 +991,10 @@ img { display: block; max-width: 100%; }
     height: auto !important;
     overflow: visible !important;
     min-height: 0 !important;
-    /* Padding: use base clamp(80px, 12vh, 140px) — generous on all touch sizes */
+    /* More generous vertical breathing room — base desktop value was
+       tuned for 100svh sticky containers, not natural document flow */
+    padding-top:    clamp(100px, 15vh, 180px);
+    padding-bottom: clamp(100px, 15vh, 180px);
   }
 
   /* Hero stays full-height */
@@ -1033,6 +1036,13 @@ img { display: block; max-width: 100%; }
 
   /* Tighter horizontal padding — more text width on small screens */
   :root { --pad-x: clamp(20px, 5.5vw, 32px); }
+
+  /* Phone vertical padding — slightly less than tablet since
+     phones are shorter; still more generous than the desktop value */
+  .panel__content {
+    padding-top:    clamp(80px, 13vh, 130px);
+    padding-bottom: clamp(80px, 13vh, 130px);
+  }
 
   /* Bigger body copy on phone */
   .essay {

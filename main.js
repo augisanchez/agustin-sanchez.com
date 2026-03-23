@@ -79,13 +79,38 @@ if (!isMobile) {
   });
 
 } else {
-  // ── Touch / tablet: stamp bg-color directly on each section ──
-  // Sections become self-contained colored blocks. As the user
-  // scrolls, the section's own padding-top (72px of solid color)
-  // appears before any content — bg always leads content.
-  bgSections.forEach((section) => {
-    section.style.backgroundColor = section.dataset.bg;
+  // ── Touch / tablet: scroll-driven CSS transition on page-bg ──
+  // Sections remain transparent. page-bg (fixed, z-index:-2) owns
+  // all color. A passive scroll listener picks whichever section's
+  // midpoint has most recently crossed 40% of its height past the
+  // viewport centre — only one section can win at a time.
+  let activeTouchBg = '';
+
+  function updateTouchBg() {
+    const midY = window.scrollY + window.innerHeight * 0.5;
+    let newBg   = bgSections[0].dataset.bg;
+
+    for (const section of bgSections) {
+      if (midY > section.offsetTop + section.offsetHeight * 0.4) {
+        newBg = section.dataset.bg;
+      }
+    }
+
+    if (newBg !== activeTouchBg) {
+      activeTouchBg = newBg;
+      pageBg.style.backgroundColor = newBg;
+    }
+  }
+
+  // Seed initial colour with no transition (prevents flash on load)
+  updateTouchBg();
+
+  // Enable smooth transition only after first paint
+  requestAnimationFrame(() => {
+    pageBg.style.transition = 'background-color 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
   });
+
+  window.addEventListener('scroll', updateTouchBg, { passive: true });
 }
 
 /* ============================================================
