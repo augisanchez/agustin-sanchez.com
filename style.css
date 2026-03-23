@@ -952,9 +952,9 @@ img { display: block; max-width: 100%; }
 
   /* ─── Kill sticky panel system — natural document flow ───
      Desktop uses .panel (tall dwell container) + .panel__content
-     (sticky 100svh pin). On mobile these create hard-to-read
-     viewport overflows and text overlap between adjacent panels.
-     Strip all of it: panels become normal block elements. ─── */
+     (sticky 100svh pin). On mobile these create viewport overflows
+     and text overlap between adjacent panels. Strip all of it:
+     panels become normal block elements. ─── */
 
   .panel { height: auto !important; }
 
@@ -963,8 +963,9 @@ img { display: block; max-width: 100%; }
     height: auto !important;
     overflow: visible !important;
     min-height: 0 !important;
-    padding-top: clamp(72px, 10vh, 96px);
-    padding-bottom: clamp(56px, 8vh, 80px);
+    /* Generous vertical rhythm — sections need room to breathe */
+    padding-top:    clamp(96px, 14vh, 140px);
+    padding-bottom: clamp(96px, 14vh, 140px);
   }
 
   /* Hero is the one panel that stays full-height */
@@ -974,6 +975,9 @@ img { display: block; max-width: 100%; }
     height: 100svh !important;
     overflow: hidden !important; /* clip the canvas */
   }
+
+  /* Tighter horizontal padding gives text more width */
+  :root { --pad-x: clamp(20px, 5.5vw, 32px); }
 
   /* ─── Override GSAP initial opacity: 0 / transform states ───
      GSAP sets these inline before animations fire. With natural
@@ -1003,14 +1007,28 @@ img { display: block; max-width: 100%; }
     filter: none !important;
   }
 
+  /* ─── Typography — bigger body, full width ─── */
+
+  /* Push body text larger — 19px minimum, fills column width */
+  .essay {
+    font-size: clamp(19px, 5vw, 21px);
+    line-height: 1.75;
+  }
+
+  /* Remove all max-width constraints on body copy */
+  .principle-body--narrow,
+  .projects-headline { max-width: none !important; }
+
   .hud {
     padding: 14px var(--pad-x);
   }
 
   .hud__role { display: none; }
 
-  /* color-buffer is only needed for sticky transition timing — hide on mobile */
-  .color-buffer { display: none; }
+  /* color-buffer provides scroll space for bg transition timing.
+     Small on mobile — enough for the scrub to start before
+     content appears, creating a smooth Lenis-driven bg shift. */
+  .color-buffer { height: 64px; }
 
   .strip-cols {
     grid-template-columns: 1fr;
@@ -1019,10 +1037,20 @@ img { display: block; max-width: 100%; }
 
   .panel__content--leadership {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 48px;
   }
 
-  .leadership-image { display: none; }
+  /* Leadership image — show on mobile, full-width landscape frame */
+  .leadership-image {
+    display: block;
+    flex: none;           /* don't flex-grow on mobile */
+    height: 58vw;         /* landscape crop, ~225px on 390px screen */
+    width: 100%;
+    margin-top: 32px;
+    object-fit: cover;
+    object-position: center bottom;
+    border-radius: 12px;
+  }
 
   .beliefs-principles {
     grid-template-columns: 1fr;

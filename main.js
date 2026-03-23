@@ -45,15 +45,8 @@ if (prefersReducedMotion) {
 
 const pageBg = document.getElementById('page-bg');
 
-// Mobile — stamp background-color directly on each panel.
-// page-bg transitions rely on the tall dwell height of sticky
-// panels; without that, the fixed bg layer lags behind the
-// actual scroll position, leaving white gaps.
-if (isMobile) {
-  document.querySelectorAll('[data-bg]').forEach((el) => {
-    el.style.backgroundColor = el.dataset.bg;
-  });
-}
+// page-bg scrub transitions work via viewport position, not dwell height —
+// they run fine on mobile with natural scroll. No special handling needed.
 
 // Build ordered list of all [data-bg] sections
 const bgSections = Array.from(document.querySelectorAll('[data-bg]'));
