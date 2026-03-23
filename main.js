@@ -588,7 +588,7 @@ if (!isMobile) document.querySelectorAll('.panel').forEach((panel) => {
     {
       opacity: 0,
       filter: 'blur(10px)',
-      ease: 'none',
+      ease: 'power2.in',  // slow start, fast end — content lingers then snaps away
       scrollTrigger: {
         trigger: panel,
         start: isHero ? 'bottom 45%' : 'bottom 65%',
