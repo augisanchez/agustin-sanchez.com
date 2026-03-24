@@ -289,6 +289,7 @@ if (leaderPanel) {
 
   if (label) gsap.set(label, { opacity: 0 });
   if (photo) gsap.set(photo, { yPercent: 110 });
+  if (spans.length) gsap.set(spans, { yPercent: 110 });
   if (paras.length) gsap.set(paras, { opacity: 0, y: 24 });
   if (note)  gsap.set(note,  { opacity: 0, y: 14 });
 
@@ -314,6 +315,7 @@ if (orgIntroPanel) {
   const note  = orgIntroPanel.querySelector('.org-intro-note');
 
   if (label) gsap.set(label, { opacity: 0 });
+  if (spans.length) gsap.set(spans, { yPercent: 110 });
   if (note)  gsap.set(note,  { opacity: 0, y: 14 });
 
   const tl = gsap.timeline({
@@ -335,6 +337,8 @@ if (orgStatPanel) {
   const accentSpans = orgStatPanel.querySelectorAll('.org-lines--accent .line-mask span');
   const notes       = orgStatPanel.querySelectorAll('.org-intro-note');
 
+  if (mutedSpans.length)  gsap.set(mutedSpans,  { yPercent: 110 });
+  if (accentSpans.length) gsap.set(accentSpans, { yPercent: 110 });
   if (notes.length) gsap.set(notes, { opacity: 0, y: 14 });
 
   const tl = gsap.timeline({
@@ -358,11 +362,14 @@ if (beliefsPanel) {
   const beliefsDivider = beliefsPanel.querySelector('.beliefs-divider');
 
   if (label)         gsap.set(label,          { opacity: 0 });
+  if (hlSpans.length) gsap.set(hlSpans,       { yPercent: 110 });
   if (beliefsDivider) gsap.set(beliefsDivider, { opacity: 0 });
   beliefsPanel.querySelectorAll('.belief-col').forEach(col => {
     const cl = col.querySelector('.principle-label');
+    const cs = col.querySelectorAll('.principle-headline .line-mask span');
     const cb = col.querySelector('.principle-body');
     if (cl) gsap.set(cl, { opacity: 0 });
+    if (cs.length) gsap.set(cs, { yPercent: 110 });
     if (cb) gsap.set(cb, { opacity: 0, y: 18 });
   });
 
@@ -397,6 +404,7 @@ if (curiosityPanel) {
   const xl    = curiosityPanel.querySelector('.principle-headline--xl');
 
   if (label) gsap.set(label, { opacity: 0 });
+  if (spans.length) gsap.set(spans, { yPercent: 110 });
   if (body)  gsap.set(body,  { opacity: 0, y: 18 });
 
   const tl = gsap.timeline({
@@ -422,6 +430,8 @@ if (gapPanel) {
   const note     = gapPanel.querySelector('.org-intro-note');
 
   if (label) gsap.set(label, { opacity: 0 });
+  if (hlSpans.length)  gsap.set(hlSpans,  { yPercent: 110 });
+  if (subSpans.length) gsap.set(subSpans, { yPercent: 110 });
   if (body)  gsap.set(body,  { opacity: 0, y: 18 });
   if (note)  gsap.set(note,  { opacity: 0, y: 14 });
 
@@ -446,6 +456,7 @@ if (projectsSection) {
   const headlineSpans = projectsSection.querySelectorAll('.projects-headline .line-mask span');
 
   if (label) gsap.set(label, { opacity: 0 });
+  if (headlineSpans.length) gsap.set(headlineSpans, { yPercent: 110 });
 
   const tl = gsap.timeline({
     scrollTrigger: {
@@ -497,6 +508,8 @@ if (deliveryPanel) {
   const body     = deliveryPanel.querySelector('.principle-body');
 
   if (label) gsap.set(label, { opacity: 0 });
+  if (hlSpans.length)  gsap.set(hlSpans,  { yPercent: 110 });
+  if (subSpans.length) gsap.set(subSpans, { yPercent: 110 });
   if (body)  gsap.set(body,  { opacity: 0, y: 18 });
 
   const tl = gsap.timeline({
@@ -523,6 +536,7 @@ if (frameworkPanel) {
   const deliveryTable = frameworkPanel.querySelector('.delivery-table');
 
   if (label)         gsap.set(label,        { opacity: 0 });
+  if (hlSpans.length) gsap.set(hlSpans,    { yPercent: 110 });
   if (body)          gsap.set(body,         { opacity: 0, y: 18 });
   if (deliveryTable) gsap.set(deliveryTable, { opacity: 0 });
   if (phases.length) gsap.set(phases,       { opacity: 0, y: 12 });
