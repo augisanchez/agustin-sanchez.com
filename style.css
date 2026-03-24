@@ -109,8 +109,8 @@ img { display: block; max-width: 100%; }
 
 .noise {
   position: fixed;
-  inset: -2px;          /* 2px bleed on all edges — eliminates sub-pixel rendering gaps */
-  width: calc(100% + 4px);
+  inset: -2px;                    /* 2px bleed on all edges */
+  width:  calc(100% + 4px);
   height: calc(100% + 4px);
   z-index: 999;
   pointer-events: none;
@@ -127,7 +127,7 @@ img { display: block; max-width: 100%; }
 /* COLOR BUFFER — empty scroll space so bg finishes transitioning
    before sticky content starts pinning */
 .color-buffer {
-  height: 60vh;
+  height: 10vh;
   pointer-events: none;
 }
 
@@ -362,7 +362,7 @@ img { display: block; max-width: 100%; }
    Same paper section as identity hero, no color change
    ============================================================ */
 
-.panel--statement { height: 160vh; }
+.panel--statement { height: 150vh; }
 
 .panel__content--statement {
   align-items: flex-start;
@@ -379,7 +379,7 @@ img { display: block; max-width: 100%; }
    Two columns: label+headline+image left / body text right
    ============================================================ */
 
-.panel--leadership { height: 160vh; }
+.panel--leadership { height: 150vh; }
 
 .panel__content--leadership {
   display: grid;
@@ -444,7 +444,7 @@ img { display: block; max-width: 100%; }
    ============================================================ */
 
 /* Panel 1: Entry — label + XL headline, bottom-aligned */
-.panel--org-intro { height: 160vh; } /* already correct */
+.panel--org-intro { height: 150vh; } /* already correct */
 
 .panel__content--org-intro {
   justify-content: flex-end;
@@ -468,7 +468,7 @@ img { display: block; max-width: 100%; }
 }
 
 /* Panel 2: Diagnosis — two-line statement, vertically centered */
-.panel--org-statement { height: 160vh; }
+.panel--org-statement { height: 150vh; }
 
 .panel__content--org-statement {
   justify-content: center;
@@ -495,7 +495,7 @@ img { display: block; max-width: 100%; }
    ONE panel: headline top-left, two-col principles + divider below
    ============================================================ */
 
-.panel--beliefs-full { height: 160vh; }
+.panel--beliefs-full { height: 150vh; }
 
 .panel__content--beliefs-full {
   justify-content: center;
@@ -541,7 +541,7 @@ img { display: block; max-width: 100%; }
    05 + 06 — PRINCIPLE PANELS (Curiosity, The Gap)
    ============================================================ */
 
-.panel--principle { height: 160vh; }
+.panel--principle { height: 150vh; }
 
 .panel__content--principle {
   justify-content: flex-start;
@@ -589,7 +589,7 @@ img { display: block; max-width: 100%; }
    05b — VALIDATED DELIVERY — Signal-Based Decision System
    ============================================================ */
 
-.panel--framework { height: 160vh; }
+.panel--framework { height: 150vh; }
 
 .delivery-table {
   width: 100%;
@@ -625,7 +625,7 @@ img { display: block; max-width: 100%; }
    Red right-border on gate columns.
    ============================================================ */
 
-.panel--ai-matrix { height: 220vh; }
+.panel--ai-matrix { height: 190vh; }
 
 .panel__content--ai-matrix {
   justify-content: center;
@@ -997,27 +997,8 @@ img { display: block; max-width: 100%; }
     overflow: hidden !important;
   }
 
-  /* color-buffer is part of the desktop sticky timing system —
-     phones use document flow so the gap is not needed */
-  .color-buffer { display: none; }
-
-  /* ─── Override GSAP initial states — phones skip animations ─── */
-  .panel__content,
-  .intro-label, .org-label, .principle-label,
-  .leadership-headline, .org-intro-lines, .beliefs-headline,
-  .principle-headline, .principle-subhead, .principle-body,
-  .org-diagnosis, .ai-frame,
-  .body-para, .org-intro-note,
-  .ai-m__ph, .ai-m__disc, .ai-m__cell {
-    opacity: 1 !important;
-    transform: none !important;
-    filter: none !important;
-  }
-
-  .line-mask span {
-    transform: none !important;
-    opacity: 1 !important;
-  }
+  /* color-buffer gives scroll room for the CSS bg transition to play */
+  .color-buffer { height: 14vh; }
 
   /* ─── Typography — full width on phone ─── */
   .principle-body--narrow,
@@ -1047,6 +1028,9 @@ img { display: block; max-width: 100%; }
     padding-top:    clamp(80px, 13vh, 130px);
     padding-bottom: clamp(80px, 13vh, 130px);
   }
+
+  /* Principle headlines — display-s is vw-driven so clamps too small on 375px */
+  .display-s { font-size: clamp(24px, 6.4vw, 32px); }
 
   /* Bigger body copy on phone */
   .essay {
@@ -1254,8 +1238,8 @@ img { display: block; max-width: 100%; }
     margin-bottom: clamp(12px, 1.8vh, 24px);
   }
 
-  /* Color buffer — less scroll dwell between sections */
-  .color-buffer { height: 40vh; }
+  /* Color buffer — tighter on tablet portrait */
+  .color-buffer { height: 12vh; }
 }
 
 /* ============================================================
