@@ -723,9 +723,9 @@ gsap.to('.footer__personal', {
   const WAVE_FY      = 0.011; // spatial freq Y (different → diagonal travel)
 
   const PUSH_RADIUS  = 320;   // repulsion influence (px)
-  const PUSH_STR     = 1.2;   // repulsion force magnitude
-  const SPRING_K     = 0.012; // spring stiffness — weak pull, slow return
-  const DAMPING      = 0.70;  // velocity RETENTION per frame — lower = more friction, no oscillation
+  const PUSH_STR     = 0.7;   // repulsion force magnitude
+  const SPRING_K     = 0.006; // spring stiffness — weak pull, slow return
+  const DAMPING      = 0.65;  // velocity RETENTION per frame — lower = more friction, no oscillation
 
   const FADE_RADIUS  = 130;   // opacity fade zone (larger than push)
   const VFADE_START  = 0.55;  // vertical fade begins at this fraction of H
