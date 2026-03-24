@@ -310,7 +310,7 @@ if (leaderPanel) {
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
   if (photo) tl.to(photo, { yPercent: 0, duration: 0.9, ease: 'power3.out' }, '<+0.08');
-  if (spans.length) tl.to(spans, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
+  if (spans.length) tl.fromTo(spans, { yPercent: 110 }, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
   if (paras.length) tl.to(paras, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.10 }, '<+0.28');
   if (note)  tl.to(note,  { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.25');
 }
@@ -333,7 +333,7 @@ if (orgIntroPanel) {
     },
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
-  if (spans.length) tl.to(spans, { yPercent: 0, duration: 0.9, ease: 'power3.out', stagger: 0.13 }, '<+0.1');
+  if (spans.length) tl.fromTo(spans, { yPercent: 110 }, { yPercent: 0, duration: 0.9, ease: 'power3.out', stagger: 0.13 }, '<+0.1');
   if (note)  tl.to(note,  { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.35');
 }
 
@@ -354,8 +354,8 @@ if (orgStatPanel) {
       scrub:   true,
     },
   });
-  if (mutedSpans.length)  tl.to(mutedSpans,  { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 });
-  if (accentSpans.length) tl.to(accentSpans, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.22');
+  if (mutedSpans.length)  tl.fromTo(mutedSpans,  { yPercent: 110 }, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 });
+  if (accentSpans.length) tl.fromTo(accentSpans, { yPercent: 110 }, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.22');
   if (notes.length)       tl.to(notes,         { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.06 }, '<+0.22');
 }
 
@@ -386,7 +386,7 @@ if (beliefsPanel) {
     },
   });
   if (label)          tl.to(label,          { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length) tl.to(hlSpans, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.12 }, '<+0.08');
+  if (hlSpans.length) tl.fromTo(hlSpans, { yPercent: 110 }, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.12 }, '<+0.08');
   if (beliefsDivider) tl.to(beliefsDivider, { opacity: 1, duration: 0.4, ease: 'power2.out' }, '<+0.2');
 
   beliefsPanel.querySelectorAll('.belief-col').forEach((col, i) => {
@@ -395,7 +395,7 @@ if (beliefsPanel) {
     const colBody  = col.querySelector('.principle-body');
     const pos      = `<+${i === 0 ? 0.2 : 0.06}`;
     if (colLabel) tl.to(colLabel, { opacity: 0.55, duration: 0.3, ease: 'power2.out' }, pos);
-    if (colSpans.length) tl.to(colSpans, { yPercent: 0, duration: 0.65, ease: 'power3.out', stagger: 0.10 }, '<+0.08');
+    if (colSpans.length) tl.fromTo(colSpans, { yPercent: 110 }, { yPercent: 0, duration: 0.65, ease: 'power3.out', stagger: 0.10 }, '<+0.08');
     if (colBody)  tl.to(colBody, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.18');
   });
 }
@@ -420,7 +420,7 @@ if (curiosityPanel) {
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
   if (xl)    tl.from(xl,  { scale: 1.02, duration: 1.0, ease: 'power3.out' }, '<');
-  if (spans.length) tl.to(spans, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
+  if (spans.length) tl.fromTo(spans, { yPercent: 110 }, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
   if (body)  tl.to(body, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '<+0.25');
 }
 
@@ -442,12 +442,12 @@ if (gapPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: gapPanel, start: PANEL_START, end: PANEL_END,
-      scrub:   true, markers: true,
+      scrub:   true,
     },
   });
   if (label)           tl.to(label,     { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length)  tl.to(hlSpans,  { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
-  if (subSpans.length) tl.to(subSpans, { yPercent: 0, duration: 0.7, ease: 'power3.out', stagger: 0.12 }, '<+0.2');
+  if (hlSpans.length)  tl.fromTo(hlSpans,  { yPercent: 110 }, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
+  if (subSpans.length) tl.fromTo(subSpans, { yPercent: 110 }, { yPercent: 0, duration: 0.7, ease: 'power3.out', stagger: 0.12 }, '<+0.2');
   if (body)            tl.to(body,      { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
   if (note)            tl.to(note,      { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.2');
 }
@@ -468,7 +468,7 @@ if (projectsSection) {
     },
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
-  if (headlineSpans.length) tl.to(headlineSpans, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.1');
+  if (headlineSpans.length) tl.fromTo(headlineSpans, { yPercent: 110 }, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.1');
 }
 
 // Project rows — keep toggle (normal-flow list, not a sticky panel)
@@ -522,8 +522,8 @@ if (deliveryPanel) {
     },
   });
   if (label)           tl.to(label,     { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length)  tl.to(hlSpans,  { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
-  if (subSpans.length) tl.to(subSpans, { yPercent: 0, duration: 0.7, ease: 'power3.out', stagger: 0.12 }, '<+0.2');
+  if (hlSpans.length)  tl.fromTo(hlSpans,  { yPercent: 110 }, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
+  if (subSpans.length) tl.fromTo(subSpans, { yPercent: 110 }, { yPercent: 0, duration: 0.7, ease: 'power3.out', stagger: 0.12 }, '<+0.2');
   if (body)            tl.to(body,      { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
 }
 
@@ -550,7 +550,7 @@ if (frameworkPanel) {
     },
   });
   if (label)          tl.to(label,         { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length) tl.to(hlSpans, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
+  if (hlSpans.length) tl.fromTo(hlSpans, { yPercent: 110 }, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
   if (body)           tl.to(body,          { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
   if (deliveryTable)  tl.to(deliveryTable, { opacity: 1, duration: 0.4, ease: 'power2.out' }, '<+0.2');
   if (phases.length)  tl.to(phases,        { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out', stagger: 0.10 }, '<+0.1');

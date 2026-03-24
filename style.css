@@ -228,7 +228,6 @@ img { display: block; max-width: 100%; }
 .line-mask span {
   display: block;
   will-change: transform;
-  transform: translateY(110%); /* hidden by default; GSAP animates to 0 */
 }
 
 /* ============================================================
