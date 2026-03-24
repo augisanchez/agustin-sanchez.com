@@ -276,7 +276,7 @@ gsap.from('#hero-strip', {
 // Desktop: fires during dwell — content is pinned and stationary when text reveals.
 // Mobile:  fires during approach — panels are natural-flow on phones (no sticky/dwell).
 const PANEL_START = isMobile ? 'top 80%' : 'top top';
-const PANEL_END   = isMobile ? 'top 20%' : () => `+=${window.innerHeight * 0.20}`;
+const PANEL_END   = isMobile ? 'top 20%' : () => `+=${window.innerHeight * 0.40}`;
 
 /* ── 6. Leadership ── */
 const leaderPanel = document.querySelector('.panel--leadership');
@@ -594,12 +594,12 @@ if (!isMobile) document.querySelectorAll('.panel').forEach((panel) => {
   }
 
   // Non-hero: exit fires DURING the dwell so content is still pinned while
-  // text blinds up. 130vh panels = 30vh dwell. Entrance: 0→0.20vh.
-  // Exit: 0.20→0.28vh (8vh range, fully within dwell). Blank panel scrolls off.
+  // text blinds up. 155vh panels = 55vh dwell. Entrance: 0→0.40vh.
+  // Exit: 0.43→0.52vh (9vh range, fully within dwell). Blank panel scrolls off.
   const ST = {
     trigger: panel,
-    start:   () => `top+=${window.innerHeight * 0.20} top`,
-    end:     () => `top+=${window.innerHeight * 0.28} top`,
+    start:   () => `top+=${window.innerHeight * 0.43} top`,
+    end:     () => `top+=${window.innerHeight * 0.52} top`,
     scrub:   0.5,
   };
 
