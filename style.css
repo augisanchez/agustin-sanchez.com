@@ -1281,3 +1281,34 @@ img { display: block; max-width: 100%; }
   /* Remove smooth scroll */
   html { scroll-behavior: auto; }
 }
+
+/* ============================================================
+   LANDSCAPE PHONES — hero rescue
+   max-height: 500px catches all landscape iPhones (375–430px tall)
+   without touching iPads (768px+ in landscape). No JS changes needed:
+   small iPhones (≤768px wide) are already on the mobile path;
+   large iPhones (iPhone 14+, 844–932px wide) hit the desktop path
+   with a 390px viewport — the vw-sized headline becomes ~100px/line
+   and crowds the strip. Switch to vh-capped sizing so the hero fits.
+   ============================================================ */
+
+@media (max-height: 500px) and (orientation: landscape) {
+
+  /* Headline: 12vw ≈ 101px on 844px landscape. Switch to vh so two lines
+     fit comfortably in ~390px. 11vh × 390 ≈ 43px/line → ~100px total. */
+  .display-xl {
+    font-size: clamp(28px, 11vh, 52px);
+  }
+
+  /* Tighten hero bottom padding and gap to reclaim vertical space */
+  .panel__content--hero {
+    padding-bottom: clamp(16px, 3.5vh, 28px);
+    gap: clamp(6px, 1vh, 10px);
+  }
+
+  /* Scale essay text down to match the compressed layout */
+  .hero-sub .essay {
+    font-size: clamp(12px, 1.6vh, 16px);
+    line-height: 1.45;
+  }
+}
