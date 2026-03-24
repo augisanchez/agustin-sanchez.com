@@ -110,8 +110,8 @@ img { display: block; max-width: 100%; }
 .noise {
   position: fixed;
   inset: -2px;                    /* 2px bleed on all edges */
-  width:  calc(100% + 4px);
-  height: calc(100% + 4px);
+  width:  calc(100vw + 4px);
+  height: calc(100dvh + 4px);  /* dvh tracks Chrome iOS toolbar — no bottom strip */
   z-index: 999;
   pointer-events: none;
   opacity: 0.13;

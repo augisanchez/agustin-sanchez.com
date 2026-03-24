@@ -31,7 +31,8 @@ gsap.to(document.body, {
   duration: prefersReducedMotion ? 0 : 0.4,
   delay:    prefersReducedMotion ? 0 : 0.1,
   ease: 'power1.out',
-  clearProps: 'opacity',  // hand opacity back to CSS after reveal
+  // No clearProps — removing the inline style would re-expose the
+  // head CSS "body { opacity: 0 }" and blank the page permanently.
 });
 
 /* ============================================================
