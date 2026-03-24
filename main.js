@@ -9,6 +9,7 @@
    ============================================================ */
 
 gsap.registerPlugin(ScrollTrigger);
+document.documentElement.dataset.jsVersion = '20260324.01'; // DEBUG — remove after confirming
 
 /* ============================================================
    0. REDUCED MOTION — respect user preference
@@ -250,6 +251,17 @@ gsap.fromTo('.hero-headline .line-mask span',
   { yPercent: 110 },
   { yPercent: 0, duration: 1.0, ease: 'power3.out', stagger: 0.1, delay: 0.25 }
 );
+
+// DEBUG — run in console: window._debugSpans()
+window._debugSpans = () => {
+  document.querySelectorAll('.line-mask span').forEach(s => {
+    console.log(
+      gsap.getProperty(s, 'yPercent').toFixed(1).padStart(6),
+      '|', s.closest('[id]')?.id || s.closest('[class*=panel]')?.className.split(' ')[1] || '?',
+      '|', s.textContent.trim().slice(0, 20)
+    );
+  });
+};
 
 gsap.from('#hero-strip', {
   opacity: 0,
