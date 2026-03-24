@@ -295,9 +295,8 @@ if (leaderPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: leaderPanel, start: PANEL_START, end: PANEL_END,
-      scrub:       2.0,
-      onLeave:     (self) => self.animation.progress(1),
-      onLeaveBack: (self) => self.animation.progress(0),
+      scrub:   2.0,
+      onLeave: (self) => self.animation.progress(1),
     },
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
@@ -320,9 +319,8 @@ if (orgIntroPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: orgIntroPanel, start: PANEL_START, end: PANEL_END,
-      scrub:       2.0,
-      onLeave:     (self) => self.animation.progress(1),
-      onLeaveBack: (self) => self.animation.progress(0),
+      scrub:   2.0,
+      onLeave: (self) => self.animation.progress(1),
     },
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
@@ -342,9 +340,8 @@ if (orgStatPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: orgStatPanel, start: PANEL_START, end: PANEL_END,
-      scrub:       2.0,
-      onLeave:     (self) => self.animation.progress(1),
-      onLeaveBack: (self) => self.animation.progress(0),
+      scrub:   2.0,
+      onLeave: (self) => self.animation.progress(1),
     },
   });
   if (mutedSpans.length)  tl.from(mutedSpans,  { yPercent: 110, duration: 0.8, ease: 'power3.out', stagger: 0.13 });
@@ -372,9 +369,8 @@ if (beliefsPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: beliefsPanel, start: PANEL_START, end: PANEL_END,
-      scrub:       2.0,
-      onLeave:     (self) => self.animation.progress(1),
-      onLeaveBack: (self) => self.animation.progress(0),
+      scrub:   2.0,
+      onLeave: (self) => self.animation.progress(1),
     },
   });
   if (label)          tl.to(label,          { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
@@ -406,9 +402,8 @@ if (curiosityPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: curiosityPanel, start: PANEL_START, end: PANEL_END,
-      scrub:       2.0,
-      onLeave:     (self) => self.animation.progress(1),
-      onLeaveBack: (self) => self.animation.progress(0),
+      scrub:   2.0,
+      onLeave: (self) => self.animation.progress(1),
     },
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
@@ -433,9 +428,8 @@ if (gapPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: gapPanel, start: PANEL_START, end: PANEL_END,
-      scrub:       2.0,
-      onLeave:     (self) => self.animation.progress(1),
-      onLeaveBack: (self) => self.animation.progress(0),
+      scrub:   2.0,
+      onLeave: (self) => self.animation.progress(1),
     },
   });
   if (label)           tl.to(label,     { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
@@ -508,9 +502,8 @@ if (deliveryPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: deliveryPanel, start: PANEL_START, end: PANEL_END,
-      scrub:       2.0,
-      onLeave:     (self) => self.animation.progress(1),
-      onLeaveBack: (self) => self.animation.progress(0),
+      scrub:   2.0,
+      onLeave: (self) => self.animation.progress(1),
     },
   });
   if (label)           tl.to(label,     { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
@@ -537,9 +530,8 @@ if (frameworkPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: frameworkPanel, start: PANEL_START, end: PANEL_END,
-      scrub:       2.0,
-      onLeave:     (self) => self.animation.progress(1),
-      onLeaveBack: (self) => self.animation.progress(0),
+      scrub:   2.0,
+      onLeave: (self) => self.animation.progress(1),
     },
   });
   if (label)          tl.to(label,         { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
@@ -573,9 +565,8 @@ if (aiMatrixPanel && !prefersReducedMotion) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: aiMatrixPanel, start: PANEL_START, end: PANEL_END,
-      scrub:       2.0,
-      onLeave:     (self) => self.animation.progress(1),
-      onLeaveBack: (self) => self.animation.progress(0),
+      scrub:   2.0,
+      onLeave: (self) => self.animation.progress(1),
     },
   });
   if (eyebrow)           tl.to(eyebrow,    { opacity: 0.75, duration: 0.3, ease: 'power2.out' });
@@ -616,7 +607,7 @@ if (!isMobile) document.querySelectorAll('.panel').forEach((panel) => {
   // Exit: 0.43→0.52vh (9vh range, fully within dwell). Blank panel scrolls off.
   const ST = {
     trigger: panel,
-    start:   () => `top+=${window.innerHeight * 0.22} top`,
+    start:   () => `top+=${window.innerHeight * 0.24} top`,
     end:     () => `top+=${window.innerHeight * 0.30} top`,
     scrub:   0.5,
   };

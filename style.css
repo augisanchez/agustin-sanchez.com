@@ -127,7 +127,7 @@ img { display: block; max-width: 100%; }
 /* COLOR BUFFER — empty scroll space so bg finishes transitioning
    before sticky content starts pinning */
 .color-buffer {
-  height: 1.5vh;
+  height: 0.6vh;
   pointer-events: none;
 }
 
@@ -1011,7 +1011,7 @@ img { display: block; max-width: 100%; }
   }
 
   /* color-buffer gives scroll room for the CSS bg transition to play */
-  .color-buffer { height: 2vh; }
+  .color-buffer { height: 1vh; }
 
   /* ─── Typography — full width on phone ─── */
   .principle-body--narrow,
@@ -1250,7 +1250,7 @@ img { display: block; max-width: 100%; }
   }
 
   /* Color buffer — tighter on tablet portrait */
-  .color-buffer { height: 1.5vh; }
+  .color-buffer { height: 0.6vh; }
 }
 
 /* ============================================================
