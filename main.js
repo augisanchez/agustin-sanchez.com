@@ -442,7 +442,7 @@ if (gapPanel) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: gapPanel, start: PANEL_START, end: PANEL_END,
-      scrub:   true,
+      scrub:   true, markers: true,
     },
   });
   if (label)           tl.to(label,     { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
