@@ -989,6 +989,9 @@ img { display: block; max-width: 100%; }
 
 @media (max-width: 768px) {
 
+  /* ─── No noise texture on mobile — prevents Chrome iOS strip artifact ─── */
+  .noise { display: none; }
+
   /* ─── Kill sticky panel system on phones ─── */
   .panel { height: auto !important; }
 

@@ -593,13 +593,13 @@ if (!isMobile) document.querySelectorAll('.panel').forEach((panel) => {
     return;
   }
 
-  // Non-hero: exit fires as the panel scrolls off (after the 30vh dwell).
-  // 130vh panels = 30vh dwell. Entrance: 0→0.20vh. Exit: 0.31→0.65vh (34vh range).
-  // Scrub matches entrance (0.5). Photo exits same as spans — yPercent: -110.
+  // Non-hero: exit fires DURING the dwell so content is still pinned while
+  // text blinds up. 130vh panels = 30vh dwell. Entrance: 0→0.20vh.
+  // Exit: 0.20→0.28vh (8vh range, fully within dwell). Blank panel scrolls off.
   const ST = {
     trigger: panel,
-    start:   () => `top+=${window.innerHeight * 0.31} top`,
-    end:     () => `top+=${window.innerHeight * 0.65} top`,
+    start:   () => `top+=${window.innerHeight * 0.20} top`,
+    end:     () => `top+=${window.innerHeight * 0.28} top`,
     scrub:   0.5,
   };
 
