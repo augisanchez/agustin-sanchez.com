@@ -286,6 +286,7 @@ if (leaderPanel) {
 
   if (label) gsap.set(label, { opacity: 0 });
   if (photo) gsap.set(photo, { yPercent: 110 });
+  if (spans.length) gsap.set(spans, { yPercent: 110 });
   if (paras.length) gsap.set(paras, { opacity: 0, y: 24 });
   if (note)  gsap.set(note,  { opacity: 0, y: 14 });
 
@@ -297,7 +298,7 @@ if (leaderPanel) {
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
   if (photo) tl.to(photo, { yPercent: 0, duration: 0.9, ease: 'power3.out' }, '<+0.08');
-  if (spans.length) tl.fromTo(spans, { yPercent: 110, immediateRender: true }, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
+  if (spans.length) tl.to(spans, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
   if (paras.length) tl.to(paras, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.10 }, '<+0.28');
   if (note)  tl.to(note,  { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.25');
 }
@@ -310,6 +311,7 @@ if (orgIntroPanel) {
   const note  = orgIntroPanel.querySelector('.org-intro-note');
 
   if (label) gsap.set(label, { opacity: 0 });
+  if (spans.length) gsap.set(spans, { yPercent: 110 });
   if (note)  gsap.set(note,  { opacity: 0, y: 14 });
 
   const tl = gsap.timeline({
@@ -319,7 +321,7 @@ if (orgIntroPanel) {
     },
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
-  if (spans.length) tl.fromTo(spans, { yPercent: 110, immediateRender: true }, { yPercent: 0, duration: 0.9, ease: 'power3.out', stagger: 0.13 }, '<+0.1');
+  if (spans.length) tl.to(spans, { yPercent: 0, duration: 0.9, ease: 'power3.out', stagger: 0.13 }, '<+0.1');
   if (note)  tl.to(note,  { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.35');
 }
 
@@ -330,6 +332,8 @@ if (orgStatPanel) {
   const accentSpans = orgStatPanel.querySelectorAll('.org-lines--accent .line-mask span');
   const notes       = orgStatPanel.querySelectorAll('.org-intro-note');
 
+  if (mutedSpans.length)  gsap.set(mutedSpans,  { yPercent: 110 });
+  if (accentSpans.length) gsap.set(accentSpans, { yPercent: 110 });
   if (notes.length) gsap.set(notes, { opacity: 0, y: 14 });
 
   const tl = gsap.timeline({
@@ -338,8 +342,8 @@ if (orgStatPanel) {
       scrub:   true,
     },
   });
-  if (mutedSpans.length)  tl.fromTo(mutedSpans,  { yPercent: 110, immediateRender: true }, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 });
-  if (accentSpans.length) tl.fromTo(accentSpans, { yPercent: 110, immediateRender: true }, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.22');
+  if (mutedSpans.length)  tl.to(mutedSpans,  { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 });
+  if (accentSpans.length) tl.to(accentSpans, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.22');
   if (notes.length)       tl.to(notes,         { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.06 }, '<+0.22');
 }
 
@@ -352,11 +356,14 @@ if (beliefsPanel) {
   const beliefsDivider = beliefsPanel.querySelector('.beliefs-divider');
 
   if (label)         gsap.set(label,          { opacity: 0 });
+  if (hlSpans.length) gsap.set(hlSpans,       { yPercent: 110 });
   if (beliefsDivider) gsap.set(beliefsDivider, { opacity: 0 });
   beliefsPanel.querySelectorAll('.belief-col').forEach(col => {
     const cl = col.querySelector('.principle-label');
+    const cs = col.querySelectorAll('.principle-headline .line-mask span');
     const cb = col.querySelector('.principle-body');
     if (cl) gsap.set(cl, { opacity: 0 });
+    if (cs.length) gsap.set(cs, { yPercent: 110 });
     if (cb) gsap.set(cb, { opacity: 0, y: 18 });
   });
 
@@ -367,7 +374,7 @@ if (beliefsPanel) {
     },
   });
   if (label)          tl.to(label,          { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length) tl.fromTo(hlSpans, { yPercent: 110, immediateRender: true }, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.12 }, '<+0.08');
+  if (hlSpans.length) tl.to(hlSpans, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.12 }, '<+0.08');
   if (beliefsDivider) tl.to(beliefsDivider, { opacity: 1, duration: 0.4, ease: 'power2.out' }, '<+0.2');
 
   beliefsPanel.querySelectorAll('.belief-col').forEach((col, i) => {
@@ -376,7 +383,7 @@ if (beliefsPanel) {
     const colBody  = col.querySelector('.principle-body');
     const pos      = `<+${i === 0 ? 0.2 : 0.06}`;
     if (colLabel) tl.to(colLabel, { opacity: 0.55, duration: 0.3, ease: 'power2.out' }, pos);
-    if (colSpans.length) tl.fromTo(colSpans, { yPercent: 110, immediateRender: true }, { yPercent: 0, duration: 0.65, ease: 'power3.out', stagger: 0.10 }, '<+0.08');
+    if (colSpans.length) tl.to(colSpans, { yPercent: 0, duration: 0.65, ease: 'power3.out', stagger: 0.10 }, '<+0.08');
     if (colBody)  tl.to(colBody, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.18');
   });
 }
@@ -390,6 +397,7 @@ if (curiosityPanel) {
   const xl    = curiosityPanel.querySelector('.principle-headline--xl');
 
   if (label) gsap.set(label, { opacity: 0 });
+  if (spans.length) gsap.set(spans, { yPercent: 110 });
   if (body)  gsap.set(body,  { opacity: 0, y: 18 });
 
   const tl = gsap.timeline({
@@ -400,7 +408,7 @@ if (curiosityPanel) {
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
   if (xl)    tl.from(xl,  { scale: 1.02, duration: 1.0, ease: 'power3.out' }, '<');
-  if (spans.length) tl.fromTo(spans, { yPercent: 110, immediateRender: true }, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
+  if (spans.length) tl.to(spans, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
   if (body)  tl.to(body, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '<+0.25');
 }
 
@@ -414,6 +422,8 @@ if (gapPanel) {
   const note     = gapPanel.querySelector('.org-intro-note');
 
   if (label) gsap.set(label, { opacity: 0 });
+  if (hlSpans.length)  gsap.set(hlSpans,  { yPercent: 110 });
+  if (subSpans.length) gsap.set(subSpans, { yPercent: 110 });
   if (body)  gsap.set(body,  { opacity: 0, y: 18 });
   if (note)  gsap.set(note,  { opacity: 0, y: 14 });
 
@@ -424,8 +434,8 @@ if (gapPanel) {
     },
   });
   if (label)           tl.to(label,     { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length)  tl.fromTo(hlSpans,  { yPercent: 110 }, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
-  if (subSpans.length) tl.fromTo(subSpans, { yPercent: 110, immediateRender: true }, { yPercent: 0, duration: 0.7, ease: 'power3.out', stagger: 0.12 }, '<+0.2');
+  if (hlSpans.length)  tl.to(hlSpans,  { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
+  if (subSpans.length) tl.to(subSpans, { yPercent: 0, duration: 0.7, ease: 'power3.out', stagger: 0.12 }, '<+0.2');
   if (body)            tl.to(body,      { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
   if (note)            tl.to(note,      { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.2');
 }
@@ -437,6 +447,7 @@ if (projectsSection) {
   const headlineSpans = projectsSection.querySelectorAll('.projects-headline .line-mask span');
 
   if (label) gsap.set(label, { opacity: 0 });
+  if (headlineSpans.length) gsap.set(headlineSpans, { yPercent: 110 });
 
   const tl = gsap.timeline({
     scrollTrigger: {
@@ -445,7 +456,7 @@ if (projectsSection) {
     },
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
-  if (headlineSpans.length) tl.fromTo(headlineSpans, { yPercent: 110, immediateRender: true }, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.1');
+  if (headlineSpans.length) tl.to(headlineSpans, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.1');
 }
 
 // Project rows — keep toggle (normal-flow list, not a sticky panel)
@@ -488,6 +499,8 @@ if (deliveryPanel) {
   const body     = deliveryPanel.querySelector('.principle-body');
 
   if (label) gsap.set(label, { opacity: 0 });
+  if (hlSpans.length)  gsap.set(hlSpans,  { yPercent: 110 });
+  if (subSpans.length) gsap.set(subSpans, { yPercent: 110 });
   if (body)  gsap.set(body,  { opacity: 0, y: 18 });
 
   const tl = gsap.timeline({
@@ -497,8 +510,8 @@ if (deliveryPanel) {
     },
   });
   if (label)           tl.to(label,     { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length)  tl.fromTo(hlSpans,  { yPercent: 110 }, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
-  if (subSpans.length) tl.fromTo(subSpans, { yPercent: 110, immediateRender: true }, { yPercent: 0, duration: 0.7, ease: 'power3.out', stagger: 0.12 }, '<+0.2');
+  if (hlSpans.length)  tl.to(hlSpans,  { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
+  if (subSpans.length) tl.to(subSpans, { yPercent: 0, duration: 0.7, ease: 'power3.out', stagger: 0.12 }, '<+0.2');
   if (body)            tl.to(body,      { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
 }
 
@@ -513,6 +526,7 @@ if (frameworkPanel) {
   const deliveryTable = frameworkPanel.querySelector('.delivery-table');
 
   if (label)         gsap.set(label,        { opacity: 0 });
+  if (hlSpans.length) gsap.set(hlSpans,    { yPercent: 110 });
   if (body)          gsap.set(body,         { opacity: 0, y: 18 });
   if (deliveryTable) gsap.set(deliveryTable, { opacity: 0 });
   if (phases.length) gsap.set(phases,       { opacity: 0, y: 12 });
@@ -524,7 +538,7 @@ if (frameworkPanel) {
     },
   });
   if (label)          tl.to(label,         { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length) tl.fromTo(hlSpans, { yPercent: 110, immediateRender: true }, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
+  if (hlSpans.length) tl.to(hlSpans, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
   if (body)           tl.to(body,          { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
   if (deliveryTable)  tl.to(deliveryTable, { opacity: 1, duration: 0.4, ease: 'power2.out' }, '<+0.2');
   if (phases.length)  tl.to(phases,        { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out', stagger: 0.10 }, '<+0.1');
