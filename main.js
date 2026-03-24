@@ -276,7 +276,7 @@ gsap.from('#hero-strip', {
 // Desktop: fires during dwell — content is pinned and stationary when text reveals.
 // Mobile:  fires during approach — panels are natural-flow on phones (no sticky/dwell).
 const PANEL_START = isMobile ? 'top 80%' : 'top top';
-const PANEL_END   = isMobile ? 'top 20%' : () => `+=${window.innerHeight * 0.40}`;
+const PANEL_END   = isMobile ? 'top 20%' : () => `+=${window.innerHeight * 0.22}`;
 
 /* ── 6. Leadership ── */
 const leaderPanel = document.querySelector('.panel--leadership');
@@ -300,8 +300,8 @@ if (leaderPanel) {
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
   if (photo) tl.to(photo, { yPercent: 0, duration: 0.9, ease: 'power3.out' }, '<+0.08');
-  if (spans.length) tl.from(spans, { yPercent: 110, duration: 0.8, ease: 'power3.out', stagger: 0.25 }, '<+0.08');
-  if (paras.length) tl.to(paras, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.18 }, '<+0.28');
+  if (spans.length) tl.from(spans, { yPercent: 110, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
+  if (paras.length) tl.to(paras, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.10 }, '<+0.28');
   if (note)  tl.to(note,  { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.25');
 }
 
@@ -322,7 +322,7 @@ if (orgIntroPanel) {
     },
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
-  if (spans.length) tl.from(spans, { yPercent: 110, duration: 0.9, ease: 'power3.out', stagger: 0.25 }, '<+0.1');
+  if (spans.length) tl.from(spans, { yPercent: 110, duration: 0.9, ease: 'power3.out', stagger: 0.13 }, '<+0.1');
   if (note)  tl.to(note,  { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.35');
 }
 
@@ -341,9 +341,9 @@ if (orgStatPanel) {
       scrub: 0.5,
     },
   });
-  if (mutedSpans.length)  tl.from(mutedSpans,  { yPercent: 110, duration: 0.8, ease: 'power3.out', stagger: 0.25 });
-  if (accentSpans.length) tl.from(accentSpans, { yPercent: 110, duration: 0.8, ease: 'power3.out', stagger: 0.25 }, '<+0.22');
-  if (notes.length)       tl.to(notes,         { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.1 }, '<+0.22');
+  if (mutedSpans.length)  tl.from(mutedSpans,  { yPercent: 110, duration: 0.8, ease: 'power3.out', stagger: 0.13 });
+  if (accentSpans.length) tl.from(accentSpans, { yPercent: 110, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.22');
+  if (notes.length)       tl.to(notes,         { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.06 }, '<+0.22');
 }
 
 /* ── 8. Beliefs ── */
@@ -370,7 +370,7 @@ if (beliefsPanel) {
     },
   });
   if (label)          tl.to(label,          { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length) tl.from(hlSpans,      { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.22 }, '<+0.08');
+  if (hlSpans.length) tl.from(hlSpans,      { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.12 }, '<+0.08');
   if (beliefsDivider) tl.to(beliefsDivider, { opacity: 1, duration: 0.4, ease: 'power2.out' }, '<+0.2');
 
   beliefsPanel.querySelectorAll('.belief-col').forEach((col, i) => {
@@ -379,7 +379,7 @@ if (beliefsPanel) {
     const colBody  = col.querySelector('.principle-body');
     const pos      = `<+${i === 0 ? 0.2 : 0.06}`;
     if (colLabel) tl.to(colLabel, { opacity: 0.55, duration: 0.3, ease: 'power2.out' }, pos);
-    if (colSpans.length) tl.from(colSpans, { yPercent: 110, duration: 0.65, ease: 'power3.out', stagger: 0.18 }, '<+0.08');
+    if (colSpans.length) tl.from(colSpans, { yPercent: 110, duration: 0.65, ease: 'power3.out', stagger: 0.10 }, '<+0.08');
     if (colBody)  tl.to(colBody, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.18');
   });
 }
@@ -403,7 +403,7 @@ if (curiosityPanel) {
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
   if (xl)    tl.from(xl,  { scale: 1.02, duration: 1.0, ease: 'power3.out' }, '<');
-  if (spans.length) tl.from(spans, { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.25 }, '<+0.08');
+  if (spans.length) tl.from(spans, { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
   if (body)  tl.to(body, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '<+0.25');
 }
 
@@ -427,8 +427,8 @@ if (gapPanel) {
     },
   });
   if (label)           tl.to(label,     { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length)  tl.from(hlSpans, { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.25 }, '<+0.08');
-  if (subSpans.length) tl.from(subSpans, { yPercent: 110, duration: 0.7, ease: 'power3.out', stagger: 0.22 }, '<+0.2');
+  if (hlSpans.length)  tl.from(hlSpans, { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
+  if (subSpans.length) tl.from(subSpans, { yPercent: 110, duration: 0.7, ease: 'power3.out', stagger: 0.12 }, '<+0.2');
   if (body)            tl.to(body,      { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
   if (note)            tl.to(note,      { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.2');
 }
@@ -448,7 +448,7 @@ if (projectsSection) {
     },
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
-  if (headlineSpans.length) tl.from(headlineSpans, { yPercent: 110, duration: 0.8, ease: 'power3.out', stagger: 0.25 }, '<+0.1');
+  if (headlineSpans.length) tl.from(headlineSpans, { yPercent: 110, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.1');
 }
 
 // Project rows — keep toggle (normal-flow list, not a sticky panel)
@@ -500,8 +500,8 @@ if (deliveryPanel) {
     },
   });
   if (label)           tl.to(label,     { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length)  tl.from(hlSpans, { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.25 }, '<+0.08');
-  if (subSpans.length) tl.from(subSpans, { yPercent: 110, duration: 0.7, ease: 'power3.out', stagger: 0.22 }, '<+0.2');
+  if (hlSpans.length)  tl.from(hlSpans, { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
+  if (subSpans.length) tl.from(subSpans, { yPercent: 110, duration: 0.7, ease: 'power3.out', stagger: 0.12 }, '<+0.2');
   if (body)            tl.to(body,      { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
 }
 
@@ -527,10 +527,10 @@ if (frameworkPanel) {
     },
   });
   if (label)          tl.to(label,         { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length) tl.from(hlSpans,     { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.25 }, '<+0.08');
+  if (hlSpans.length) tl.from(hlSpans,     { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
   if (body)           tl.to(body,          { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
   if (deliveryTable)  tl.to(deliveryTable, { opacity: 1, duration: 0.4, ease: 'power2.out' }, '<+0.2');
-  if (phases.length)  tl.to(phases,        { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out', stagger: 0.18 }, '<+0.1');
+  if (phases.length)  tl.to(phases,        { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out', stagger: 0.10 }, '<+0.1');
 }
 
 /* ── 12b. AI Matrix ──
@@ -562,8 +562,8 @@ if (aiMatrixPanel && !prefersReducedMotion) {
   });
   if (eyebrow)           tl.to(eyebrow,    { opacity: 0.75, duration: 0.3, ease: 'power2.out' });
   if (thesis)            tl.to(thesis,     { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' }, '<+0.08');
-  if (phHeaders.length)  tl.to(phHeaders,  { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out', stagger: 0.15 }, '<+0.15');
-  if (discLabels.length) tl.to(discLabels, { opacity: 0.75, duration: 0.35, ease: 'power2.out', stagger: 0.20 }, '<+0.15');
+  if (phHeaders.length)  tl.to(phHeaders,  { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out', stagger: 0.08 }, '<+0.15');
+  if (discLabels.length) tl.to(discLabels, { opacity: 0.75, duration: 0.35, ease: 'power2.out', stagger: 0.11 }, '<+0.15');
   if (hCells.length)     tl.to(hCells,     { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', stagger: 0.08 }, '<+0.1');
   if (aiCells.length)    tl.to(aiCells,    { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', stagger: 0.08 }, '<+0.05');
   if (legend)            tl.to(legend,     { opacity: 1, duration: 0.3, ease: 'power2.out' }, '<+0.15');
@@ -598,8 +598,8 @@ if (!isMobile) document.querySelectorAll('.panel').forEach((panel) => {
   // Exit: 0.43→0.52vh (9vh range, fully within dwell). Blank panel scrolls off.
   const ST = {
     trigger: panel,
-    start:   () => `top+=${window.innerHeight * 0.43} top`,
-    end:     () => `top+=${window.innerHeight * 0.52} top`,
+    start:   () => `top+=${window.innerHeight * 0.22} top`,
+    end:     () => `top+=${window.innerHeight * 0.30} top`,
     scrub:   0.5,
   };
 
@@ -616,7 +616,7 @@ if (!isMobile) document.querySelectorAll('.panel').forEach((panel) => {
     gsap.to(spans, {
       yPercent:        -110,
       ease:            'power3.in',
-      stagger:         { each: 0.14, from: 'start' },
+      stagger:         { each: 0.08, from: 'start' },
       immediateRender: false,
       overwrite:       'auto',
       scrollTrigger:   ST,

@@ -127,7 +127,7 @@ img { display: block; max-width: 100%; }
 /* COLOR BUFFER — empty scroll space so bg finishes transitioning
    before sticky content starts pinning */
 .color-buffer {
-  height: 2.5vh;
+  height: 1.5vh;
   pointer-events: none;
 }
 
@@ -362,7 +362,7 @@ img { display: block; max-width: 100%; }
    Same paper section as identity hero, no color change
    ============================================================ */
 
-.panel--statement { height: 155vh; }
+.panel--statement { height: 130vh; }
 
 .panel__content--statement {
   align-items: flex-start;
@@ -379,7 +379,7 @@ img { display: block; max-width: 100%; }
    Two columns: label+headline+image left / body text right
    ============================================================ */
 
-.panel--leadership { height: 155vh; }
+.panel--leadership { height: 130vh; }
 
 .panel__content--leadership {
   display: grid;
@@ -454,7 +454,7 @@ img { display: block; max-width: 100%; }
    ============================================================ */
 
 /* Panel 1: Entry — label + XL headline, bottom-aligned */
-.panel--org-intro { height: 155vh; } /* already correct */
+.panel--org-intro { height: 130vh; } /* already correct */
 
 .panel__content--org-intro {
   justify-content: flex-end;
@@ -478,7 +478,7 @@ img { display: block; max-width: 100%; }
 }
 
 /* Panel 2: Diagnosis — two-line statement, vertically centered */
-.panel--org-statement { height: 155vh; }
+.panel--org-statement { height: 130vh; }
 
 .panel__content--org-statement {
   justify-content: center;
@@ -505,7 +505,7 @@ img { display: block; max-width: 100%; }
    ONE panel: headline top-left, two-col principles + divider below
    ============================================================ */
 
-.panel--beliefs-full { height: 155vh; }
+.panel--beliefs-full { height: 130vh; }
 
 .panel__content--beliefs-full {
   justify-content: center;
@@ -551,7 +551,7 @@ img { display: block; max-width: 100%; }
    05 + 06 — PRINCIPLE PANELS (Curiosity, The Gap)
    ============================================================ */
 
-.panel--principle { height: 155vh; }
+.panel--principle { height: 130vh; }
 
 .panel__content--principle {
   justify-content: flex-start;
@@ -599,7 +599,7 @@ img { display: block; max-width: 100%; }
    05b — VALIDATED DELIVERY — Signal-Based Decision System
    ============================================================ */
 
-.panel--framework { height: 155vh; }
+.panel--framework { height: 130vh; }
 
 .delivery-table {
   width: 100%;
@@ -635,7 +635,7 @@ img { display: block; max-width: 100%; }
    Red right-border on gate columns.
    ============================================================ */
 
-.panel--ai-matrix { height: 175vh; }
+.panel--ai-matrix { height: 145vh; }
 
 .panel__content--ai-matrix {
   justify-content: center;
@@ -1011,7 +1011,7 @@ img { display: block; max-width: 100%; }
   }
 
   /* color-buffer gives scroll room for the CSS bg transition to play */
-  .color-buffer { height: 3.5vh; }
+  .color-buffer { height: 2vh; }
 
   /* ─── Typography — full width on phone ─── */
   .principle-body--narrow,
@@ -1250,7 +1250,7 @@ img { display: block; max-width: 100%; }
   }
 
   /* Color buffer — tighter on tablet portrait */
-  .color-buffer { height: 3vh; }
+  .color-buffer { height: 1.5vh; }
 }
 
 /* ============================================================
