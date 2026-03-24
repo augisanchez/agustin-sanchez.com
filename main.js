@@ -246,8 +246,8 @@ document.querySelectorAll('[data-tone]').forEach((el) => {
    5. HERO — load animation (identity: AGUSTIN SANCHEZ.)
    ============================================================ */
 
-gsap.from('.hero-headline .line-mask span', {
-  yPercent: 110,
+gsap.to('.hero-headline .line-mask span', {
+  yPercent: 0,
   duration: 1.0,
   ease: 'power3.out',
   stagger: 0.1,
