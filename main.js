@@ -21,6 +21,20 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 const isMobile            = window.matchMedia('(max-width: 768px)').matches;
 
 /* ============================================================
+   0b. PAGE REVEAL — body starts opacity:0 (set in <head> inline
+   style to prevent FOUC). Fade in once this script has run and
+   GSAP has set all initial states.
+   ============================================================ */
+
+gsap.to(document.body, {
+  opacity: 1,
+  duration: prefersReducedMotion ? 0 : 0.4,
+  delay:    prefersReducedMotion ? 0 : 0.1,
+  ease: 'power1.out',
+  clearProps: 'opacity',  // hand opacity back to CSS after reveal
+});
+
+/* ============================================================
    1. LENIS — weighted smooth scroll
    ============================================================ */
 
