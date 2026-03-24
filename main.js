@@ -615,7 +615,7 @@ if (!isMobile) document.querySelectorAll('.panel').forEach((panel) => {
   if (spans.length) {
     gsap.to(spans, {
       yPercent:        -110,
-      ease:            'expo.in',
+      ease:            'power3.in',
       stagger:         { each: 0.14, from: 'start' },
       immediateRender: false,
       overwrite:       'auto',
@@ -626,7 +626,7 @@ if (!isMobile) document.querySelectorAll('.panel').forEach((panel) => {
   if (photo) {
     gsap.to(photo, {
       yPercent:        -110,
-      ease:            'expo.in',
+      ease:            'power3.in',
       immediateRender: false,
       overwrite:       'auto',
       scrollTrigger:   ST,
