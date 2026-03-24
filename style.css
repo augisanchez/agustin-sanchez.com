@@ -127,7 +127,7 @@ img { display: block; max-width: 100%; }
 /* COLOR BUFFER — empty scroll space so bg finishes transitioning
    before sticky content starts pinning */
 .color-buffer {
-  height: 10vh;
+  height: 2.5vh;
   pointer-events: none;
 }
 
@@ -320,7 +320,7 @@ img { display: block; max-width: 100%; }
   position: relative;
   z-index: 1;       /* text + strip above hero-canvas (z-index: 0) */
   justify-content: flex-end;
-  gap: clamp(20px, 3vh, 36px);
+  gap: clamp(10px, 1.5vh, 18px);
   padding-bottom: clamp(48px, 8vh, 96px);
 }
 
@@ -346,7 +346,7 @@ img { display: block; max-width: 100%; }
 .strip-rule {
   height: 1px;
   background: var(--c-divider);
-  margin-bottom: clamp(20px, 3vh, 36px);
+  margin-bottom: clamp(10px, 1.5vh, 18px);
 }
 
 .strip-cols {
@@ -362,7 +362,7 @@ img { display: block; max-width: 100%; }
    Same paper section as identity hero, no color change
    ============================================================ */
 
-.panel--statement { height: 150vh; }
+.panel--statement { height: 130vh; }
 
 .panel__content--statement {
   align-items: flex-start;
@@ -379,12 +379,12 @@ img { display: block; max-width: 100%; }
    Two columns: label+headline+image left / body text right
    ============================================================ */
 
-.panel--leadership { height: 150vh; }
+.panel--leadership { height: 130vh; }
 
 .panel__content--leadership {
   display: grid;
   grid-template-columns: 5fr 7fr;
-  gap: clamp(48px, 7vw, 96px);
+  gap: clamp(24px, 3.5vw, 48px);
   align-items: stretch;
   padding-top: clamp(80px, 12vh, 140px);
   padding-bottom: clamp(60px, 10vh, 100px);
@@ -405,7 +405,7 @@ img { display: block; max-width: 100%; }
 .intro-label {
   display: block;
   color: var(--c-mid);
-  margin-bottom: clamp(16px, 2.5vh, 28px);
+  margin-bottom: clamp(8px, 1.25vh, 14px);
   will-change: opacity;
 }
 
@@ -414,16 +414,26 @@ img { display: block; max-width: 100%; }
   flex-direction: column;
 }
 
-/* Image fills remaining left-col space after headline */
-.leadership-image {
-  flex: 1 1 0;       /* flex: 1 with height: 0 base so flex controls the height */
-  height: 0;         /* forces flex growth to determine rendered height */
+/* Image mask — clips the slide-up reveal like a line-mask */
+.leadership-image-mask {
+  flex: 1 1 0;
+  height: 0;
   min-height: clamp(160px, 26vh, 380px);
-  margin-top: clamp(24px, 4vh, 48px);
+  margin-top: clamp(12px, 2vh, 24px);
   width: 100%;
-  object-fit: cover;
-  object-position: center bottom; /* anchor feet — crop top when needed */
+  position: relative;   /* containing block for absolute img */
+  overflow: hidden;
   border-radius: 12px;
+}
+
+/* absolute fill so height:100% resolves against the rendered mask */
+.leadership-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
   display: block;
 }
 
@@ -444,7 +454,7 @@ img { display: block; max-width: 100%; }
    ============================================================ */
 
 /* Panel 1: Entry — label + XL headline, bottom-aligned */
-.panel--org-intro { height: 150vh; } /* already correct */
+.panel--org-intro { height: 130vh; } /* already correct */
 
 .panel__content--org-intro {
   justify-content: flex-end;
@@ -454,7 +464,7 @@ img { display: block; max-width: 100%; }
 .org-label {
   display: block;
   color: var(--c-mid);
-  margin-bottom: clamp(16px, 2.5vh, 28px);
+  margin-bottom: clamp(8px, 1.25vh, 14px);
 }
 
 .org-intro-lines {
@@ -464,11 +474,11 @@ img { display: block; max-width: 100%; }
 
 .org-intro-note {
   color: var(--c-mid);
-  margin-top: clamp(20px, 3vh, 32px);
+  margin-top: clamp(10px, 1.5vh, 16px);
 }
 
 /* Panel 2: Diagnosis — two-line statement, vertically centered */
-.panel--org-statement { height: 150vh; }
+.panel--org-statement { height: 130vh; }
 
 .panel__content--org-statement {
   justify-content: center;
@@ -495,12 +505,12 @@ img { display: block; max-width: 100%; }
    ONE panel: headline top-left, two-col principles + divider below
    ============================================================ */
 
-.panel--beliefs-full { height: 150vh; }
+.panel--beliefs-full { height: 130vh; }
 
 .panel__content--beliefs-full {
   justify-content: center;
   padding-top: 0;
-  gap: clamp(48px, 7vh, 80px);
+  gap: clamp(24px, 3.5vh, 40px);
 }
 
 .beliefs-header {
@@ -541,7 +551,7 @@ img { display: block; max-width: 100%; }
    05 + 06 — PRINCIPLE PANELS (Curiosity, The Gap)
    ============================================================ */
 
-.panel--principle { height: 150vh; }
+.panel--principle { height: 130vh; }
 
 .panel__content--principle {
   justify-content: flex-start;
@@ -558,23 +568,23 @@ img { display: block; max-width: 100%; }
 .principle-label {
   display: block;
   color: var(--c-mid);
-  margin-bottom: clamp(16px, 2.5vh, 28px);
+  margin-bottom: clamp(8px, 1.25vh, 14px);
 }
 
 .principle-headline {
   display: flex;
   flex-direction: column;
-  margin-bottom: clamp(20px, 3vh, 40px);
+  margin-bottom: clamp(10px, 1.5vh, 20px);
 }
 
 .principle-headline--xl {
-  margin-bottom: clamp(24px, 4vh, 48px);
+  margin-bottom: clamp(12px, 2vh, 24px);
 }
 
 .principle-subhead {
   display: flex;
   flex-direction: column;
-  margin-bottom: clamp(20px, 3vh, 40px);
+  margin-bottom: clamp(10px, 1.5vh, 20px);
 }
 
 .principle-body {
@@ -589,12 +599,12 @@ img { display: block; max-width: 100%; }
    05b — VALIDATED DELIVERY — Signal-Based Decision System
    ============================================================ */
 
-.panel--framework { height: 150vh; }
+.panel--framework { height: 130vh; }
 
 .delivery-table {
   width: 100%;
   border-top: 1px solid var(--c-divider);
-  margin-top: clamp(24px, 4vh, 48px);
+  margin-top: clamp(12px, 2vh, 24px);
 }
 
 .delivery-phase {
@@ -625,7 +635,7 @@ img { display: block; max-width: 100%; }
    Red right-border on gate columns.
    ============================================================ */
 
-.panel--ai-matrix { height: 190vh; }
+.panel--ai-matrix { height: 150vh; }
 
 .panel__content--ai-matrix {
   justify-content: center;
@@ -634,7 +644,7 @@ img { display: block; max-width: 100%; }
 .ai-frame {
   display: flex;
   flex-direction: column;
-  gap: clamp(28px, 4vh, 52px);
+  gap: clamp(14px, 2vh, 26px);
   width: 100%;
 }
 
@@ -797,7 +807,7 @@ img { display: block; max-width: 100%; }
 }
 
 .projects-header {
-  margin-bottom: clamp(24px, 4vh, 48px);
+  margin-bottom: clamp(12px, 2vh, 24px);
 }
 
 
@@ -805,7 +815,7 @@ img { display: block; max-width: 100%; }
   display: flex;
   flex-direction: column;
   margin-top: clamp(10px, 1.5vh, 20px);
-  margin-bottom: clamp(24px, 4vh, 48px);
+  margin-bottom: clamp(12px, 2vh, 24px);
   max-width: 100%;
 }
 
@@ -998,7 +1008,7 @@ img { display: block; max-width: 100%; }
   }
 
   /* color-buffer gives scroll room for the CSS bg transition to play */
-  .color-buffer { height: 14vh; }
+  .color-buffer { height: 3.5vh; }
 
   /* ─── Typography — full width on phone ─── */
   .principle-body--narrow,
@@ -1049,15 +1059,14 @@ img { display: block; max-width: 100%; }
   }
 
   /* Leadership image — full-width landscape crop on phone */
-  .leadership-image {
-    display: block;
+  .leadership-image-mask {
     flex: none;
     height: 58vw;
     width: 100%;
     margin-top: 32px;
-    object-fit: cover;
-    object-position: center bottom;
-    border-radius: 12px;
+  }
+  .leadership-image {
+    height: 100%;
   }
 
   .beliefs-principles {
@@ -1135,8 +1144,7 @@ img { display: block; max-width: 100%; }
     gap: clamp(32px, 4vw, 56px);
   }
 
-  .leadership-image {
-    display: block;  /* restore from phone hide */
+  .leadership-image-mask {
     flex: 1 1 0;
     height: 0;
     min-height: clamp(140px, 20vh, 280px);
@@ -1169,7 +1177,7 @@ img { display: block; max-width: 100%; }
     gap: clamp(28px, 4vw, 64px);
   }
 
-  .leadership-image {
+  .leadership-image-mask {
     min-height: clamp(100px, 16vh, 220px);
     margin-top: clamp(16px, 2.5vh, 32px);
   }
@@ -1214,32 +1222,32 @@ img { display: block; max-width: 100%; }
   .intro-label,
   .org-label,
   .principle-label {
-    margin-bottom: clamp(10px, 1.4vh, 20px);
+    margin-bottom: clamp(5px, 0.7vh, 10px);
   }
 
   .principle-headline {
-    margin-bottom: clamp(10px, 1.6vh, 24px);
+    margin-bottom: clamp(5px, 0.8vh, 12px);
   }
 
   .principle-headline--xl {
-    margin-bottom: clamp(12px, 1.8vh, 28px);
+    margin-bottom: clamp(6px, 0.9vh, 14px);
   }
 
   .principle-subhead {
-    margin-bottom: clamp(10px, 1.6vh, 24px);
+    margin-bottom: clamp(5px, 0.8vh, 12px);
   }
 
   .org-intro-note {
-    margin-top: clamp(12px, 1.8vh, 24px);
+    margin-top: clamp(6px, 0.9vh, 12px);
   }
 
   /* Strip rule gap in hero */
   .strip-rule {
-    margin-bottom: clamp(12px, 1.8vh, 24px);
+    margin-bottom: clamp(6px, 0.9vh, 12px);
   }
 
   /* Color buffer — tighter on tablet portrait */
-  .color-buffer { height: 12vh; }
+  .color-buffer { height: 3vh; }
 }
 
 /* ============================================================

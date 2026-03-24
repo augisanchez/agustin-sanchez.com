@@ -40,10 +40,10 @@ gsap.to(document.body, {
    ============================================================ */
 
 const lenis = new Lenis({
-  lerp:            0.08,
+  lerp:            0.07,
   smoothWheel:     true,
   orientation:     'vertical',
-  wheelMultiplier: 0.85,
+  wheelMultiplier: 0.45,
 });
 
 gsap.ticker.add((time) => { lenis.raf(time * 1000); });
@@ -152,10 +152,10 @@ if (!isMobile) {
   const colorBuffers = Array.from(document.querySelectorAll('.color-buffer'));
   const allPanels    = Array.from(document.querySelectorAll('.panel:not(.panel--hero)'));
 
-  const LERP_FAST   = 0.09;  // panel edges + buffer zones
-  const LERP_SLOW   = 0.05;  // panel centre — maximum mass
-  const MULT_NORMAL = 0.85;
-  const MULT_BUFFER = 2.0;
+  const LERP_FAST   = 0.07;  // panel edges + buffer zones
+  const LERP_SLOW   = 0.038; // panel centre — maximum mass
+  const MULT_NORMAL = 0.45;
+  const MULT_BUFFER = 1.2;
 
   let bufferZones = [], panelZones = [];
 
@@ -276,7 +276,7 @@ gsap.from('#hero-strip', {
 // Desktop: fires during dwell — content is pinned and stationary when text reveals.
 // Mobile:  fires during approach — panels are natural-flow on phones (no sticky/dwell).
 const PANEL_START = isMobile ? 'top 80%' : 'top top';
-const PANEL_END   = isMobile ? 'top 20%' : () => `+=${window.innerHeight * 0.45}`;
+const PANEL_END   = isMobile ? 'top 20%' : () => `+=${window.innerHeight * 0.20}`;
 
 /* ── 6. Leadership ── */
 const leaderPanel = document.querySelector('.panel--leadership');
@@ -288,7 +288,7 @@ if (leaderPanel) {
   const note  = leaderPanel.querySelector('.org-intro-note');
 
   if (label) gsap.set(label, { opacity: 0 });
-  if (photo) gsap.set(photo, { opacity: 0, scale: 1.03 });
+  if (photo) gsap.set(photo, { yPercent: 110 });
   if (paras.length) gsap.set(paras, { opacity: 0, y: 24 });
   if (note)  gsap.set(note,  { opacity: 0, y: 14 });
 
@@ -299,7 +299,7 @@ if (leaderPanel) {
     },
   });
   if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
-  if (photo) tl.to(photo, { opacity: 1, scale: 1, duration: 0.9, ease: 'power3.out' }, '<+0.08');
+  if (photo) tl.to(photo, { yPercent: 0, duration: 0.9, ease: 'power3.out' }, '<+0.08');
   if (spans.length) tl.from(spans, { yPercent: 110, duration: 0.8, ease: 'power3.out', stagger: 0.25 }, '<+0.08');
   if (paras.length) tl.to(paras, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.18 }, '<+0.28');
   if (note)  tl.to(note,  { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.25');
@@ -352,7 +352,10 @@ if (beliefsPanel) {
   const label   = beliefsPanel.querySelector('.intro-label');
   const hlSpans = beliefsPanel.querySelectorAll('.beliefs-headline .line-mask span');
 
-  if (label) gsap.set(label, { opacity: 0 });
+  const beliefsDivider = beliefsPanel.querySelector('.beliefs-divider');
+
+  if (label)         gsap.set(label,          { opacity: 0 });
+  if (beliefsDivider) gsap.set(beliefsDivider, { opacity: 0 });
   beliefsPanel.querySelectorAll('.belief-col').forEach(col => {
     const cl = col.querySelector('.principle-label');
     const cb = col.querySelector('.principle-body');
@@ -366,8 +369,9 @@ if (beliefsPanel) {
       scrub: 0.5,
     },
   });
-  if (label) tl.to(label, { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length) tl.from(hlSpans, { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.22 }, '<+0.08');
+  if (label)          tl.to(label,          { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
+  if (hlSpans.length) tl.from(hlSpans,      { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.22 }, '<+0.08');
+  if (beliefsDivider) tl.to(beliefsDivider, { opacity: 1, duration: 0.4, ease: 'power2.out' }, '<+0.2');
 
   beliefsPanel.querySelectorAll('.belief-col').forEach((col, i) => {
     const colLabel = col.querySelector('.principle-label');
@@ -509,9 +513,12 @@ if (frameworkPanel) {
   const body    = frameworkPanel.querySelector('.principle-body');
   const phases  = frameworkPanel.querySelectorAll('.delivery-phase');
 
-  if (label)         gsap.set(label,  { opacity: 0 });
-  if (body)          gsap.set(body,   { opacity: 0, y: 18 });
-  if (phases.length) gsap.set(phases, { opacity: 0, y: 12 });
+  const deliveryTable = frameworkPanel.querySelector('.delivery-table');
+
+  if (label)         gsap.set(label,        { opacity: 0 });
+  if (body)          gsap.set(body,         { opacity: 0, y: 18 });
+  if (deliveryTable) gsap.set(deliveryTable, { opacity: 0 });
+  if (phases.length) gsap.set(phases,       { opacity: 0, y: 12 });
 
   const tl = gsap.timeline({
     scrollTrigger: {
@@ -519,10 +526,11 @@ if (frameworkPanel) {
       scrub: 0.5,
     },
   });
-  if (label)          tl.to(label,    { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length) tl.from(hlSpans, { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.25 }, '<+0.08');
-  if (body)           tl.to(body,     { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
-  if (phases.length)  tl.to(phases,   { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out', stagger: 0.18 }, '<+0.25');
+  if (label)          tl.to(label,         { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
+  if (hlSpans.length) tl.from(hlSpans,     { yPercent: 110, duration: 0.75, ease: 'power3.out', stagger: 0.25 }, '<+0.08');
+  if (body)           tl.to(body,          { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
+  if (deliveryTable)  tl.to(deliveryTable, { opacity: 1, duration: 0.4, ease: 'power2.out' }, '<+0.2');
+  if (phases.length)  tl.to(phases,        { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out', stagger: 0.18 }, '<+0.1');
 }
 
 /* ── 12b. AI Matrix ──
@@ -562,34 +570,79 @@ if (aiMatrixPanel && !prefersReducedMotion) {
 }
 
 /* ============================================================
-   13. PANEL EXIT — fade + blur all sticky panels on scroll-out
-   Scrub-driven, bidirectional. Fires during the final portion
-   of each panel's scroll travel as content retreats upward.
-   Mobile: skipped — panels are natural block elements (no dwell
-   height), so scrub timings are meaningless and content would
-   flash-fade incorrectly.
+   13. PANEL EXIT — spans slide up out of line-masks on scroll-out.
+   Mirrors the entrance: lines entered bottom-up, they exit top-up.
+   Last line leaves first (reverse stagger), same wave direction.
+   Hero gets the original blur fade. Mobile skipped.
    ============================================================ */
 
 if (!isMobile) document.querySelectorAll('.panel').forEach((panel) => {
-  const content = panel.querySelector('.panel__content');
-  if (!content) return;
-
   const isHero = panel.classList.contains('panel--hero');
 
-  gsap.fromTo(content,
-    { opacity: 1, filter: 'blur(0px)' },
-    {
-      opacity: 0,
-      filter: 'blur(10px)',
-      ease: 'power2.in',  // slow start, fast end — content lingers then snaps away
-      scrollTrigger: {
-        trigger: panel,
-        start: isHero ? 'bottom 45%' : 'bottom 65%',
-        end:   'bottom 5%',
-        scrub: 0.4,
-      },
+  if (isHero) {
+    // Hero: keep the original blur/fade on the content block
+    const content = panel.querySelector('.panel__content');
+    if (content) {
+      gsap.fromTo(content,
+        { opacity: 1, filter: 'blur(0px)' },
+        { opacity: 0, filter: 'blur(10px)', ease: 'power2.in',
+          scrollTrigger: { trigger: panel, start: 'bottom 45%', end: 'bottom 5%', scrub: 0.4 }
+        }
+      );
     }
+    return;
+  }
+
+  // Non-hero: exit fires as the panel scrolls off (after the 30vh dwell).
+  // 130vh panels = 30vh dwell. Entrance: 0→0.20vh. Exit: 0.31→0.65vh (34vh range).
+  // Scrub matches entrance (0.5). Photo exits same as spans — yPercent: -110.
+  const ST = {
+    trigger: panel,
+    start:   () => `top+=${window.innerHeight * 0.31} top`,
+    end:     () => `top+=${window.innerHeight * 0.65} top`,
+    scrub:   0.5,
+  };
+
+  const spans  = panel.querySelectorAll('.line-mask span');
+  const photo  = panel.querySelector('.leadership-image');
+  const others = panel.querySelectorAll(
+    '.principle-body, .org-intro-note, .body-para, ' +
+    '.intro-label, .org-label, .principle-label, ' +
+    '.delivery-phase, .ai-m__ph, .ai-m__disc, .ai-m__cell, ' +
+    '.ai-frame__thesis, .beliefs-divider, .delivery-table'
   );
+
+  if (spans.length) {
+    gsap.to(spans, {
+      yPercent:        -110,
+      ease:            'expo.in',
+      stagger:         { each: 0.14, from: 'start' },
+      immediateRender: false,
+      overwrite:       'auto',
+      scrollTrigger:   ST,
+    });
+  }
+
+  if (photo) {
+    gsap.to(photo, {
+      yPercent:        -110,
+      ease:            'expo.in',
+      immediateRender: false,
+      overwrite:       'auto',
+      scrollTrigger:   ST,
+    });
+  }
+
+  if (others.length) {
+    gsap.to(others, {
+      opacity:         0,
+      y:               -22,
+      ease:            'power3.in',
+      immediateRender: false,
+      overwrite:       'auto',
+      scrollTrigger:   ST,
+    });
+  }
 });
 
 /* ============================================================
