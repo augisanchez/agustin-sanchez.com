@@ -9,7 +9,6 @@
    ============================================================ */
 
 gsap.registerPlugin(ScrollTrigger);
-document.documentElement.dataset.jsVersion = '20260324.01'; // DEBUG — remove after confirming
 
 /* ============================================================
    0. REDUCED MOTION — respect user preference
@@ -85,8 +84,8 @@ if (!isMobile) {
         ease: 'none',
         scrollTrigger: {
           trigger: section,
-          start: 'top 85%',
-          end:   'top 15%',
+          start: 'top 40%',
+          end:   'top top',
           scrub: 1,
         },
       }
@@ -252,16 +251,6 @@ gsap.fromTo('.hero-headline .line-mask span',
   { yPercent: 0, duration: 1.0, ease: 'power3.out', stagger: 0.1, delay: 0.25 }
 );
 
-// DEBUG — run in console: window._debugSpans()
-window._debugSpans = () => {
-  document.querySelectorAll('.line-mask span').forEach(s => {
-    console.log(
-      gsap.getProperty(s, 'yPercent').toFixed(1).padStart(6),
-      '|', s.closest('[id]')?.id || s.closest('[class*=panel]')?.className.split(' ')[1] || '?',
-      '|', s.textContent.trim().slice(0, 20)
-    );
-  });
-};
 
 gsap.from('#hero-strip', {
   opacity: 0,
@@ -285,7 +274,7 @@ gsap.from('#hero-strip', {
 // Desktop: fires during dwell — content is pinned and stationary when text reveals.
 // Mobile:  fires during approach — panels are natural-flow on phones (no sticky/dwell).
 const PANEL_START = isMobile ? 'top 80%' : 'top top';
-const PANEL_END   = isMobile ? 'top 20%' : () => `+=${window.innerHeight * 0.22}`;
+const PANEL_END   = isMobile ? 'top 20%' : () => `+=${window.innerHeight * 0.12}`;
 
 /* ── 6. Leadership ── */
 const leaderPanel = document.querySelector('.panel--leadership');
@@ -562,15 +551,17 @@ if (frameworkPanel) {
 const aiMatrixPanel = document.getElementById('p-ai-matrix');
 if (aiMatrixPanel && !prefersReducedMotion) {
   const eyebrow    = aiMatrixPanel.querySelector('.principle-label');
-  const thesis     = aiMatrixPanel.querySelector('.ai-frame__thesis');
+  const hlSpans    = aiMatrixPanel.querySelectorAll('.principle-headline .line-mask span');
+  const body       = aiMatrixPanel.querySelector('.principle-body');
   const phHeaders  = aiMatrixPanel.querySelectorAll('.ai-m__ph');
   const discLabels = aiMatrixPanel.querySelectorAll('.ai-m__disc');
   const hCells     = aiMatrixPanel.querySelectorAll('.ai-m__cell--h');
   const aiCells    = aiMatrixPanel.querySelectorAll('.ai-m__cell--ai');
   const legend     = aiMatrixPanel.querySelector('.ai-frame__legend');
 
-  if (eyebrow) gsap.set(eyebrow, { opacity: 0 });
-  if (thesis)  gsap.set(thesis,  { opacity: 0, y: 6 });
+  if (eyebrow)           gsap.set(eyebrow,    { opacity: 0 });
+  if (hlSpans.length)    gsap.set(hlSpans,    { yPercent: 110 });
+  if (body)              gsap.set(body,       { opacity: 0, y: 6 });
   if (phHeaders.length)  gsap.set(phHeaders,  { opacity: 0, y: 10 });
   if (discLabels.length) gsap.set(discLabels, { opacity: 0 });
   if (hCells.length)     gsap.set(hCells,     { opacity: 0, y: 6 });
@@ -584,7 +575,8 @@ if (aiMatrixPanel && !prefersReducedMotion) {
     },
   });
   if (eyebrow)           tl.to(eyebrow,    { opacity: 0.75, duration: 0.3, ease: 'power2.out' });
-  if (thesis)            tl.to(thesis,     { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' }, '<+0.08');
+  if (hlSpans.length)    tl.fromTo(hlSpans, { yPercent: 110 }, { yPercent: 0, duration: 0.6, ease: 'power3.out', stagger: 0.08 }, '<+0.08');
+  if (body)              tl.to(body,       { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' }, '<+0.12');
   if (phHeaders.length)  tl.to(phHeaders,  { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out', stagger: 0.08 }, '<+0.15');
   if (discLabels.length) tl.to(discLabels, { opacity: 0.75, duration: 0.35, ease: 'power2.out', stagger: 0.11 }, '<+0.15');
   if (hCells.length)     tl.to(hCells,     { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', stagger: 0.08 }, '<+0.1');
@@ -617,12 +609,12 @@ if (!isMobile) document.querySelectorAll('.panel').forEach((panel) => {
   }
 
   // Non-hero: exit fires DURING the dwell so content is still pinned while
-  // text blinds up. 155vh panels = 55vh dwell. Entrance: 0→0.40vh.
-  // Exit: 0.43→0.52vh (9vh range, fully within dwell). Blank panel scrolls off.
+  // text blinds up. 115vh panels = 15vh dwell. Entrance: 0→0.12vh.
+  // Exit: 0.12→0.15vh (3vh range, fully within dwell). Blank panel scrolls off.
   const ST = {
     trigger: panel,
-    start:   () => `top+=${window.innerHeight * 0.24} top`,
-    end:     () => `top+=${window.innerHeight * 0.30} top`,
+    start:   () => `top+=${window.innerHeight * 0.12} top`,
+    end:     () => `top+=${window.innerHeight * 0.15} top`,
     scrub:   0.5,
   };
 
@@ -632,7 +624,7 @@ if (!isMobile) document.querySelectorAll('.panel').forEach((panel) => {
     '.principle-body, .org-intro-note, .body-para, ' +
     '.intro-label, .org-label, .principle-label, ' +
     '.delivery-phase, .ai-m__ph, .ai-m__disc, .ai-m__cell, ' +
-    '.ai-frame__thesis, .beliefs-divider, .delivery-table'
+    '.beliefs-divider, .delivery-table, .ai-frame__legend'
   );
 
   if (spans.length) {
