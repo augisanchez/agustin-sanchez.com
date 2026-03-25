@@ -152,21 +152,30 @@ if (!isMobile) {
   const colorBuffers = Array.from(document.querySelectorAll('.color-buffer'));
   const allPanels    = Array.from(document.querySelectorAll('.panel:not(.panel--hero)'));
 
-  const LERP_FAST   = 0.07;  // panel edges + buffer zones
-  const LERP_SLOW   = 0.038; // panel centre — maximum mass
+  const LERP_FAST   = 0.07;   // between panels, buffer zones
+  const LERP_SLOW   = 0.038;  // panel approach / departure curve
+  const LERP_REST   = 0.03;   // fully-revealed rest window — absorbs fast scroll
   const MULT_NORMAL = 0.45;
   const MULT_BUFFER = 1.2;
+
+  // Rest window boundaries relative to each panel's stick point (in px).
+  // Matches entrance end (0.12vh) → exit start (0.22vh).
+  const restInVh  = 0.12;
+  const restOutVh = 0.22;
 
   let bufferZones = [], panelZones = [];
 
   function buildScrollZones() {
+    const vh = window.innerHeight;
     bufferZones = colorBuffers.map(el => ({
       top: el.offsetTop,
       bot: el.offsetTop + el.offsetHeight,
     }));
     panelZones = allPanels.map(el => ({
-      top:    el.offsetTop,
-      height: el.offsetHeight,
+      top:       el.offsetTop,
+      height:    el.offsetHeight,
+      restStart: el.offsetTop + vh * restInVh,
+      restEnd:   el.offsetTop + vh * restOutVh,
     }));
   }
   buildScrollZones();
@@ -174,7 +183,7 @@ if (!isMobile) {
   window.addEventListener('load',   buildScrollZones);
 
   lenis.on('scroll', ({ scroll }) => {
-    // Buffer zones take priority — move fast through transitions
+    // Buffer zones take priority — move fast through color transitions
     if (bufferZones.some(z => scroll >= z.top && scroll <= z.bot)) {
       lenis.options.lerp            = LERP_FAST;
       lenis.options.wheelMultiplier = MULT_BUFFER;
@@ -183,12 +192,17 @@ if (!isMobile) {
 
     lenis.options.wheelMultiplier = MULT_NORMAL;
 
-    // Find active panel and apply depth curve
     const zone = panelZones.find(z => scroll >= z.top && scroll <= z.top + z.height);
     if (zone) {
-      const progress      = (scroll - zone.top) / zone.height;   // 0→1
-      const distFromCentre = Math.abs(progress - 0.5) * 2;       // 1 at edges, 0 at centre
-      lenis.options.lerp  = LERP_SLOW + distFromCentre * (LERP_FAST - LERP_SLOW);
+      if (scroll >= zone.restStart && scroll <= zone.restEnd) {
+        // Fully-revealed rest window: resist fast scroll, act as a natural stopping point
+        lenis.options.lerp = LERP_REST;
+      } else {
+        // Approach / departure: ease in and out of the panel
+        const progress       = (scroll - zone.top) / zone.height;
+        const distFromCentre = Math.abs(progress - 0.5) * 2;
+        lenis.options.lerp   = LERP_SLOW + distFromCentre * (LERP_FAST - LERP_SLOW);
+      }
     } else {
       lenis.options.lerp = LERP_FAST;
     }
@@ -609,12 +623,12 @@ if (!isMobile) document.querySelectorAll('.panel').forEach((panel) => {
   }
 
   // Non-hero: exit fires DURING the dwell so content is still pinned while
-  // text blinds up. 115vh panels = 15vh dwell. Entrance: 0→0.12vh.
-  // Exit: 0.12→0.15vh (3vh range, fully within dwell). Blank panel scrolls off.
+  // text blinds up. 125vh panels = 25vh dwell. Entrance: 0→0.12vh, rest: 0.12→0.22vh.
+  // Exit: 0.22→0.25vh (3vh, fully within dwell). Panel unsticks at 0.25vh.
   const ST = {
     trigger: panel,
-    start:   () => `top+=${window.innerHeight * 0.12} top`,
-    end:     () => `top+=${window.innerHeight * 0.15} top`,
+    start:   () => `top+=${window.innerHeight * 0.22} top`,
+    end:     () => `top+=${window.innerHeight * 0.25} top`,
     scrub:   0.5,
   };
 
