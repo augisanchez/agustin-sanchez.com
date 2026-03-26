@@ -40,10 +40,10 @@ gsap.to(document.body, {
    ============================================================ */
 
 const lenis = new Lenis({
-  lerp:            0.07,
+  lerp:            0.072,
   smoothWheel:     true,
   orientation:     'vertical',
-  wheelMultiplier: 0.45,
+  wheelMultiplier: 0.55,
 });
 
 gsap.ticker.add((time) => { lenis.raf(time * 1000); });
@@ -73,9 +73,13 @@ if (bgSections.length) gsap.set(pageBg, { backgroundColor: bgSections[0].dataset
 
 if (!isMobile) {
   // ── Desktop: scrub fromTo per section ──────────────────────
+  // Last section (projects/blue) gets an early trigger so yellow→blue
+  // completes while the section is still in the lower viewport —
+  // well before content animates in at top 25%.
   bgSections.forEach((section, i) => {
     const fromBg = i === 0 ? section.dataset.bg : bgSections[i - 1].dataset.bg;
     const toBg   = section.dataset.bg;
+    const isLast = i === bgSections.length - 1;
 
     gsap.fromTo(pageBg,
       { backgroundColor: fromBg },
@@ -84,9 +88,9 @@ if (!isMobile) {
         ease: 'none',
         scrollTrigger: {
           trigger: section,
-          start: 'top 40%',
-          end:   'top top',
-          scrub: 1,
+          start: isLast ? 'top 75%' : 'top 20%',
+          end:   isLast ? 'top 35%' : 'top top',
+          scrub: 0.3,
         },
       }
     );
@@ -128,23 +132,17 @@ if (!isMobile) {
 }
 
 /* ============================================================
-   2b. SCROLL FEEL — buffer acceleration + section mass
-   Two behaviours work together:
-
-   COLOR BUFFERS (60 vh gaps between sections):
-     Wheel multiplier doubles (2×) so the transition space
-     crosses quickly and feels deliberate, not blank.
-
-   PANEL DEPTH CURVE — ease out in, ease in out:
-     Inside every .panel (except hero) lerp follows a
-     centre-distance curve:
-       edge of panel  → LERP_FAST (light, matches buffer speed)
-       centre of panel → LERP_SLOW (heavy, maximum mass)
-     As you scroll toward the centre lerp decreases → the
-     section decelerates under you (ease-out arrival).
-     As you push away from centre lerp increases → you have
-     to overcome inertia to leave (ease-in departure).
-     This is symmetric: works identically scrolling up or down.
+   2b. SCROLL FEEL — panel depth curve
+   Inside every .panel (except hero) lerp follows a
+   centre-distance curve:
+     edge of panel   → LERP_FAST (0.072 — lighter, responsive)
+     centre of panel → LERP_SLOW (0.052 — heavier, decelerates)
+   As you scroll toward the centre lerp decreases → the
+   section decelerates under you (ease-out arrival).
+   As you push away from centre lerp increases → you have
+   to overcome inertia to leave (ease-in departure).
+   Symmetric: works identically scrolling up or down.
+   Single wheelMultiplier throughout — no speed jumps.
    Desktop + tablet only.
    ============================================================ */
 
@@ -152,30 +150,15 @@ if (!isMobile) {
   const colorBuffers = Array.from(document.querySelectorAll('.color-buffer'));
   const allPanels    = Array.from(document.querySelectorAll('.panel:not(.panel--hero)'));
 
-  const LERP_FAST   = 0.07;   // between panels, buffer zones
-  const LERP_SLOW   = 0.038;  // panel approach / departure curve
-  const LERP_REST   = 0.03;   // fully-revealed rest window — absorbs fast scroll
-  const MULT_NORMAL = 0.45;
-  const MULT_BUFFER = 1.2;
+  const LERP_FAST = 0.072;  // between panels / panel edges
+  const LERP_SLOW = 0.052;  // panel centre — gentle deceleration
 
-  // Rest window boundaries relative to each panel's stick point (in px).
-  // Matches entrance end (0.12vh) → exit start (0.22vh).
-  const restInVh  = 0.12;
-  const restOutVh = 0.22;
-
-  let bufferZones = [], panelZones = [];
+  let panelZones = [];
 
   function buildScrollZones() {
-    const vh = window.innerHeight;
-    bufferZones = colorBuffers.map(el => ({
-      top: el.offsetTop,
-      bot: el.offsetTop + el.offsetHeight,
-    }));
     panelZones = allPanels.map(el => ({
-      top:       el.offsetTop,
-      height:    el.offsetHeight,
-      restStart: el.offsetTop + vh * restInVh,
-      restEnd:   el.offsetTop + vh * restOutVh,
+      top:    el.offsetTop,
+      height: el.offsetHeight,
     }));
   }
   buildScrollZones();
@@ -183,26 +166,12 @@ if (!isMobile) {
   window.addEventListener('load',   buildScrollZones);
 
   lenis.on('scroll', ({ scroll }) => {
-    // Buffer zones take priority — move fast through color transitions
-    if (bufferZones.some(z => scroll >= z.top && scroll <= z.bot)) {
-      lenis.options.lerp            = LERP_FAST;
-      lenis.options.wheelMultiplier = MULT_BUFFER;
-      return;
-    }
-
-    lenis.options.wheelMultiplier = MULT_NORMAL;
-
     const zone = panelZones.find(z => scroll >= z.top && scroll <= z.top + z.height);
     if (zone) {
-      if (scroll >= zone.restStart && scroll <= zone.restEnd) {
-        // Fully-revealed rest window: resist fast scroll, act as a natural stopping point
-        lenis.options.lerp = LERP_REST;
-      } else {
-        // Approach / departure: ease in and out of the panel
-        const progress       = (scroll - zone.top) / zone.height;
-        const distFromCentre = Math.abs(progress - 0.5) * 2;
-        lenis.options.lerp   = LERP_SLOW + distFromCentre * (LERP_FAST - LERP_SLOW);
-      }
+      // Depth curve: centre of panel feels heavier, edges feel lighter
+      const progress       = (scroll - zone.top) / zone.height;
+      const distFromCentre = Math.abs(progress - 0.5) * 2;
+      lenis.options.lerp   = LERP_SLOW + distFromCentre * (LERP_FAST - LERP_SLOW);
     } else {
       lenis.options.lerp = LERP_FAST;
     }
@@ -275,187 +244,181 @@ gsap.from('#hero-strip', {
 });
 
 /* ============================================================
-   6–11. TEXT BUILD-ONS — scroll-scrubbed single timelines
-   Each panel gets ONE gsap.timeline with scrub: true.
-   scroll position IS the playhead — 1:1, no lag.
-   Range: top-of-panel at viewport bottom → top-of-panel at
-   viewport top (the full approach phase, ~100 vh of travel).
-   onLeave locks the timeline at progress 1 and kills the
-   trigger so the text stays visible on scroll-back (Option B).
+   6. PANEL ANIMATION SYSTEM
+   registerPanel(sel, buildFn) — one call per sticky panel.
+
+   set* helpers — apply initial hidden states before reveal.
+     CSS also sets these; GSAP overrides with precise values.
+   add* helpers — add entrance tweens to the scrubbed timeline.
+
+   To add a case study: call registerPanel() with a selector
+   and a buildFn that describes the animation sequence.
    ============================================================ */
 
 // Trigger range for sticky-panel text build-ons.
 // Desktop: fires during dwell — content is pinned and stationary when text reveals.
 // Mobile:  fires during approach — panels are natural-flow on phones (no sticky/dwell).
 const PANEL_START = isMobile ? 'top 80%' : 'top top';
-const PANEL_END   = isMobile ? 'top 20%' : () => `+=${window.innerHeight * 0.12}`;
+const PANEL_END   = isMobile ? 'top 20%' : () => `+=${window.innerHeight * 0.16}`;
+
+/* ── Query helpers ── */
+const q  = (scope, sel) => scope.querySelector(sel);
+const qa = (scope, sel) => scope.querySelectorAll(sel);
+
+/* ── Initial state setters ── */
+function setLabel(el)         { if (el) gsap.set(el, { opacity: 0 }); }
+function setSpans(els)        { if (els && els.length) gsap.set(els, { yPercent: 110 }); }
+function setImage(el)         { if (el) gsap.set(el, { yPercent: 110 }); }
+function setFade(els, y = 24) { if (els && (els.nodeType || els.length)) gsap.set(els, { opacity: 0, y }); }
+function setNote(el)          { if (el) gsap.set(el, { opacity: 0, y: 14 }); }
+
+/* ── Entrance tween helpers ── */
+function addLabel(tl, el, pos = '<', opacity = 0.55) {
+  if (!el) return;
+  tl.to(el, { opacity, duration: 0.3, ease: 'power2.out' }, pos);
+}
+function addSpans(tl, els, pos = '<', dur = 0.8, stagger = 0.13) {
+  if (!els || !els.length) return;
+  tl.fromTo(els, { yPercent: 110 }, { yPercent: 0, duration: dur, ease: 'power3.out', stagger }, pos);
+}
+function addImage(tl, el, pos = '<') {
+  if (!el) return;
+  tl.to(el, { yPercent: 0, duration: 0.9, ease: 'power3.out' }, pos);
+}
+function addFade(tl, els, pos = '<', dur = 0.8, stagger = 0.10) {
+  if (!els || (!els.nodeType && !els.length)) return;
+  tl.to(els, { opacity: 1, y: 0, duration: dur, ease: 'power3.out', stagger }, pos);
+}
+function addNote(tl, el, pos = '<') {
+  if (!el) return;
+  tl.to(el, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, pos);
+}
+function addReveal(tl, el, pos = '<', dur = 0.4) {
+  if (!el) return;
+  tl.to(el, { opacity: 1, duration: dur, ease: 'power2.out' }, pos);
+}
+function addRows(tl, els, pos = '<') {
+  if (!els || !els.length) return;
+  tl.to(els, { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out', stagger: 0.10 }, pos);
+}
+
+/* ── Panel factory ── */
+function registerPanel(sel, buildFn) {
+  const panel = typeof sel === 'string' ? document.querySelector(sel) : sel;
+  if (!panel) return;
+  const tl = gsap.timeline({
+    scrollTrigger: { trigger: panel, start: PANEL_START, end: PANEL_END, scrub: true },
+  });
+  buildFn(panel, tl);
+}
 
 /* ── 6. Leadership ── */
-const leaderPanel = document.querySelector('.panel--leadership');
-if (leaderPanel) {
-  const label = leaderPanel.querySelector('.intro-label');
-  const spans = leaderPanel.querySelectorAll('.leadership-headline .line-mask span');
-  const paras = leaderPanel.querySelectorAll('.body-para');
-  const photo = leaderPanel.querySelector('.leadership-image');
-  const note  = leaderPanel.querySelector('.org-intro-note');
+registerPanel('.panel--leadership', (panel, tl) => {
+  const label = q(panel, '.intro-label');
+  const photo = q(panel, '.leadership-image');
+  const spans = qa(panel, '.leadership-headline .line-mask span');
+  const paras = qa(panel, '.body-para');
+  const note  = q(panel, '.org-intro-note');
 
-  if (label) gsap.set(label, { opacity: 0 });
-  if (photo) gsap.set(photo, { yPercent: 110 });
-  if (spans.length) gsap.set(spans, { yPercent: 110 });
-  if (paras.length) gsap.set(paras, { opacity: 0, y: 24 });
-  if (note)  gsap.set(note,  { opacity: 0, y: 14 });
+  setLabel(label); setImage(photo); setSpans(spans); setFade(paras); setNote(note);
 
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: leaderPanel, start: PANEL_START, end: PANEL_END,
-      scrub:   true,
-    },
-  });
-  if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
-  if (photo) tl.to(photo, { yPercent: 0, duration: 0.9, ease: 'power3.out' }, '<+0.08');
-  if (spans.length) tl.fromTo(spans, { yPercent: 110 }, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
-  if (paras.length) tl.to(paras, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.10 }, '<+0.28');
-  if (note)  tl.to(note,  { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.25');
-}
+  addLabel(tl, label);
+  addImage(tl, photo, '<+0.08');
+  addSpans(tl, spans, '<+0.08');
+  addFade(tl,  paras, '<+0.28');
+  addNote(tl,  note,  '<+0.25');
+});
 
 /* ── 7a. Org intro ── */
-const orgIntroPanel = document.querySelector('.panel--org-intro');
-if (orgIntroPanel) {
-  const label = orgIntroPanel.querySelector('.org-label');
-  const spans = orgIntroPanel.querySelectorAll('.org-intro-lines .line-mask span');
-  const note  = orgIntroPanel.querySelector('.org-intro-note');
+registerPanel('.panel--org-intro', (panel, tl) => {
+  const label = q(panel, '.org-label');
+  const spans = qa(panel, '.org-intro-lines .line-mask span');
+  const note  = q(panel, '.org-intro-note');
 
-  if (label) gsap.set(label, { opacity: 0 });
-  if (spans.length) gsap.set(spans, { yPercent: 110 });
-  if (note)  gsap.set(note,  { opacity: 0, y: 14 });
+  setLabel(label); setSpans(spans); setNote(note);
 
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: orgIntroPanel, start: PANEL_START, end: PANEL_END,
-      scrub:   true,
-    },
-  });
-  if (label) tl.to(label, { opacity: 0.55, duration: 0.35, ease: 'power2.out' });
-  if (spans.length) tl.fromTo(spans, { yPercent: 110 }, { yPercent: 0, duration: 0.9, ease: 'power3.out', stagger: 0.13 }, '<+0.1');
-  if (note)  tl.to(note,  { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.35');
-}
+  addLabel(tl, label);
+  addSpans(tl, spans, '<+0.1', 0.9);
+  addNote(tl,  note,  '<+0.35');
+});
 
 /* ── 7b. Org statement ── */
-const orgStatPanel = document.querySelector('.panel--org-statement');
-if (orgStatPanel) {
-  const mutedSpans  = orgStatPanel.querySelectorAll('.org-lines--muted .line-mask span');
-  const accentSpans = orgStatPanel.querySelectorAll('.org-lines--accent .line-mask span');
-  const notes       = orgStatPanel.querySelectorAll('.org-intro-note');
+registerPanel('.panel--org-statement', (panel, tl) => {
+  const mutedSpans  = qa(panel, '.org-lines--muted .line-mask span');
+  const accentSpans = qa(panel, '.org-lines--accent .line-mask span');
+  const notes       = qa(panel, '.org-intro-note');
 
-  if (mutedSpans.length)  gsap.set(mutedSpans,  { yPercent: 110 });
-  if (accentSpans.length) gsap.set(accentSpans, { yPercent: 110 });
-  if (notes.length) gsap.set(notes, { opacity: 0, y: 14 });
+  setSpans(mutedSpans); setSpans(accentSpans); setFade(notes, 14);
 
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: orgStatPanel, start: PANEL_START, end: PANEL_END,
-      scrub:   true,
-    },
-  });
-  if (mutedSpans.length)  tl.fromTo(mutedSpans,  { yPercent: 110 }, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 });
-  if (accentSpans.length) tl.fromTo(accentSpans, { yPercent: 110 }, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.22');
-  if (notes.length)       tl.to(notes,         { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.06 }, '<+0.22');
-}
+  addSpans(tl, mutedSpans);
+  addSpans(tl, accentSpans, '<+0.22');
+  addFade(tl,  notes, '<+0.22', 0.7, 0.06);
+});
 
 /* ── 8. Beliefs ── */
-const beliefsPanel = document.querySelector('.panel--beliefs-full');
-if (beliefsPanel) {
-  const label   = beliefsPanel.querySelector('.intro-label');
-  const hlSpans = beliefsPanel.querySelectorAll('.beliefs-headline .line-mask span');
+registerPanel('.panel--beliefs-full', (panel, tl) => {
+  const label   = q(panel, '.intro-label');
+  const hlSpans = qa(panel, '.beliefs-headline .line-mask span');
+  const divider = q(panel, '.beliefs-divider');
 
-  const beliefsDivider = beliefsPanel.querySelector('.beliefs-divider');
+  setLabel(label); setSpans(hlSpans);
+  if (divider) gsap.set(divider, { opacity: 0 });
 
-  if (label)         gsap.set(label,          { opacity: 0 });
-  if (hlSpans.length) gsap.set(hlSpans,       { yPercent: 110 });
-  if (beliefsDivider) gsap.set(beliefsDivider, { opacity: 0 });
-  beliefsPanel.querySelectorAll('.belief-col').forEach(col => {
-    const cl = col.querySelector('.principle-label');
-    const cs = col.querySelectorAll('.principle-headline .line-mask span');
-    const cb = col.querySelector('.principle-body');
-    if (cl) gsap.set(cl, { opacity: 0 });
-    if (cs.length) gsap.set(cs, { yPercent: 110 });
+  addLabel(tl,  label);
+  addSpans(tl,  hlSpans, '<+0.08', 0.75, 0.12);
+  addReveal(tl, divider, '<+0.2');
+
+  panel.querySelectorAll('.belief-col').forEach((col, i) => {
+    const cl = q(col, '.principle-label');
+    const cs = qa(col, '.principle-headline .line-mask span');
+    const cb = q(col, '.principle-body');
+    setLabel(cl); setSpans(cs);
     if (cb) gsap.set(cb, { opacity: 0, y: 18 });
-  });
 
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: beliefsPanel, start: PANEL_START, end: PANEL_END,
-      scrub:   true,
-    },
+    addLabel(tl, cl, i === 0 ? '<+0.2' : '<+0.06');
+    addSpans(tl, cs, '<+0.08', 0.65, 0.10);
+    if (cb) tl.to(cb, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.18');
   });
-  if (label)          tl.to(label,          { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length) tl.fromTo(hlSpans, { yPercent: 110 }, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.12 }, '<+0.08');
-  if (beliefsDivider) tl.to(beliefsDivider, { opacity: 1, duration: 0.4, ease: 'power2.out' }, '<+0.2');
-
-  beliefsPanel.querySelectorAll('.belief-col').forEach((col, i) => {
-    const colLabel = col.querySelector('.principle-label');
-    const colSpans = col.querySelectorAll('.principle-headline .line-mask span');
-    const colBody  = col.querySelector('.principle-body');
-    const pos      = `<+${i === 0 ? 0.2 : 0.06}`;
-    if (colLabel) tl.to(colLabel, { opacity: 0.55, duration: 0.3, ease: 'power2.out' }, pos);
-    if (colSpans.length) tl.fromTo(colSpans, { yPercent: 110 }, { yPercent: 0, duration: 0.65, ease: 'power3.out', stagger: 0.10 }, '<+0.08');
-    if (colBody)  tl.to(colBody, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.18');
-  });
-}
+});
 
 /* ── 9. Curiosity ── */
-const curiosityPanel = document.getElementById('p-curiosity');
-if (curiosityPanel) {
-  const label = curiosityPanel.querySelector('.principle-label');
-  const spans = curiosityPanel.querySelectorAll('.principle-headline .line-mask span');
-  const body  = curiosityPanel.querySelector('.principle-body');
-  const xl    = curiosityPanel.querySelector('.principle-headline--xl');
+registerPanel('#p-curiosity', (panel, tl) => {
+  const label = q(panel, '.principle-label');
+  const spans = qa(panel, '.principle-headline .line-mask span');
+  const body  = q(panel, '.principle-body');
+  const xl    = q(panel, '.principle-headline--xl');
 
-  if (label) gsap.set(label, { opacity: 0 });
-  if (spans.length) gsap.set(spans, { yPercent: 110 });
-  if (body)  gsap.set(body,  { opacity: 0, y: 18 });
+  setLabel(label); setSpans(spans);
+  if (body) gsap.set(body, { opacity: 0, y: 18 });
 
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: curiosityPanel, start: PANEL_START, end: PANEL_END,
-      scrub:   true,
-    },
-  });
-  if (label) tl.to(label, { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (xl)    tl.from(xl,  { scale: 1.02, duration: 1.0, ease: 'power3.out' }, '<');
-  if (spans.length) tl.fromTo(spans, { yPercent: 110 }, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
-  if (body)  tl.to(body, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '<+0.25');
-}
+  addLabel(tl, label);
+  if (xl) tl.from(xl, { scale: 1.02, duration: 1.0, ease: 'power3.out' }, '<');
+  addSpans(tl, spans, '<+0.08');
+  if (body) tl.to(body, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '<+0.25');
+});
 
 /* ── 10. The Gap ── */
-const gapPanel = document.getElementById('p-gap');
-if (gapPanel) {
-  const label    = gapPanel.querySelector('.principle-label');
-  const hlSpans  = gapPanel.querySelectorAll('.principle-headline .line-mask span');
-  const subSpans = gapPanel.querySelectorAll('.principle-subhead .line-mask span');
-  const body     = gapPanel.querySelector('.principle-body');
-  const note     = gapPanel.querySelector('.org-intro-note');
+registerPanel('#p-gap', (panel, tl) => {
+  const label    = q(panel, '.principle-label');
+  const hlSpans  = qa(panel, '.principle-headline .line-mask span');
+  const subSpans = qa(panel, '.principle-subhead .line-mask span');
+  const body     = q(panel, '.principle-body');
+  const note     = q(panel, '.org-intro-note');
 
-  if (label) gsap.set(label, { opacity: 0 });
-  if (hlSpans.length)  gsap.set(hlSpans,  { yPercent: 110 });
-  if (subSpans.length) gsap.set(subSpans, { yPercent: 110 });
-  if (body)  gsap.set(body,  { opacity: 0, y: 18 });
-  if (note)  gsap.set(note,  { opacity: 0, y: 14 });
+  setLabel(label); setSpans(hlSpans); setSpans(subSpans);
+  if (body) gsap.set(body, { opacity: 0, y: 18 });
+  setNote(note);
 
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: gapPanel, start: PANEL_START, end: PANEL_END,
-      scrub:   true,
-    },
-  });
-  if (label)           tl.to(label,     { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length)  tl.fromTo(hlSpans,  { yPercent: 110 }, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
-  if (subSpans.length) tl.fromTo(subSpans, { yPercent: 110 }, { yPercent: 0, duration: 0.7, ease: 'power3.out', stagger: 0.12 }, '<+0.2');
-  if (body)            tl.to(body,      { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
-  if (note)            tl.to(note,      { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '<+0.2');
-}
+  addLabel(tl,     label);
+  addSpans(tl,     hlSpans,  '<+0.08');
+  addSpans(tl,     subSpans, '<+0.2', 0.7, 0.12);
+  if (body) tl.to(body, { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
+  addNote(tl,      note, '<+0.2');
+});
 
-/* ── 11. Projects headline (non-sticky) ── */
+/* ── 11. Projects headline (non-sticky) ──
+   Color transition completes at top 35% of the section.
+   Content waits until top 25% so it enters on a fully blue background. */
 const projectsSection = document.querySelector('.projects-section');
 if (projectsSection) {
   const label         = projectsSection.querySelector('.intro-label');
@@ -466,7 +429,7 @@ if (projectsSection) {
 
   const tl = gsap.timeline({
     scrollTrigger: {
-      trigger: projectsSection, start: 'top 85%', end: 'top 20%',
+      trigger: projectsSection, start: 'top 25%', end: 'top -15%',
       scrub: 0.5,
     },
   });
@@ -474,13 +437,13 @@ if (projectsSection) {
   if (headlineSpans.length) tl.fromTo(headlineSpans, { yPercent: 110 }, { yPercent: 0, duration: 0.8, ease: 'power3.out', stagger: 0.13 }, '<+0.1');
 }
 
-// Project rows — keep toggle (normal-flow list, not a sticky panel)
+// Project rows — fire after section is well into viewport (color already done)
 gsap.set('.project-row', { opacity: 0, y: 14 });
 gsap.to('.project-row', {
   opacity: 1, y: 0,
   duration: 0.75, ease: 'power3.out', stagger: 0.085,
   scrollTrigger: {
-    trigger: '.projects-table', start: 'top 80%',
+    trigger: '.projects-table', start: 'top 55%',
     toggleActions: 'restart none none reset',
   },
 });
@@ -506,96 +469,72 @@ document.querySelectorAll('.project-row').forEach((row) => {
 });
 
 /* ── 11b. Delivery Panel A ── */
-const deliveryPanel = document.getElementById('p-delivery');
-if (deliveryPanel) {
-  const label    = deliveryPanel.querySelector('.principle-label');
-  const hlSpans  = deliveryPanel.querySelectorAll('.principle-headline .line-mask span');
-  const subSpans = deliveryPanel.querySelectorAll('.principle-subhead .line-mask span');
-  const body     = deliveryPanel.querySelector('.principle-body');
+registerPanel('#p-delivery', (panel, tl) => {
+  const label    = q(panel, '.principle-label');
+  const hlSpans  = qa(panel, '.principle-headline .line-mask span');
+  const subSpans = qa(panel, '.principle-subhead .line-mask span');
+  const body     = q(panel, '.principle-body');
 
-  if (label) gsap.set(label, { opacity: 0 });
-  if (hlSpans.length)  gsap.set(hlSpans,  { yPercent: 110 });
-  if (subSpans.length) gsap.set(subSpans, { yPercent: 110 });
-  if (body)  gsap.set(body,  { opacity: 0, y: 18 });
+  setLabel(label); setSpans(hlSpans); setSpans(subSpans);
+  if (body) gsap.set(body, { opacity: 0, y: 18 });
 
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: deliveryPanel, start: PANEL_START, end: PANEL_END,
-      scrub:   true,
-    },
-  });
-  if (label)           tl.to(label,     { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length)  tl.fromTo(hlSpans,  { yPercent: 110 }, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
-  if (subSpans.length) tl.fromTo(subSpans, { yPercent: 110 }, { yPercent: 0, duration: 0.7, ease: 'power3.out', stagger: 0.12 }, '<+0.2');
-  if (body)            tl.to(body,      { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
-}
+  addLabel(tl,     label);
+  addSpans(tl,     hlSpans,  '<+0.08');
+  addSpans(tl,     subSpans, '<+0.2', 0.7, 0.12);
+  if (body) tl.to(body, { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
+});
 
 /* ── 11c. Delivery Panel B ── */
-const frameworkPanel = document.getElementById('p-framework');
-if (frameworkPanel) {
-  const label   = frameworkPanel.querySelector('.principle-label');
-  const hlSpans = frameworkPanel.querySelectorAll('.principle-headline .line-mask span');
-  const body    = frameworkPanel.querySelector('.principle-body');
-  const phases  = frameworkPanel.querySelectorAll('.delivery-phase');
+registerPanel('#p-framework', (panel, tl) => {
+  const label   = q(panel, '.principle-label');
+  const hlSpans = qa(panel, '.principle-headline .line-mask span');
+  const body    = q(panel, '.principle-body');
+  const table   = q(panel, '.delivery-table');
+  const phases  = qa(panel, '.delivery-phase');
 
-  const deliveryTable = frameworkPanel.querySelector('.delivery-table');
+  setLabel(label); setSpans(hlSpans);
+  if (body)   gsap.set(body,   { opacity: 0, y: 18 });
+  if (table)  gsap.set(table,  { opacity: 0 });
+  if (phases.length) gsap.set(phases, { opacity: 0, y: 12 });
 
-  if (label)         gsap.set(label,        { opacity: 0 });
-  if (hlSpans.length) gsap.set(hlSpans,    { yPercent: 110 });
-  if (body)          gsap.set(body,         { opacity: 0, y: 18 });
-  if (deliveryTable) gsap.set(deliveryTable, { opacity: 0 });
-  if (phases.length) gsap.set(phases,       { opacity: 0, y: 12 });
-
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: frameworkPanel, start: PANEL_START, end: PANEL_END,
-      scrub:   true,
-    },
-  });
-  if (label)          tl.to(label,         { opacity: 0.55, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length) tl.fromTo(hlSpans, { yPercent: 110 }, { yPercent: 0, duration: 0.75, ease: 'power3.out', stagger: 0.13 }, '<+0.08');
-  if (body)           tl.to(body,          { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
-  if (deliveryTable)  tl.to(deliveryTable, { opacity: 1, duration: 0.4, ease: 'power2.out' }, '<+0.2');
-  if (phases.length)  tl.to(phases,        { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out', stagger: 0.10 }, '<+0.1');
-}
+  addLabel(tl,  label);
+  addSpans(tl,  hlSpans, '<+0.08');
+  if (body)  tl.to(body,  { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '<+0.2');
+  addReveal(tl, table, '<+0.2');
+  addRows(tl,   phases, '<+0.1');
+});
 
 /* ── 12b. AI Matrix ──
    AI cells use CSS color opacity for dimming (not GSAP) to preserve
    AAA contrast. GSAP animates element opacity 0→1 only.          */
-const aiMatrixPanel = document.getElementById('p-ai-matrix');
-if (aiMatrixPanel && !prefersReducedMotion) {
-  const eyebrow    = aiMatrixPanel.querySelector('.principle-label');
-  const hlSpans    = aiMatrixPanel.querySelectorAll('.principle-headline .line-mask span');
-  const body       = aiMatrixPanel.querySelector('.principle-body');
-  const phHeaders  = aiMatrixPanel.querySelectorAll('.ai-m__ph');
-  const discLabels = aiMatrixPanel.querySelectorAll('.ai-m__disc');
-  const hCells     = aiMatrixPanel.querySelectorAll('.ai-m__cell--h');
-  const aiCells    = aiMatrixPanel.querySelectorAll('.ai-m__cell--ai');
-  const legend     = aiMatrixPanel.querySelector('.ai-frame__legend');
+if (!prefersReducedMotion) {
+  registerPanel('#p-ai-matrix', (panel, tl) => {
+    const eyebrow    = q(panel, '.principle-label');
+    const hlSpans    = qa(panel, '.principle-headline .line-mask span');
+    const body       = q(panel, '.principle-body');
+    const phHeaders  = qa(panel, '.ai-m__ph');
+    const discLabels = qa(panel, '.ai-m__disc');
+    const hCells     = qa(panel, '.ai-m__cell--h');
+    const aiCells    = qa(panel, '.ai-m__cell--ai');
+    const legend     = q(panel, '.ai-frame__legend');
 
-  if (eyebrow)           gsap.set(eyebrow,    { opacity: 0 });
-  if (hlSpans.length)    gsap.set(hlSpans,    { yPercent: 110 });
-  if (body)              gsap.set(body,       { opacity: 0, y: 6 });
-  if (phHeaders.length)  gsap.set(phHeaders,  { opacity: 0, y: 10 });
-  if (discLabels.length) gsap.set(discLabels, { opacity: 0 });
-  if (hCells.length)     gsap.set(hCells,     { opacity: 0, y: 6 });
-  if (aiCells.length)    gsap.set(aiCells,    { opacity: 0, y: 6 });
-  if (legend)            gsap.set(legend,     { opacity: 0 });
+    setLabel(eyebrow); setSpans(hlSpans);
+    if (body)              gsap.set(body,       { opacity: 0, y: 6 });
+    if (phHeaders.length)  gsap.set(phHeaders,  { opacity: 0, y: 10 });
+    if (discLabels.length) gsap.set(discLabels, { opacity: 0 });
+    if (hCells.length)     gsap.set(hCells,     { opacity: 0, y: 6 });
+    if (aiCells.length)    gsap.set(aiCells,    { opacity: 0, y: 6 });
+    if (legend)            gsap.set(legend,     { opacity: 0 });
 
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: aiMatrixPanel, start: PANEL_START, end: PANEL_END,
-      scrub:   true,
-    },
+    addLabel(tl,          eyebrow, '<', 0.75);
+    addSpans(tl,          hlSpans, '<+0.08', 0.6, 0.08);
+    if (body)              tl.to(body,       { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' }, '<+0.12');
+    if (phHeaders.length)  tl.to(phHeaders,  { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out', stagger: 0.08 }, '<+0.15');
+    if (discLabels.length) tl.to(discLabels, { opacity: 0.75, duration: 0.35, ease: 'power2.out', stagger: 0.11 }, '<+0.15');
+    if (hCells.length)     tl.to(hCells,     { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', stagger: 0.08 }, '<+0.1');
+    if (aiCells.length)    tl.to(aiCells,    { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', stagger: 0.08 }, '<+0.05');
+    if (legend)            tl.to(legend,     { opacity: 1, duration: 0.3, ease: 'power2.out' }, '<+0.15');
   });
-  if (eyebrow)           tl.to(eyebrow,    { opacity: 0.75, duration: 0.3, ease: 'power2.out' });
-  if (hlSpans.length)    tl.fromTo(hlSpans, { yPercent: 110 }, { yPercent: 0, duration: 0.6, ease: 'power3.out', stagger: 0.08 }, '<+0.08');
-  if (body)              tl.to(body,       { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' }, '<+0.12');
-  if (phHeaders.length)  tl.to(phHeaders,  { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out', stagger: 0.08 }, '<+0.15');
-  if (discLabels.length) tl.to(discLabels, { opacity: 0.75, duration: 0.35, ease: 'power2.out', stagger: 0.11 }, '<+0.15');
-  if (hCells.length)     tl.to(hCells,     { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', stagger: 0.08 }, '<+0.1');
-  if (aiCells.length)    tl.to(aiCells,    { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', stagger: 0.08 }, '<+0.05');
-  if (legend)            tl.to(legend,     { opacity: 1, duration: 0.3, ease: 'power2.out' }, '<+0.15');
 }
 
 /* ============================================================
@@ -623,12 +562,12 @@ if (!isMobile) document.querySelectorAll('.panel').forEach((panel) => {
   }
 
   // Non-hero: exit fires DURING the dwell so content is still pinned while
-  // text blinds up. 125vh panels = 25vh dwell. Entrance: 0→0.12vh, rest: 0.12→0.22vh.
-  // Exit: 0.22→0.25vh (3vh, fully within dwell). Panel unsticks at 0.25vh.
+  // text blinds up. 125vh panels = 25vh dwell. Entrance: 0→0.16vh, rest: 0.16→0.20vh.
+  // Exit: 0.20→0.24vh (4vh, fully within dwell). Panel unsticks at 0.25vh.
   const ST = {
     trigger: panel,
-    start:   () => `top+=${window.innerHeight * 0.22} top`,
-    end:     () => `top+=${window.innerHeight * 0.25} top`,
+    start:   () => `top+=${window.innerHeight * 0.20} top`,
+    end:     () => `top+=${window.innerHeight * 0.24} top`,
     scrub:   0.5,
   };
 
@@ -925,5 +864,5 @@ gsap.to('.footer__personal', {
    ============================================================ */
 
 window.addEventListener('load', () => {
-  ScrollTrigger.refresh(true);
+  ScrollTrigger.refresh();
 });

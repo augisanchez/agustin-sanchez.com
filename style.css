@@ -127,9 +127,11 @@ img { display: block; max-width: 100%; }
 /* COLOR BUFFER — empty scroll space so bg finishes transitioning
    before sticky content starts pinning */
 .color-buffer {
-  height: 0.6vh;
+  height: 0;
   pointer-events: none;
 }
+
+/* All sections: color timing handles separation, no buffer needed */
 
 /* ============================================================
    TYPOGRAPHY SCALE
@@ -454,11 +456,11 @@ img { display: block; max-width: 100%; }
    ============================================================ */
 
 /* Panel 1: Entry — label + XL headline, bottom-aligned */
-.panel--org-intro { height: 125vh; } /* already correct */
+.panel--org-intro { height: 125vh; }
 
 .panel__content--org-intro {
   justify-content: flex-end;
-  padding-bottom: clamp(80px, 14vh, 160px);
+  padding-bottom: clamp(80px, 12vh, 140px);
 }
 
 .org-label {
@@ -555,7 +557,7 @@ img { display: block; max-width: 100%; }
 
 .panel__content--principle {
   justify-content: flex-start;
-  padding-top: clamp(80px, 14vh, 160px);
+  padding-top: clamp(80px, 12vh, 140px);
 }
 
 #p-delivery .panel__content--principle,
