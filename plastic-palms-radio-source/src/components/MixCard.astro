@@ -61,6 +61,20 @@ const displayLabel = label.charAt(0).toUpperCase() + label.slice(1);
     </div>
   </div>
 
+  <a
+    class="card__download"
+    href={audioSrc}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label={`Download ${displayLabel}`}
+    tabindex="-1"
+    onclick="event.stopPropagation()"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 4v12M8 12l4 4 4-4M4 20h16"/>
+    </svg>
+  </a>
+
   {order !== null && (
     <span class="card__number" aria-hidden="true">
       {String(order).padStart(3, '0')}

@@ -319,6 +319,34 @@ body::after {
   to   { height: 20px; }
 }
 
+/* ---- Download link ---- */
+.card__download {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(244, 242, 238, 0.5);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease, color 0.2s ease;
+  z-index: 3;
+}
+
+.card__download svg { width: 16px; height: 16px; }
+
+.mix-card:hover .card__download,
+.mix-card:focus-visible .card__download,
+.mix-card[data-active="true"] .card__download {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.card__download:hover { color: var(--paper); }
+
 /* ---- Mix number ---- */
 .card__number {
   position: absolute;
@@ -575,6 +603,12 @@ body::after {
   /* Card number stays hidden on hover — only appears on active */
   .mix-card:hover .card__number {
     opacity: 0;
+  }
+
+  /* Download always visible on touch */
+  .mix-card .card__download {
+    opacity: 1;
+    pointer-events: auto;
   }
 
   /* Back link — no opacity change */
