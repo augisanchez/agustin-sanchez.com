@@ -339,33 +339,29 @@ body::after {
 .card__download svg { width: 16px; height: 16px; }
 
 .mix-card:hover .card__download,
-.mix-card:focus-visible .card__download,
-.mix-card[data-active="true"] .card__download {
+.mix-card:focus-visible .card__download {
   opacity: 1;
   pointer-events: auto;
 }
+
+.mix-card[data-active="true"] .card__download {
+  opacity: 1;
+  pointer-events: auto;
+  color: var(--paper);
+  background: rgba(17, 17, 17, 0.55);
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+}
+
+.mix-card[data-active="true"] .card__download svg { width: 20px; height: 20px; }
 
 .card__download:hover { color: var(--paper); }
 
 /* ---- Mix number ---- */
 .card__number {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-weight: 500;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(244, 242, 238, 0.5);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  display: none;
 }
-
-.mix-card:hover .card__number,
-.mix-card:focus-visible .card__number,
-.mix-card[data-active="true"] .card__number { opacity: 1; }
 
 @media (min-width: 1024px) {
   .mix-grid {
@@ -561,13 +557,6 @@ body::after {
     padding: var(--gap) var(--pad-x);
   }
 
-  /* Card number: slightly smaller on mobile */
-  .card__number {
-    font-size: 9px;
-    top: 8px;
-    right: 8px;
-  }
-
   /* Bottom overlay: tighter insets */
   .card__bottom {
     bottom: 10px;
@@ -597,11 +586,6 @@ body::after {
 
   /* Overlay stays hidden on hover — only appears on active */
   .mix-card:hover .card__overlay {
-    opacity: 0;
-  }
-
-  /* Card number stays hidden on hover — only appears on active */
-  .mix-card:hover .card__number {
     opacity: 0;
   }
 
