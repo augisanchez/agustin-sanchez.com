@@ -324,39 +324,23 @@ body::after {
   position: absolute;
   top: 12px;
   left: 12px;
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(244, 242, 238, 0.5);
-  pointer-events: none;
+  color: var(--paper);
   opacity: 0;
-  transition: opacity 0.2s ease, color 0.2s ease;
+  pointer-events: none;
   z-index: 3;
 }
 
-.card__download svg { width: 16px; height: 16px; }
+.card__download svg { width: 28px; height: 28px; }
 
-.mix-card:hover .card__download,
-.mix-card:focus-visible .card__download {
+.mix-card[data-playing="true"] .card__download {
   opacity: 1;
   pointer-events: auto;
 }
-
-.mix-card[data-active="true"] .card__download {
-  opacity: 1;
-  pointer-events: auto;
-  color: var(--paper);
-  background: rgba(17, 17, 17, 0.55);
-  border-radius: 6px;
-  width: 36px;
-  height: 36px;
-}
-
-.mix-card[data-active="true"] .card__download svg { width: 20px; height: 20px; }
-
-.card__download:hover { color: var(--paper); }
 
 /* ---- Mix number ---- */
 .card__number {
@@ -587,12 +571,6 @@ body::after {
   /* Overlay stays hidden on hover — only appears on active */
   .mix-card:hover .card__overlay {
     opacity: 0;
-  }
-
-  /* Download always visible on touch */
-  .mix-card .card__download {
-    opacity: 1;
-    pointer-events: auto;
   }
 
   /* Back link — no opacity change */
