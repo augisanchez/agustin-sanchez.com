@@ -503,6 +503,27 @@ if (!prefersReducedMotion) {
 }
 
 /* ============================================================
+   9b. SHARED-ELEMENT MORPH — clicking a work card morphs its
+   image into the detail page's hero (cross-document View
+   Transitions). We tag the clicked card's image with the same
+   view-transition-name the detail hero carries; the browser
+   does the rest. Chrome/Safari; elsewhere it's a normal load.
+   ============================================================ */
+
+{
+  let lastClickedImg = null;
+  document.addEventListener('click', (e) => {
+    const card = e.target.closest('a.work-card, a.project-row');
+    lastClickedImg = card ? card.querySelector('img') : null;
+  }, true);
+  window.addEventListener('pageswap', (e) => {
+    if (e.viewTransition && lastClickedImg) {
+      lastClickedImg.style.viewTransitionName = 'work-hero';
+    }
+  });
+}
+
+/* ============================================================
    10. LIGHTBOX — click any image in a [data-lightbox] gallery to
    view it large. Ink backdrop, image contained, prev/next via
    click zones + arrow keys, Escape or backdrop closes, counter
