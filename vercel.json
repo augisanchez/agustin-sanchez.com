@@ -1,0 +1,5 @@
+{
+  "redirects": [
+    { "source": "/work/portraits.html", "destination": "/work/photography.html", "permanent": true }
+  ]
+}

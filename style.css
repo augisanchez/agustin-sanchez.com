@@ -632,6 +632,60 @@ body { transition: none; } /* GSAP tweens backgroundColor directly */
   .gallery--rows .g-row--natural > * { height: auto; width: 100%; }
 }
 
+/* Full-viewport wall (Photography template): edge to edge, tight
+   gaps, taller rows. The page chrome stays; the pictures own it. */
+.gallery--bleed {
+  padding-inline: clamp(10px, 1.2vw, 20px);
+  gap: clamp(8px, 0.9vw, 14px);
+  margin-top: clamp(24px, 4vh, 48px);
+  margin-bottom: clamp(24px, 4vh, 48px);
+}
+.gallery--bleed .g-row { gap: clamp(8px, 0.9vw, 14px); }
+.gallery--bleed img { border-radius: 5px; }
+
+/* ============================================================
+   LIGHTBOX — ink room for one photograph at a time
+   ============================================================ */
+
+html.lightbox-open { overflow: hidden; }
+
+.lightbox {
+  position: fixed; inset: 0; z-index: 1100;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(17, 17, 17, 0.95);
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+.lightbox.is-open { opacity: 1; pointer-events: auto; }
+.lightbox__img {
+  max-width: 92vw; max-height: 86vh;
+  width: auto; height: auto;
+  border-radius: 4px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55);
+}
+.lightbox__zone {
+  position: absolute; top: 0; bottom: 0; width: 32%;
+  background: none; border: 0; z-index: 2;
+}
+.lightbox__zone--prev { left: 0; }
+.lightbox__zone--next { right: 0; }
+.lightbox__close {
+  position: absolute; top: 18px; right: 22px; z-index: 3;
+  width: 46px; height: 46px; border-radius: 50%;
+  background: none; border: 1.5px solid rgba(244, 242, 238, 0.4);
+  color: var(--paper); font-size: 26px; line-height: 1;
+  transition: border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.lightbox__close:hover { border-color: var(--paper); transform: scale(1.08); }
+.lightbox__count {
+  position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+  color: rgba(244, 242, 238, 0.75);
+  font-variant-numeric: tabular-nums;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lightbox { transition: none; }
+}
+
 /* ============================================================
    WORK — visual project cards
    ============================================================ */

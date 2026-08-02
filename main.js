@@ -422,8 +422,11 @@ function justifyRows(container) {
   return decodedAll(imgs, 8000).then(() => {
     const W = container.clientWidth;
     if (!W || !items.length) return;
-    // Target row height: tall enough to read, short enough for 2-4 frames a row
-    const target = Math.min(Math.max(W * 0.34, 260), 480);
+    // Target row height: tall enough to read, short enough for 2-4 frames a row.
+    // data-row-h overrides the multiplier (full-bleed walls run taller).
+    const mult = parseFloat(container.dataset.rowH) || 0.34;
+    const cap = container.dataset.rowH ? 680 : 480;
+    const target = Math.min(Math.max(W * mult, 260), cap);
     let row = [];
     let sum = 0;
     const flush = (natural) => {
@@ -500,7 +503,77 @@ if (!prefersReducedMotion) {
 }
 
 /* ============================================================
-   10. REFRESH after fonts + images settle
+   10. LIGHTBOX — click any image in a [data-lightbox] gallery to
+   view it large. Ink backdrop, image contained, prev/next via
+   click zones + arrow keys, Escape or backdrop closes, counter
+   below. Neighbors preload. Lenis pauses while open.
+   ============================================================ */
+
+const lbGallery = document.querySelector('[data-lightbox]');
+if (lbGallery) {
+  const lb = document.createElement('div');
+  lb.className = 'lightbox';
+  lb.setAttribute('role', 'dialog');
+  lb.setAttribute('aria-label', 'Image viewer');
+  lb.innerHTML = `
+    <button class="lightbox__zone lightbox__zone--prev" aria-label="Previous image" data-cursor="Back one"></button>
+    <img class="lightbox__img" alt="" />
+    <button class="lightbox__zone lightbox__zone--next" aria-label="Next image" data-cursor="Keep going"></button>
+    <button class="lightbox__close" aria-label="Close viewer" data-cursor="Back to the wall">&times;</button>
+    <span class="caption lightbox__count" aria-live="polite"></span>`;
+  document.body.appendChild(lb);
+  const lbImg = lb.querySelector('.lightbox__img');
+  const lbCount = lb.querySelector('.lightbox__count');
+
+  const frames = () => [...lbGallery.querySelectorAll('img')];
+  let idx = -1;
+
+  const preload = (i) => {
+    const f = frames();
+    [i - 1, i + 1].forEach((n) => {
+      if (f[n]) { const im = new Image(); im.src = f[n].currentSrc || f[n].src; }
+    });
+  };
+  const show = (i) => {
+    const f = frames();
+    if (!f.length) return;
+    idx = (i + f.length) % f.length;
+    lbImg.src = f[idx].currentSrc || f[idx].src;
+    lbImg.alt = f[idx].alt || '';
+    lbCount.textContent = `${idx + 1} / ${f.length}`;
+    preload(idx);
+  };
+  const open = (i) => {
+    show(i);
+    lb.classList.add('is-open');
+    document.documentElement.classList.add('lightbox-open');
+    lenis.stop();
+  };
+  const close = () => {
+    lb.classList.remove('is-open');
+    document.documentElement.classList.remove('lightbox-open');
+    lenis.start();
+  };
+
+  lbGallery.addEventListener('click', (e) => {
+    const img = e.target.closest('img');
+    if (!img) return;
+    open(frames().indexOf(img));
+  });
+  lb.querySelector('.lightbox__zone--prev').addEventListener('click', () => show(idx - 1));
+  lb.querySelector('.lightbox__zone--next').addEventListener('click', () => show(idx + 1));
+  lb.querySelector('.lightbox__close').addEventListener('click', close);
+  lb.addEventListener('click', (e) => { if (e.target === lb) close(); });
+  document.addEventListener('keydown', (e) => {
+    if (!lb.classList.contains('is-open')) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowLeft') show(idx - 1);
+    if (e.key === 'ArrowRight') show(idx + 1);
+  });
+}
+
+/* ============================================================
+   11. REFRESH after fonts + images settle
    ============================================================ */
 
 window.addEventListener('load', () => ScrollTrigger.refresh());
