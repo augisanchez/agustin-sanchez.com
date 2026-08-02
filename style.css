@@ -240,11 +240,11 @@ html.is-pressing .cursor-dot::after  { transform: scale(1.4); }
   line-height: 1.08; letter-spacing: var(--track-tight);
 }
 .body-l {
-  font-family: 'IBM Plex Sans', sans-serif; font-weight: 300;
+  font-family: 'IBM Plex Sans', sans-serif; font-weight: 500;
   font-size: var(--fs-body-l); line-height: var(--lh-prose);
 }
 .body {
-  font-family: 'IBM Plex Sans', sans-serif; font-weight: 300;
+  font-family: 'IBM Plex Sans', sans-serif; font-weight: 500;
   font-size: var(--fs-body); line-height: var(--lh-body);
 }
 .caption {
@@ -751,6 +751,73 @@ body { transition: none; } /* GSAP tweens backgroundColor directly */
 .narrative__lead img { width: 100%; height: auto; border-radius: 12px; display: block; }
 .narrative__lead figcaption { margin-top: 10px; }
 
+/* ============================================================
+   DIAGRAMS — conceptual support for the POV page. Vocabulary
+   carried forward from v1's delivery table, restyled to the
+   current tokens. Pure HTML/CSS: responsive, reduced-motion safe.
+   ============================================================ */
+
+.diagram {
+  margin-top: clamp(24px, 3.5vh, 44px);
+  padding: clamp(20px, 3vw, 40px);
+  border: 1px solid var(--c-hair);
+  border-radius: 12px;
+  background: color-mix(in srgb, #ffffff 45%, transparent);
+}
+.diagram__label { display: block; color: var(--c-mid); margin-bottom: clamp(14px, 2vh, 22px); }
+
+/* Translation: three inputs converge into one decision */
+.dg-translate {
+  display: grid; grid-template-columns: minmax(0, 1.1fr) auto minmax(0, 1fr);
+  gap: clamp(14px, 2.5vw, 36px); align-items: center;
+}
+.dg-translate__inputs { display: flex; flex-direction: column; gap: 10px; }
+.dg-translate__chip {
+  border: 1.5px solid var(--ink); border-radius: 999px;
+  padding: 10px 16px; background: var(--paper);
+}
+.dg-translate__join { color: var(--accent); font-size: clamp(22px, 2.4vw, 34px); text-align: center; }
+.dg-translate__out {
+  border-radius: 12px; background: var(--ink); color: var(--paper);
+  padding: clamp(18px, 2.6vw, 32px);
+}
+.dg-translate__out .caption { color: color-mix(in srgb, var(--paper) 70%, transparent); display: block; margin-bottom: 8px; }
+@media (max-width: 700px) {
+  .dg-translate { grid-template-columns: 1fr; }
+  .dg-translate__join { transform: rotate(90deg); }
+}
+
+/* Delivery phases: v1's signal table, sentence-case */
+.delivery-table { display: flex; flex-direction: column; border-top: 1px solid var(--c-hair); }
+.delivery-phase {
+  display: grid; grid-template-columns: 44px minmax(0, 0.85fr) minmax(0, 1.5fr);
+  gap: clamp(12px, 2.5vw, 40px); align-items: baseline;
+  padding: 14px 0; border-bottom: 1px solid var(--c-hair);
+}
+.delivery-phase--gate {
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+  margin-inline: -12px; padding-inline: 12px; border-radius: 8px;
+}
+.gate-marker { color: var(--accent); margin-right: 6px; }
+@media (max-width: 640px) {
+  .delivery-phase { grid-template-columns: 36px 1fr; }
+  .delivery-phase__intent { grid-column: 2; }
+}
+
+/* Sequence strip: numbered steps with arrows between */
+.dg-steps { display: flex; align-items: stretch; gap: clamp(10px, 1.6vw, 20px); flex-wrap: wrap; }
+.dg-step {
+  flex: 1 1 180px; border: 1px solid var(--c-hair); border-radius: 10px;
+  padding: clamp(14px, 2vw, 24px); background: var(--paper);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.dg-step__num { color: var(--accent); }
+.dg-steps__sep { align-self: center; color: var(--c-mid); font-size: 1.3em; }
+@media (max-width: 640px) {
+  .dg-steps { flex-direction: column; }
+  .dg-steps__sep { transform: rotate(90deg); align-self: flex-start; margin-left: 24px; }
+}
+
 /* Side-by-side detail pair (e.g. two app screens compared) */
 .figure-pair {
   display: grid; grid-template-columns: 1fr 1fr;
@@ -905,7 +972,7 @@ body { transition: none; } /* GSAP tweens backgroundColor directly */
   border: 1px solid var(--c-hair);
   border-radius: 4px; color: var(--ink);
   font-family: 'IBM Plex Sans', sans-serif;
-  font-size: clamp(15px, 1.1vw, 17px); font-weight: 300;
+  font-size: clamp(15px, 1.1vw, 17px); font-weight: 500;
   padding: 14px 16px; outline: none; width: 100%;
   transition: border-color var(--dur-fast) var(--ease);
 }

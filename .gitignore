@@ -21,3 +21,4 @@ plastic-palms-radio-source/node_modules/
 
 # Case-study records stay local: internal annotations, public repo
 records/
+.vercel
