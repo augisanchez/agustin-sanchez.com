@@ -565,14 +565,15 @@ if (lbGallery) {
   const preload = (i) => {
     const f = frames();
     [i - 1, i + 1].forEach((n) => {
-      if (f[n]) { const im = new Image(); im.src = f[n].currentSrc || f[n].src; }
+      if (f[n]) { const im = new Image(); im.src = f[n].dataset.full || f[n].currentSrc || f[n].src; }
     });
   };
   const show = (i) => {
     const f = frames();
     if (!f.length) return;
     idx = (i + f.length) % f.length;
-    lbImg.src = f[idx].currentSrc || f[idx].src;
+    // Prefer the full-size optimized source; fall back to whatever loaded
+    lbImg.src = f[idx].dataset.full || f[idx].currentSrc || f[idx].src;
     lbImg.alt = f[idx].alt || '';
     lbCount.textContent = `${idx + 1} / ${f.length}`;
     preload(idx);

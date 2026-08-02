@@ -1,4 +1,9 @@
 {
+  "images": {
+    "sizes": [480, 828, 1200, 1600, 2048],
+    "formats": ["image/avif", "image/webp"],
+    "minimumCacheTTL": 2678400
+  },
   "redirects": [
     { "source": "/work/portraits.html", "destination": "/work/photography.html", "permanent": true }
   ]
