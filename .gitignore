@@ -2,11 +2,11 @@
 IMG_2026_03_22-10_35_00_0690_B6B028F7.jpg
 IMG_2026_03_22-10_37_12_5910_CD03FFE3.jpg
 leadership-photo.jpg
-leadership-photo_.jpg
 
-# Working documents
-*.md
-*.md.html
+
+# Working documents are tracked (copy-final.md, briefs, drafts) — was `*.md` before.
+# Keep private/scratch docs out by name if needed.
+8th-light-ai-pricing-summary.md
 
 # Astro build cache (source only — built output in /plastic-palms-radio is kept)
 plastic-palms-radio-source/dist/
@@ -18,3 +18,6 @@ plastic-palms-radio-source/node_modules/
 
 # OS
 .DS_Store
+
+# Case-study records stay local: internal annotations, public repo
+records/

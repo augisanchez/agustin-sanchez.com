@@ -1,0 +1,11 @@
+# Working documents & records never ship to the live domain
+records/
+*.md
+*.md.html
+.claude/
+.gitignore
+plastic-palms-radio-source/
+compression-map-frame.html
+IMG_2026_*.jpg
+leadership-photo.jpg
+leadership-photo_.jpg

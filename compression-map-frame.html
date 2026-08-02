@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Compression Map — Redesign Frame</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+
+    /* ---- Tokens ---- */
+    :root {
+      --ink:     #111111;
+      --paper:   #F4F2EE;
+      --mid:     #333331;
+      --red:     #C52B10;
+      --divider: rgba(17, 17, 17, 0.12);
+    }
+
+    /* ---- Reset ---- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'IBM Plex Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- Outer frame — mimics panel__content sizing ---- */
+    .frame {
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(48px, 8vh, 96px) clamp(40px, 6vw, 96px);
+    }
+
+    /* ---- Main container ---- */
+    .compression-map {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(28px, 4vh, 52px);
+      width: 100%;
+      max-width: 1280px;
+    }
+
+    /* ---- Header: label + thesis ---- */
+    .map__header {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .map__label {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 500;
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--mid);
+    }
+
+    .map__thesis {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: clamp(13px, 1.2vw, 17px);
+      font-weight: 300;
+      color: var(--mid);
+      line-height: 1.6;
+      max-width: 52ch;
+    }
+
+    /* ---- Scrollable wrapper ---- */
+    .map__scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ---- Grid: [label col] + 5 phase cols ---- */
+    .map__grid {
+      display: grid;
+      grid-template-columns: 90px repeat(5, 1fr);
+      gap: 2px;
+      min-width: 560px;
+    }
+
+    /* ---- Phase header cells ---- */
+    .ph__corner { /* empty top-left cell */ }
+
+    .ph__head {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 14px 16px 18px;
+      border-bottom: 1px solid var(--divider);
+      position: relative;
+    }
+
+    .ph__head--gate {
+      border-right: 1.5px solid var(--red);
+    }
+
+    .ph__num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: clamp(9px, 0.8vw, 11px);
+      color: var(--mid);
+      letter-spacing: 0.1em;
+    }
+
+    .ph__name {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: clamp(11px, 1vw, 13px);
+      font-weight: 600;
+      color: var(--ink);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      line-height: 1.3;
+    }
+
+    .ph__gate-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: clamp(9px, 0.75vw, 10px);
+      color: var(--red);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    /* ---- Discipline label cells (left col) ---- */
+    .row__disc {
+      display: flex;
+      align-items: center;
+      padding: 14px 0;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: clamp(10px, 0.85vw, 12px);
+      font-weight: 600;
+      color: var(--mid);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      border-top: 1px solid var(--divider);
+    }
+
+    /* ---- Activity cells ---- */
+    .row__cell {
+      padding: 14px 16px 16px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: clamp(11px, 1vw, 13px);
+      font-weight: 400;
+      line-height: 1.45;
+      border-top: 1px solid var(--divider);
+      border-right: 1px solid rgba(17, 17, 17, 0.05);
+      color: var(--mid);
+    }
+
+    /* Human: filled background, full ink weight */
+    .row__cell--human {
+      background: rgba(17, 17, 17, 0.05);
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    /* AI: no fill, dimmer — visually recedes */
+    .row__cell--ai {
+      background: transparent;
+      color: rgba(17, 17, 17, 0.38);
+    }
+
+    /* Gate column: red right border */
+    .row__cell--gate {
+      border-right: 1.5px solid rgba(197, 43, 16, 0.3);
+    }
+
+    /* ---- Legend ---- */
+    .map__legend {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .legend__item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: clamp(10px, 0.9vw, 12px);
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--mid);
+    }
+
+    .legend__swatch {
+      width: 20px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .legend__item--human .legend__swatch {
+      background: rgba(17, 17, 17, 0.25);
+    }
+
+    .legend__item--ai .legend__swatch {
+      background: transparent;
+      border: 1px solid rgba(17, 17, 17, 0.25);
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="frame">
+    <div class="compression-map">
+
+      <!-- Header -->
+      <header class="map__header">
+        <span class="map__label">The Compression Map</span>
+        <p class="map__thesis">Each phase runs the same questions. AI shortens how long it takes to answer them.</p>
+      </header>
+
+      <!-- Grid -->
+      <div class="map__scroll">
+        <div class="map__grid">
+
+          <!-- Phase header row -->
+          <div class="ph__corner"></div>
+
+          <div class="ph__head">
+            <span class="ph__num">01</span>
+            <span class="ph__name">Align &amp; Frame</span>
+          </div>
+
+          <div class="ph__head ph__head--gate">
+            <span class="ph__num">02</span>
+            <span class="ph__name">Diverge</span>
+            <span class="ph__gate-tag">Gate 01 · Viability</span>
+          </div>
+
+          <div class="ph__head">
+            <span class="ph__num">03</span>
+            <span class="ph__name">Converge</span>
+          </div>
+
+          <div class="ph__head ph__head--gate">
+            <span class="ph__num">04</span>
+            <span class="ph__name">Deep Validation</span>
+            <span class="ph__gate-tag">Gate 02 · Go / Adjust / Kill</span>
+          </div>
+
+          <div class="ph__head">
+            <span class="ph__num">05</span>
+            <span class="ph__name">MVP &amp; Live Signal</span>
+          </div>
+
+          <!-- Strategy row -->
+          <div class="row__disc">Strategy</div>
+          <div class="row__cell row__cell--human">Problem framing</div>
+          <div class="row__cell row__cell--human row__cell--gate">Bet sizing</div>
+          <div class="row__cell row__cell--ai">Scenario modeling</div>
+          <div class="row__cell row__cell--human row__cell--gate">Signal reading</div>
+          <div class="row__cell row__cell--human">Launch decision</div>
+
+          <!-- Design row -->
+          <div class="row__disc">Design</div>
+          <div class="row__cell row__cell--ai">Research synthesis</div>
+          <div class="row__cell row__cell--human row__cell--gate">Direction setting</div>
+          <div class="row__cell row__cell--ai">Concept generation</div>
+          <div class="row__cell row__cell--ai row__cell--gate">Testing synthesis</div>
+          <div class="row__cell row__cell--ai">Production QA</div>
+
+          <!-- Engineering row -->
+          <div class="row__disc">Engineering</div>
+          <div class="row__cell row__cell--human">Feasibility scoping</div>
+          <div class="row__cell row__cell--human row__cell--gate">Architecture review</div>
+          <div class="row__cell row__cell--ai">Rapid prototyping</div>
+          <div class="row__cell row__cell--human row__cell--gate">Integration review</div>
+          <div class="row__cell row__cell--ai">Build &amp; deploy</div>
+
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <footer class="map__legend">
+        <div class="legend__item legend__item--human">
+          <span class="legend__swatch"></span>Human judgment
+        </div>
+        <div class="legend__item legend__item--ai">
+          <span class="legend__swatch"></span>AI-compressed
+        </div>
+      </footer>
+
+    </div>
+  </div>
+
+</body>
+</html>

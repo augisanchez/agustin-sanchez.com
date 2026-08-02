@@ -1,48 +1,113 @@
 /* ============================================================
+   agustin-sanchez.com — neutral, photography-forward
+   Three pages (Overview / Work / Contact) + narrative template.
+   Palette is restrained; the photography carries the colour.
+   ============================================================ */
+
+/* ============================================================
    DESIGN TOKENS
    ============================================================ */
 
 :root {
-  --ink:   #111111;
-  --paper: #F4F2EE;
-  --mid:   #333331;   /* darkened: achieves 7:1 on paper, mint, and yellow */
+  --ink:    #111111;
+  --paper:  #F4F2EE;
+  --mid:    #57564F;   /* secondary text on paper — AAA */
+  --hair:   rgba(17, 17, 17, 0.12);
+  --accent: #0A63C2;   /* primary blue (Dakar livery) */
+  --navy:   #0B2E63;   /* deep blue */
+  --spark:  #E63326;   /* red */
 
-  --pad-x: clamp(32px, 6vw, 96px);
+  --pad-x:  clamp(24px, 6vw, 120px);
+  --maxw:   1440px;
 
-  /* Contextual tokens — override per theme */
-  --c-text:    var(--ink);
-  --c-mid:     var(--mid);
-  --c-accent:  #C52B10;   /* accessible red on light backgrounds — 5.1:1 on paper (large text AAA) */
-  --c-divider: rgba(17, 17, 17, 0.12);
+  --c-text: var(--ink);
+  --c-mid:  var(--mid);
+  --c-hair: var(--hair);
+
+  /* ---- MOTION TOKENS ------------------------------------------
+     One easing family, three durations, one stagger beat.
+     Mirrored in main.js (MOTION) — change both together.
+     JS reveals use GSAP 'power3.out', the tweened twin of --ease.
+     Documented exceptions: marquee drift (linear, ticker-driven)
+     and scrub-bound scroll effects (no easing by nature). */
+  --ease:     cubic-bezier(0.2, 0, 0.15, 1);
+  --dur-fast: 0.25s;   /* micro: color, opacity, arrows */
+  --dur:      0.6s;    /* base: hover zooms, small moves */
+  --dur-slow: 0.9s;    /* large: reveals, big travel */
+  --stagger:  0.08s;   /* one orchestration beat */
+
+  /* ---- TYPE TOKENS --------------------------------------------
+     Editorial tiers are fluid; label/body tiers stay put.
+     Tracking tightens as size grows. Measure lives on the text
+     element (ch tracks its own font-size). */
+  --fs-display-xl: clamp(48px, 10vw, 168px);
+  --fs-display-l:  clamp(38px, 7vw, 116px);
+  --fs-display-m:  clamp(28px, 4.5vw, 72px);
+  --fs-display-s:  clamp(18px, 2.2vw, 38px);
+  --fs-essay:      clamp(19px, 1.7vw, 28px);
+  --fs-body-l:     clamp(17px, 1.6vw, 24px);
+  --fs-body:       clamp(15px, 1.3vw, 20px);
+  --fs-caption:    12px;
+
+  --track-display: -0.03em;
+  --track-md:      -0.02em;
+  --track-tight:   -0.005em;
+  --track-label:    0.16em;
+
+  --lh-display: 0.98;
+  --lh-tight:   1.04;
+  --lh-body:    1.65;
+  --lh-prose:   1.7;
 }
 
+/* Dark surface (narrative hero band, one ink moment) */
 [data-theme="dark"] {
-  --c-text:    var(--paper);
-  --c-mid:     rgba(244, 242, 238, 0.82);  /* raised from 0.55 — achieves 7:1 on ink */
-  --c-accent:  #F03A1C;                     /* accessible red on dark backgrounds — 4.8:1 on ink (large text AAA) */
-  --c-divider: rgba(244, 242, 238, 0.15);
+  --c-text: var(--paper);
+  --c-mid:  rgba(244, 242, 238, 0.78);
+  --c-hair: rgba(244, 242, 238, 0.16);
   color: var(--paper);
 }
 
-/* Blue section: mid-luminance bg needs full-weight secondary text for AAA */
-[data-bg="#0044CC"] {
-  --c-mid: var(--paper);
+/* ============================================================
+   VIEW TRANSITIONS — cross-page seamlessness (Chrome/Safari;
+   Firefox falls back to normal loads). Nav and footer persist
+   across pages; the rest crossfades with a slight rise.
+   ============================================================ */
+
+@view-transition { navigation: auto; }
+
+.nav    { view-transition-name: site-nav; }
+.footer { view-transition-name: site-footer; }
+
+@keyframes vt-rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes vt-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+::view-transition-old(root) {
+  animation: vt-fade-out 0.28s var(--ease) both;
+}
+::view-transition-new(root) {
+  animation: vt-rise-in 0.5s var(--ease) both;
+}
+/* nav/footer: no animation, they simply persist */
+::view-transition-old(site-nav), ::view-transition-new(site-nav),
+::view-transition-old(site-footer), ::view-transition-new(site-footer) {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
 }
 
 /* ============================================================
    RESET & BASE
    ============================================================ */
 
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-size: inherit;
-  font-weight: inherit;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; }
 
 html { scroll-behavior: auto; }
 
@@ -55,1209 +120,882 @@ body {
   overflow-x: hidden;
 }
 
-a { color: inherit; text-decoration: none; }
+a   { color: inherit; text-decoration: none; }
 img { display: block; max-width: 100%; }
 
-/* Skip navigation — visually hidden until focused */
 .skip-link {
   position: absolute;
-  top: -100%;
-  left: var(--pad-x);
+  top: -100%; left: var(--pad-x);
   z-index: 1000;
   padding: 12px 20px;
-  background: var(--ink);
-  color: var(--paper);
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
+  background: var(--ink); color: var(--paper);
+  font-size: 14px; font-weight: 500;
   border-radius: 0 0 4px 4px;
   transition: top 0.15s ease;
 }
 .skip-link:focus { top: 0; }
 
-/* Visually hidden — accessible to screen readers, invisible on screen */
 .sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }
 
-/* Focus indicators — visible for keyboard navigation */
 :focus-visible {
   outline: 2px solid var(--c-text);
-  outline-offset: 4px;
-  border-radius: 2px;
+  outline-offset: 4px; border-radius: 2px;
 }
-[data-theme="dark"] :focus-visible {
-  outline-color: var(--paper);
+[data-theme="dark"] :focus-visible { outline-color: var(--paper); }
+
+/* ============================================================
+   CURSOR — small dot (tight) + hairline ring (trails a beat).
+   Precise but playful. Size change IS the hover state; [data-cursor]
+   text renders as a quippy label chip. JS drives position via
+   transform; CSS only transitions size/opacity (never transform).
+   ============================================================ */
+
+html.has-cursor,
+html.has-cursor a,
+html.has-cursor button,
+html.has-cursor .work-card,
+html.has-cursor .project-row { cursor: none; }
+html.has-cursor input,
+html.has-cursor textarea,
+html.has-cursor select { cursor: auto; }
+
+.cursor-dot, .cursor-ring {
+  position: fixed; top: 0; left: 0;
+  pointer-events: none; z-index: 1200;
+  will-change: transform;
+  mix-blend-mode: difference;
 }
-.project-row:focus-visible {
-  outline: 2px solid var(--paper);
-  outline-offset: 0;
+.cursor-dot::after {
+  content: ''; display: block;
+  width: 6px; height: 6px; margin: -3px 0 0 -3px;
+  border-radius: 50%; background: #fff;
+  transition: transform var(--dur-fast) var(--ease);
 }
+.cursor-ring::after {
+  content: ''; display: block;
+  width: 30px; height: 30px; margin: -15px 0 0 -15px;
+  border-radius: 50%; border: 1.5px solid #fff;
+  transition: transform var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease);
+}
+/* Hover: the ring swells, the dot tightens. Size difference is the state. */
+html.is-hovering .cursor-ring::after { transform: scale(1.65); }
+html.is-hovering .cursor-dot::after  { transform: scale(0.66); }
+/* Press: everything pinches, like a shutter. */
+html.is-pressing .cursor-ring::after { transform: scale(0.8); }
+html.is-pressing .cursor-dot::after  { transform: scale(1.4); }
+
+.cursor-label {
+  position: fixed; z-index: 1201; pointer-events: none;
+  background: var(--ink); color: var(--paper);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 8px 13px; border-radius: 999px;
+  white-space: nowrap;
+  opacity: 0; transform: translate(18px, 22px) scale(0.92);
+  transform-origin: left top;
+  transition: opacity var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.cursor-label.is-on { opacity: 1; transform: translate(18px, 22px) scale(1); }
 
 /* ============================================================
    NOISE TEXTURE
    ============================================================ */
 
 .noise {
-  position: fixed;
-  inset: -2px;                    /* 2px bleed on all edges */
-  width:  calc(100vw + 4px);
-  height: calc(100dvh + 4px);  /* dvh tracks Chrome iOS toolbar — no bottom strip */
-  z-index: 999;
-  pointer-events: none;
-  opacity: 0.13;
+  position: fixed; inset: -2px;
+  width: calc(100vw + 4px); height: calc(100dvh + 4px);
+  z-index: 999; pointer-events: none; opacity: 0.12;
 }
-
-/* PAGE BACKGROUND — GSAP drives background-color on body directly. */
-
-.color-group {
-  background: transparent;
-  position: relative;
-}
-
-/* COLOR BUFFER — empty scroll space so bg finishes transitioning
-   before sticky content starts pinning */
-.color-buffer {
-  height: 0;
-  pointer-events: none;
-}
-
-/* All sections: color timing handles separation, no buffer needed */
 
 /* ============================================================
    TYPOGRAPHY SCALE
    ============================================================ */
 
 .display-xl {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-size: clamp(56px, 12vw, 200px);
-  line-height: 0.88;
-  letter-spacing: -0.035em;
-  text-transform: uppercase;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: var(--fs-display-xl);
+  line-height: var(--lh-display); letter-spacing: var(--track-display);
   display: block;
 }
-
 .display-l {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-size: clamp(40px, 7.5vw, 130px);
-  line-height: 0.91;
-  letter-spacing: -0.03em;
-  text-transform: uppercase;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: var(--fs-display-l);
+  line-height: 1.0; letter-spacing: var(--track-display);
   display: block;
 }
-
 .display-m {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-size: clamp(28px, 4.5vw, 76px);
-  line-height: 0.95;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
-}
-
-.display-s {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 600;
-  font-size: clamp(17px, 2.2vw, 40px);
-  line-height: 1.05;
-  letter-spacing: -0.005em;
-  text-transform: uppercase;
-}
-
-.org-hl {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-size: clamp(32px, 6vw, 104px);
-  line-height: 0.91;
-  letter-spacing: -0.03em;
-  text-transform: uppercase;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: var(--fs-display-m);
+  line-height: var(--lh-tight); letter-spacing: var(--track-md);
   display: block;
 }
-
+.display-s {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+  font-size: var(--fs-display-s);
+  line-height: 1.08; letter-spacing: var(--track-tight);
+}
 .body-l {
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-weight: 300;
-  font-size: clamp(17px, 1.7vw, 26px);
-  line-height: 1.75;
+  font-family: 'IBM Plex Sans', sans-serif; font-weight: 300;
+  font-size: var(--fs-body-l); line-height: var(--lh-prose);
 }
-
 .body {
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-weight: 300;
-  font-size: clamp(15px, 1.3vw, 21px);
-  line-height: 1.7;
+  font-family: 'IBM Plex Sans', sans-serif; font-weight: 300;
+  font-size: var(--fs-body); line-height: var(--lh-body);
 }
-
 .caption {
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-weight: 500;
-  font-size: 13px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-family: 'IBM Plex Sans', sans-serif; font-weight: 500;
+  font-size: var(--fs-caption); letter-spacing: var(--track-label); text-transform: uppercase;
 }
-
 .essay {
-  font-family: 'Source Serif 4', serif;
-  font-weight: 500;
-  font-style: normal;
-  font-size: clamp(18px, 1.7vw, 28px);
-  line-height: 1.8;
+  font-family: 'Source Serif 4', serif; font-weight: 400;
+  font-size: var(--fs-essay); line-height: var(--lh-prose);
 }
 
-.accent-red { color: var(--c-accent); }
-.c-mid      { color: var(--c-mid); }
+.accent { color: var(--accent); }
+.spark  { color: var(--spark); }
+.c-mid  { color: var(--c-mid); }
 
 /* ============================================================
    LINE MASK — headline reveal container
    ============================================================ */
 
-.line-mask {
-  display: block;
-  overflow: hidden;
+/* padding-bottom gives descenders (g, y, p, j) room inside the clip;
+   negative margin keeps the visual line spacing tight. */
+.line-mask { display: block; overflow: hidden; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.line-mask span { display: block; will-change: transform; }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+
+.wrap { max-width: var(--maxw); margin-inline: auto; padding-inline: var(--pad-x); }
+
+/* Section rhythm: tight enough that sections hand off instead of ending */
+.section { padding-block: clamp(60px, 10vh, 132px); }
+.section--tight { padding-block: clamp(44px, 6.5vh, 88px); }
+
+/* Body background morphs between [data-bg] sections (JS-driven);
+   the transition lives here so the JS just swaps the value. */
+body { transition: none; } /* GSAP tweens backgroundColor directly */
+
+.hair { height: 1px; background: var(--c-hair); border: 0; }
+
+/* ============================================================
+   NAV
+   ============================================================ */
+
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px var(--pad-x);
+  mix-blend-mode: multiply;
+  transition: background-color var(--dur-fast) var(--ease),
+              box-shadow var(--dur-fast) var(--ease),
+              padding var(--dur-fast) var(--ease);
+}
+[data-theme-page="dark"] .nav { mix-blend-mode: normal; }
+/* Scrolled: solid surface + hairline so fixed nav never collides with content */
+.nav.is-scrolled {
+  mix-blend-mode: normal;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 -1px 0 var(--c-hair);
+  padding-top: 13px; padding-bottom: 13px;
 }
 
-.line-mask span {
-  display: block;
-  will-change: transform;
+.nav__name {
+  font-weight: 600; font-size: 14px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--c-text);
+}
+.nav__links { display: flex; gap: clamp(18px, 3vw, 40px); }
+.nav__links a {
+  font-weight: 500; font-size: 12px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--c-mid);
+  position: relative; padding-bottom: 3px;
+  transition: color var(--dur-fast) var(--ease);
+}
+.nav__links a:hover { color: var(--c-text); }
+.nav__links a[aria-current="page"] { color: var(--c-text); }
+.nav__links a[aria-current="page"]::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0;
+  height: 1.5px; background: var(--accent);
 }
 
 /* ============================================================
-   HUD
+   HERO (Overview)
    ============================================================ */
 
-.hud {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 900;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 20px var(--pad-x);
-  pointer-events: none;
-  opacity: 0;
-  transition: color 0.4s ease;
+.hero {
+  min-height: clamp(420px, 64svh, 720px);
+  display: flex; flex-direction: column; justify-content: center;
+  /* top padding clears the fixed nav (the faces strip used to do this job) */
+  padding: clamp(96px, 14vh, 160px) var(--pad-x) clamp(48px, 8vh, 110px);
+  max-width: var(--maxw); margin-inline: auto;
 }
-
-.hud__left {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+.hero__headline { display: flex; flex-direction: column; }
+.hero__sub {
+  margin-top: clamp(20px, 3vh, 40px);
+  max-width: 42ch; color: var(--c-mid);
 }
-
-.hud__name,
-.hud__tone,
-.hud__role,
-.hud__section { transition: color 0.35s ease; }
-
-.hud__name {
-  color: var(--ink);
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+.hero__meta {
+  margin-top: clamp(24px, 3.5vh, 44px);
+  display: flex; gap: 10px 22px; flex-wrap: wrap;
+  color: var(--c-mid);
 }
-
-.hud__tone,
-.hud__role,
-.hud__section {
-  color: var(--mid);
-  font-weight: 500;
-  font-size: 13px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.hud--dark .hud__name    { color: var(--paper); }
-.hud--dark .hud__tone    { color: rgba(244, 242, 238, 0.72); }
-.hud--dark .hud__role    { color: rgba(244, 242, 238, 0.72); }
-.hud--dark .hud__section { color: rgba(244, 242, 238, 0.72); }
-
-/* ============================================================
-   PANEL SYSTEM
-
-   .panel          = tall scroll container (height = dwell time)
-   .panel__content = sticky inner, pins at 100vh while scrolling
-   ============================================================ */
-
-.panel {
-  position: relative;
-}
-
-.panel__content {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  width: 100%;
-  max-width: 1600px;        /* ultrawide cap — content stays readable on 4K */
-  margin-left: auto;
-  margin-right: auto;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: clamp(80px, 12vh, 140px) var(--pad-x);
-  will-change: transform, filter;
-  filter: blur(0px);
+.hero__meta span:not(:last-child)::after {
+  content: '·'; margin-left: 22px; color: var(--c-hair);
 }
 
 /* ============================================================
-   01 — HERO PANEL
-   Bottom-aligned: headline fills upper area, sub-strip at bottom
+   ABOUT — portrait + statement
    ============================================================ */
 
-.panel--hero { height: 100svh; }
-
-.panel__content--hero {
-  position: relative;
-  z-index: 1;       /* text + strip above hero-canvas (z-index: 0) */
-  justify-content: flex-end;
-  gap: clamp(10px, 1.5vh, 18px);
-  padding-bottom: clamp(48px, 8vh, 96px);
-}
-
-#hero-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;       /* sits above page-bg (-2), below panel__content (z-index: 1) */
-  pointer-events: none;
-  background: transparent;
-}
-
-.hero-headline {
-  display: flex;
-  flex-direction: column;
-}
-
-.hero-sub {
-  width: 100%;
-}
-
-.strip-rule {
-  height: 1px;
-  background: var(--c-divider);
-  margin-bottom: clamp(10px, 1.5vh, 18px);
-}
-
-.strip-cols {
+.about {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--pad-x);
+  gap: clamp(32px, 5vw, 80px);
+  align-items: center;
 }
-
-.strip-cols p { max-width: none; }
+.about__media { overflow: hidden; border-radius: 12px; }
+.about__media img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: saturate(0.85);
+  aspect-ratio: 1 / 1;
+}
+.about__text { display: flex; flex-direction: column; gap: clamp(16px, 2vh, 24px); }
+.about__text .essay { max-width: 46ch; }
 
 /* ============================================================
-   01b — CLARITY STATEMENT PANEL
-   Same paper section as identity hero, no color change
+   FACETS — four-block index
    ============================================================ */
 
-.panel--statement { height: 125vh; }
-
-.panel__content--statement {
-  align-items: flex-start;
-  justify-content: center;
-}
-
-.statement-headline {
-  display: flex;
-  flex-direction: column;
-}
-
-/* ============================================================
-   02 — LEADERSHIP PANEL
-   Two columns: label+headline+image left / body text right
-   ============================================================ */
-
-.panel--leadership { height: 125vh; }
-
-.panel__content--leadership {
+.facets { border-top: 1px solid var(--c-hair); }
+.facet {
   display: grid;
-  grid-template-columns: 5fr 7fr;
-  gap: clamp(24px, 3.5vw, 48px);
-  align-items: stretch;
-  padding-top: clamp(80px, 12vh, 140px);
-  padding-bottom: clamp(60px, 10vh, 100px);
-}
-
-.leadership-left {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.leadership-top {
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-}
-
-.intro-label {
-  display: block;
-  color: var(--c-mid);
-  margin-bottom: clamp(8px, 1.25vh, 14px);
-  will-change: opacity;
-}
-
-.leadership-headline {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Image mask — clips the slide-up reveal like a line-mask */
-.leadership-image-mask {
-  flex: 1 1 0;
-  height: 0;
-  min-height: clamp(160px, 26vh, 380px);
-  margin-top: clamp(12px, 2vh, 24px);
-  width: 100%;
-  position: relative;   /* containing block for absolute img */
-  overflow: hidden;
-  border-radius: 12px;
-}
-
-/* absolute fill so height:100% resolves against the rendered mask */
-.leadership-image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center bottom;
-  display: block;
-}
-
-.leadership-right {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: clamp(20px, 3vh, 32px);
-  padding-bottom: clamp(8px, 1.5vh, 20px);
-}
-
-.body-para {
-  will-change: transform, opacity;
-}
-
-/* ============================================================
-   03 — ORG WORK PANELS (two panels)
-   ============================================================ */
-
-/* Panel 1: Entry — label + XL headline, bottom-aligned */
-.panel--org-intro { height: 125vh; }
-
-.panel__content--org-intro {
-  justify-content: flex-end;
-  padding-bottom: clamp(80px, 12vh, 140px);
-}
-
-.org-label {
-  display: block;
-  color: var(--c-mid);
-  margin-bottom: clamp(8px, 1.25vh, 14px);
-}
-
-.org-intro-lines {
-  display: flex;
-  flex-direction: column;
-}
-
-.org-intro-note {
-  color: var(--c-mid);
-  margin-top: clamp(10px, 1.5vh, 16px);
-}
-
-/* Panel 2: Diagnosis — two-line statement, vertically centered */
-.panel--org-statement { height: 125vh; }
-
-.panel__content--org-statement {
-  justify-content: center;
-}
-
-.org-diagnosis {
-  display: flex;
-  flex-direction: column;
-}
-
-.org-lines {
-  display: flex;
-  flex-direction: column;
-}
-
-.org-lines--muted .org-hl {
-  color: var(--paper);
-}
-
-.org-lines--accent { margin-top: 0.1em; }
-
-/* ============================================================
-   04 — BELIEFS PANEL
-   ONE panel: headline top-left, two-col principles + divider below
-   ============================================================ */
-
-.panel--beliefs-full { height: 125vh; }
-
-.panel__content--beliefs-full {
-  justify-content: center;
-  padding-top: 0;
-  gap: clamp(24px, 3.5vh, 40px);
-}
-
-.beliefs-header {
-  display: flex;
-  flex-direction: column;
-}
-
-.beliefs-headline {
-  display: flex;
-  flex-direction: column;
-}
-
-.beliefs-principles {
-  display: grid;
-  grid-template-columns: 1fr 1px 1fr;
-  gap: 0 clamp(32px, 5vw, 72px);
-  align-items: start;
-  width: 100%;
-}
-
-.beliefs-divider {
-  background: var(--c-divider);
-  align-self: stretch;
-}
-
-.beliefs-statement {
-  font-size: clamp(22px, 2.2vw, 36px);
-  line-height: 1.55;
-  max-width: 26ch;
-}
-
-.belief-col {
-  display: flex;
-  flex-direction: column;
-}
-
-/* ============================================================
-   05 + 06 — PRINCIPLE PANELS (Curiosity, The Gap)
-   ============================================================ */
-
-.panel--principle { height: 125vh; }
-
-.panel__content--principle {
-  justify-content: flex-start;
-  padding-top: clamp(80px, 12vh, 140px);
-}
-
-#p-delivery .panel__content--principle,
-#p-framework .panel__content,
-#p-curiosity .panel__content--principle {
-  justify-content: center;
-  padding-top: 0;
-}
-
-.principle-label {
-  display: block;
-  color: var(--c-mid);
-  margin-bottom: clamp(8px, 1.25vh, 14px);
-}
-
-.principle-headline {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: clamp(10px, 1.5vh, 20px);
-}
-
-.principle-headline--xl {
-  margin-bottom: clamp(12px, 2vh, 24px);
-}
-
-.principle-subhead {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: clamp(10px, 1.5vh, 20px);
-}
-
-.principle-body {
-  will-change: transform, opacity;
-}
-
-.principle-body--narrow {
-  max-width: none;
-}
-
-/* ============================================================
-   05b — VALIDATED DELIVERY — Signal-Based Decision System
-   ============================================================ */
-
-.panel--framework { height: 125vh; }
-
-.delivery-table {
-  width: 100%;
-  border-top: 1px solid var(--c-divider);
-  margin-top: clamp(12px, 2vh, 24px);
-}
-
-.delivery-phase {
-  display: grid;
-  grid-template-columns: 44px 1fr auto;
+  grid-template-columns: 64px minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: clamp(16px, 3vw, 56px);
   align-items: baseline;
-  gap: clamp(12px, 2.5vw, 40px);
-  padding: clamp(14px, 2.2vh, 24px) 0;
-  border-bottom: 1px solid var(--c-divider);
+  padding: clamp(28px, 4.5vh, 56px) 0;
+  border-bottom: 1px solid var(--c-hair);
+}
+.facet__num { color: var(--c-mid); font-family: 'IBM Plex Sans', sans-serif; display: flex; align-items: center; gap: 12px; }
+.facet__num::before {
+  content: ''; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--facet-c, var(--accent)); flex: none;
+  transition: transform var(--dur-fast) var(--ease);
+}
+.facet:hover .facet__num::before { transform: scale(1.6); }
+.facet__name { color: var(--c-text); transition: color var(--dur-fast) var(--ease); }
+.facet:hover .facet__name { color: var(--facet-c, var(--accent)); }
+.facet__desc { color: var(--c-mid); max-width: 42ch; }
+.facet--blue  { --facet-c: var(--accent); }
+.facet--red   { --facet-c: var(--spark); }
+.facet--navy  { --facet-c: var(--navy); }
+
+/* ============================================================
+   POV — condensed how-I-work
+   ============================================================ */
+
+/* CTA link (Overview → Work) */
+.cta-link { display: inline-block; }
+.cta-link .accent { display: inline-block; transition: transform var(--dur-fast) var(--ease); }
+.cta-link:hover .accent { transform: translate(10px, -10px); }
+
+.pov__label { display: block; color: var(--c-mid); margin-bottom: clamp(18px, 2.5vh, 32px); }
+.pov__lead { display: flex; flex-direction: column; }
+.pov__body {
+  margin-top: clamp(20px, 3vh, 36px);
+  max-width: 54ch; color: var(--c-mid);
+}
+.pov__body .essay { color: var(--c-mid); }
+
+/* ============================================================
+   MARQUEE — slow looping photo strip
+   ============================================================ */
+
+.marquee {
+  overflow: hidden;
+  padding-block: clamp(40px, 7vh, 96px);
+  border-top: 1px solid var(--c-hair);
+  border-bottom: 1px solid var(--c-hair);
+}
+.marquee__track {
+  display: flex; gap: clamp(14px, 1.6vw, 28px);
+  width: max-content; will-change: transform;
+}
+.marquee__item {
+  flex: 0 0 auto;
+  height: clamp(180px, 26vw, 360px);
+  border-radius: 8px; overflow: hidden;
+  background: var(--c-hair);
+}
+.marquee__item img { height: 100%; width: auto; object-fit: cover; }
+
+/* Top faces strip — first thing on the page; top padding clears the fixed nav
+   (so the nav sits over paper, not over photos) */
+.marquee--top {
+  border-top: 0;
+  padding-top: clamp(74px, 10vh, 116px);
+  padding-bottom: clamp(16px, 2.5vh, 32px);
+}
+.marquee--top .marquee__item { height: clamp(200px, 26vw, 380px); }
+
+/* ============================================================
+   STATEMENT — big pithy display blocks peppered through Overview
+   ============================================================ */
+
+.statement {
+  padding-block: clamp(72px, 13vh, 168px);
+}
+.statement__inner { display: flex; flex-direction: column; }
+.statement__foot {
+  margin-top: clamp(20px, 3vh, 36px);
+  max-width: 52ch; color: var(--c-mid);
 }
 
-.delivery-phase__intent {
-  text-align: right;
+/* Connection — thick blue rounded element with blue text */
+.connect-card {
+  border: clamp(5px, 0.6vw, 11px) solid var(--accent);
+  border-radius: clamp(20px, 3.2vw, 56px);
+  background: color-mix(in srgb, var(--accent) 6%, var(--paper));
+  padding: clamp(44px, 9vh, 132px) clamp(28px, 6vw, 100px);
+  color: var(--accent);
+  overflow: hidden;
+}
+.connect-card .statement__inner { color: var(--accent); }
+
+/* Full-bleed colored band — the one big color moment (connection statement) */
+.band {
+  background: var(--band, var(--accent));
+  padding-block: clamp(72px, 14vh, 180px);
+}
+.band--blue { --band: var(--accent); color: var(--paper); }
+.band--navy { --band: var(--navy); color: var(--paper); }
+.band .statement { padding-block: 0; }
+.band .statement__inner { color: inherit; }
+
+/* WORK CTA collage (Overview → Work) */
+.work-cta { display: block; position: relative; margin-top: clamp(8px, 2vh, 24px); }
+.work-cta__grid {
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: clamp(8px, 1vw, 14px);
+}
+.work-cta__tile {
+  aspect-ratio: 3 / 4; overflow: hidden; border-radius: 8px; background: var(--c-hair);
+}
+.work-cta__tile img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform var(--dur) var(--ease); will-change: transform;
+}
+.work-cta:hover .work-cta__tile img { transform: scale(1.06); }
+.work-cta__row {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 16px; margin-top: clamp(20px, 3vh, 36px);
+}
+.work-cta__label { color: var(--c-text); }
+@media (max-width: 760px) { .work-cta__grid { grid-template-columns: repeat(3, 1fr); } }
+
+/* TPJ — Spotify-style cover collage */
+.tpj-collage {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 6px; border-radius: 12px; overflow: hidden;
+}
+.tpj-collage .cov { aspect-ratio: 1; overflow: hidden; background: var(--c-hair); }
+.tpj-collage .cov img { width: 100%; height: 100%; object-fit: cover;
+  transition: transform var(--dur) var(--ease); }
+.tpj-collage .cov:hover img { transform: scale(1.08); }
+@media (max-width: 600px) { .tpj-collage { grid-template-columns: repeat(3, 1fr); } }
+.tpj-grid--names { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 760px) { .tpj-grid--names { grid-template-columns: repeat(2, 1fr); } }
+
+/* TPJ hero — broken collage (left) + short description & CTA (right) */
+.tpj-hero {
+  display: grid; grid-template-columns: 1.5fr 1fr;
+  gap: clamp(28px, 4vw, 72px); align-items: center;
+  margin-block: clamp(36px, 6vh, 80px);
+}
+.tpj-broken {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: clamp(64px, 8.5vw, 124px);
+  grid-auto-flow: dense; gap: clamp(6px, 0.8vw, 12px);
+}
+.tpj-broken .cov { overflow: hidden; border-radius: 8px; background: var(--c-hair); }
+.tpj-broken .cov img { width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform var(--dur) var(--ease); }
+.tpj-broken .cov:hover img { transform: scale(1.06); }
+.tpj-broken .cov--lg   { grid-column: span 2; grid-row: span 2; }
+.tpj-broken .cov--tall { grid-row: span 2; }
+.tpj-broken .cov--wide { grid-column: span 2; }
+.tpj-hero__text { display: flex; flex-direction: column; gap: clamp(20px, 3vh, 32px); }
+.tpj-hero__text .essay { color: var(--c-text); }
+.tpj-hero__text .btn { align-self: flex-start; }
+@media (max-width: 820px) {
+  .tpj-hero { grid-template-columns: 1fr; gap: 28px; }
 }
 
-.delivery-phase--gate .delivery-phase__intent {
-  color: var(--c-accent);
+/* Design Direction header — title/intro left, portrait right */
+.dd-head {
+  display: grid; grid-template-columns: 1.25fr 0.85fr;
+  gap: clamp(28px, 5vw, 80px); align-items: center;
+}
+.dd-head__text { display: flex; flex-direction: column; }
+.dd-head__intro { margin-top: clamp(20px, 3vh, 36px); }
+.dd-head__intro .essay { max-width: 48ch; }
+.dd-head__photo { border-radius: 12px; overflow: hidden; }
+.dd-head__photo img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 4 / 5; object-position: center top; display: block; }
+@media (max-width: 860px) {
+  .dd-head { grid-template-columns: 1fr; }
+  .dd-head__photo { max-width: 440px; order: -1; }
 }
 
-.gate-marker {
-  margin-right: 0.3em;
+/* Work-examples wall — edge-to-edge, natural proportions, static */
+.wa-label { margin-top: clamp(48px, 8vh, 112px); display: flex; flex-direction: column; gap: 10px; }
+.wa-label .body { max-width: 52ch; }
+/* Justified wall: each row grows to fill the full width (flush edges),
+   full-bleed, chunky. Last row left-aligns at natural size via ::after. */
+.work-wall {
+  display: flex; flex-wrap: wrap;
+  gap: 4px; margin-top: clamp(20px, 3vh, 40px);
+}
+.work-wall img {
+  height: clamp(150px, 19vw, 290px);
+  flex: 1 1 auto; min-width: 150px; max-width: 100%;
+  object-fit: cover; display: block; vertical-align: middle;
+  background: var(--c-hair);
+}
+.work-wall::after { content: ""; flex-grow: 1000; }
+
+/* ============================================================
+   IMG REVEAL — clip-wipe + settle (JS-driven; CSS only hints)
+   ============================================================ */
+
+[data-img] { overflow: hidden; }
+[data-img] img { display: block; will-change: transform; }
+
+/* ============================================================
+   CASCADE — grids reveal tile-by-tile.
+   JS writes a per-tile --reveal-delay (radial from the group's
+   corner) and toggles .is-armed; these transitions do the work.
+   Tiles blind up from the bottom, on the shared easing.
+   ============================================================ */
+
+[data-cascade] > *,
+[data-cascade] .g-row > * {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path var(--dur) var(--ease) var(--reveal-delay, 0s),
+              opacity   var(--dur) var(--ease) var(--reveal-delay, 0s);
+}
+[data-cascade].is-armed > *,
+[data-cascade].is-armed .g-row > * {
+  clip-path: inset(100% 0 0 0);
+  opacity: 0;
+  transition: none;
 }
 
 /* ============================================================
-   06b — AI PROCESS MATRIX
-   Panel C of the Delivery section. Dark background, 6-column
-   CSS Grid. Human-judgment cells filled, AI cells outlined.
-   Red right-border on gate columns.
+   GALLERY ROWS — justified photo rows (no crops).
+   JS groups children into .g-row and sets --r (aspect ratio) per
+   item; widths are ratio-proportional so each row shares one
+   height. Hidden until justified to avoid a layout pop.
    ============================================================ */
 
-.panel--ai-matrix { height: 125vh; }
-
-.panel__content--ai-matrix {
-  justify-content: center;
+.gallery--rows {
+  margin-top: clamp(40px, 7vh, 88px);
+  display: flex; flex-direction: column;
+  gap: clamp(12px, 1.6vw, 24px);
 }
-
-.ai-frame {
+.gallery--rows:not(.is-justified) { opacity: 0; }
+.gallery--rows .g-row {
   display: flex;
-  flex-direction: column;
-  gap: clamp(14px, 2vh, 26px);
-  width: 100%;
+  gap: clamp(12px, 1.6vw, 24px);
+}
+.gallery--rows .g-row > * { flex: var(--r, 1) 1 0%; min-width: 0; }
+.gallery--rows .g-row--natural { justify-content: flex-start; }
+.gallery--rows .g-row--natural > * { flex: 0 0 auto; height: var(--h, 320px); width: auto; }
+.gallery--rows img {
+  width: 100%; height: 100%; object-fit: cover;
+  border-radius: 8px; display: block;
+}
+.gallery--rows figure { margin: 0; }
+.gallery--rows figcaption { margin-top: 8px; }
+@media (max-width: 640px) {
+  .gallery--rows .g-row { flex-direction: column; }
+  .gallery--rows .g-row > * { flex: none; }
+  .gallery--rows .g-row--natural > * { height: auto; width: 100%; }
 }
 
-/* Scrollable wrapper for small screens */
-.ai-matrix-scroll {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
+/* ============================================================
+   WORK — visual project cards
+   ============================================================ */
 
-/* 6-col grid: [label] + 5 phases */
-.ai-matrix {
+.work-grid {
   display: grid;
-  grid-template-columns: 142px repeat(5, 1fr);
-  grid-auto-rows: auto;
-  gap: 0;
-  min-width: 580px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(28px, 4vw, 72px) clamp(20px, 3vw, 48px);
+  border-top: 1px solid var(--c-hair);
+  padding-top: clamp(40px, 6vh, 80px);
 }
-
-/* ── Phase header cells ── */
-.ai-m__corner { /* empty top-left */ }
-
-.ai-m__ph {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding: 14px 16px 18px;
-  border-bottom: 1px solid var(--c-divider);
-  position: relative;
+.work-card { display: block; position: relative; }
+.work-card__media {
+  position: relative; overflow: hidden; border-radius: 12px;
+  aspect-ratio: 4 / 3; background: var(--c-hair);
 }
-
-.ai-m__ph--gate {
-  border-right: 1.5px solid var(--c-accent);
+.work-card__media img {
+  width: 100%; height: 100%; object-fit: cover;
+  will-change: transform;
+  transition: transform var(--dur) var(--ease);
 }
-
-.ai-m__pnum {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  color: var(--c-mid);
-  letter-spacing: 0.1em;
-}
-
-.ai-m__pname {
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
+.work-card:hover .work-card__media img { transform: scale(1.05); }
+/* Inverted chip: ink surface so the count is legible on any image */
+.work-card__num {
+  position: absolute; top: 14px; left: 16px; z-index: 2;
+  background: color-mix(in srgb, var(--ink) 88%, transparent);
   color: var(--paper);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  line-height: 1.3;
+  padding: 7px 11px; border-radius: 999px;
+  letter-spacing: 0.12em;
 }
-
-.ai-m__gate-tag {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  color: #FF7560; /* AAA on ink: 7.16:1 — c-accent (#F03A1C) only reaches 4.78:1 at this size */
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-top: 6px;
-  line-height: 1.4;
+.work-card__row {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 16px; margin-top: clamp(16px, 2vh, 24px);
 }
-
-/* ── Discipline label cells ── */
-.ai-m__disc {
-  display: flex;
-  align-items: center;
-  padding: 14px 0;
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--paper);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  white-space: nowrap;
-  border-top: 1px solid var(--c-divider);
-  overflow: hidden;
-  opacity: 0.75;
+.work-card__title {
+  display: block; color: var(--c-text);
+  transition: color var(--dur-fast) var(--ease);
 }
-
-/* ── Activity cells ── */
-.ai-m__cell {
-  padding: 14px 16px 16px;
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 1.5;
-  overflow: hidden;
-  overflow-wrap: break-word;
-  border-top: 1px solid var(--c-divider);
-  border-right: 1px solid var(--c-divider);
+.work-card:hover .work-card__title { color: var(--accent); }
+.work-card__desc {
+  margin-top: 8px; max-width: 42ch; color: var(--c-mid);
 }
-
-/* Human: filled, full weight */
-.ai-m__cell--h {
-  background: rgba(244, 242, 238, 0.10);
-  color: var(--paper);
-  font-weight: 500;
-}
-
-/* AI: no fill, dimmed — visually "lighter" */
-.ai-m__cell--ai {
-  background: transparent;
-  color: rgba(244, 242, 238, 0.75); /* 9.65:1 on ink — AAA comfortable margin */
-}
-
-/* Gate column marker: red right border */
-.ai-m__cell--gate {
-  border-right: 1.5px solid rgba(197, 43, 16, 0.45);
-}
-
-/* ── Legend ── */
-.ai-frame__legend {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-}
-
-.ai-legend__item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--paper);
-  opacity: 0.65;
-}
-
-.ai-legend__swatch {
-  width: 20px;
-  height: 10px;
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-
-.ai-legend__item--h .ai-legend__swatch {
-  background: rgba(244, 242, 238, 0.55);
-}
-
-.ai-legend__item--ai .ai-legend__swatch {
-  background: transparent;
-  border: 1px solid rgba(244, 242, 238, 0.28);
-}
-
-/* ── Reduced motion ── */
-@media (prefers-reduced-motion: reduce) {
-  .ai-m__ph,
-  .ai-m__disc,
-  .ai-m__cell { opacity: 1 !important; transform: none !important; }
+/* Feature cards span full width — the case-study tier.
+   Even-positioned features go more cinematic so four in a row
+   don't read as a wall. */
+.work-card--feature { grid-column: 1 / -1; }
+.work-card--feature .work-card__media { aspect-ratio: 2 / 1; }
+.work-card--feature:nth-child(even) .work-card__media { aspect-ratio: 21 / 9; }
+.work-card--feature .work-card__media img { object-position: center 30%; }
+@media (max-width: 760px) {
+  .work-card--feature .work-card__media,
+  .work-card--feature:nth-child(even) .work-card__media { aspect-ratio: 4 / 3; }
 }
 
 /* ============================================================
-   07 — PROJECTS + FOOTER
-   Normal scroll flow — no stickiness.
+   WORK — project index
    ============================================================ */
 
-.projects-section {
-  padding: clamp(80px, 12vh, 140px) var(--pad-x) clamp(48px, 8vh, 80px);
+.page-head {
+  padding-top: clamp(120px, 22vh, 240px);
+  padding-bottom: clamp(28px, 5vh, 64px);
+}
+.page-head__label { display: block; color: var(--c-mid); margin-bottom: clamp(16px, 2.5vh, 28px); }
+.page-head__title { display: flex; flex-direction: column; }
+.page-head__dek {
+  margin-top: clamp(18px, 2.5vh, 32px);
+  max-width: 46ch; color: var(--c-mid);
 }
 
-.projects-header {
-  margin-bottom: clamp(12px, 2vh, 24px);
-}
-
-
-.projects-headline {
-  display: flex;
-  flex-direction: column;
-  margin-top: clamp(10px, 1.5vh, 20px);
-  margin-bottom: clamp(12px, 2vh, 24px);
-  max-width: 100%;
-}
-
-@media (min-width: 769px) {
-  .projects-headline { max-width: 50vw; }
-}
-
-.projects-table {
-  width: 100%;
-  border-top: 1px solid var(--c-divider);
-}
-
+.projects { border-top: 1px solid var(--c-hair); }
 .project-row {
   display: grid;
-  grid-template-columns: 55px 1fr auto 44px;
+  grid-template-columns: 56px minmax(0, 1.4fr) minmax(0, 1fr) 44px;
   align-items: center;
-  gap: clamp(12px, 2.5vw, 40px);
-  padding: clamp(18px, 2.8vh, 32px) 0;
-  border-bottom: 1px solid var(--c-divider);
-  position: relative;
-  cursor: pointer;
+  gap: clamp(16px, 3vw, 48px);
+  padding: clamp(22px, 3.6vh, 48px) 0;
+  border-bottom: 1px solid var(--c-hair);
+  position: relative; cursor: pointer;
   will-change: opacity;
 }
-
-.project-row__desc {
-  text-align: right;
-}
-
+.project-row__num  { color: var(--c-mid); }
+.project-row__name { color: var(--c-text); }
+.project-row__desc { color: var(--c-mid); text-align: right; }
 .project-row__arrow {
-  text-align: right;
-  font-size: 1.1em;
-  display: block;
-  will-change: transform;
+  text-align: right; font-size: 1.2em; color: var(--c-text);
+  display: block; will-change: transform;
 }
-
-/* Row hover */
 .project-row::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: color-mix(in srgb, var(--paper) 8%, transparent);
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  pointer-events: none;
+  content: ''; position: absolute; inset: 0 calc(var(--pad-x) * -0.5);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  opacity: 0; transition: opacity var(--dur-fast) var(--ease); pointer-events: none;
 }
 .project-row:hover::before { opacity: 1; }
 
-/* Footer */
-.footer {
-  padding: clamp(60px, 10vh, 100px) var(--pad-x) clamp(48px, 8vh, 80px);
+/* ============================================================
+   NARRATIVE — reusable project page template
+   ============================================================ */
+
+.back-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--c-mid); margin-bottom: clamp(20px, 3vh, 36px);
+  transition: color var(--dur-fast) var(--ease);
+}
+.back-link:hover { color: var(--c-text); }
+
+.narrative__meta {
+  display: flex; gap: 10px 22px; flex-wrap: wrap;
+  color: var(--c-mid); margin-top: clamp(18px, 2.5vh, 28px);
+}
+.narrative__meta span:not(:last-child)::after {
+  content: '·'; margin-left: 22px; color: var(--c-hair);
 }
 
-.footer__cols {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
+.narrative__lead {
+  margin-block: clamp(40px, 7vh, 96px);
+}
+.narrative__lead img { width: 100%; height: auto; border-radius: 12px; display: block; }
+.narrative__lead figcaption { margin-top: 10px; }
+
+/* Side-by-side detail pair (e.g. two app screens compared) */
+.figure-pair {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: clamp(12px, 1.6vw, 24px);
+  align-items: start;
+}
+@media (max-width: 640px) { .figure-pair { grid-template-columns: 1fr; } }
+
+/* TPJ — currently featured essays */
+.tpj-featured {
+  margin-top: clamp(48px, 8vh, 104px);
+  display: flex; flex-direction: column; gap: clamp(20px, 3vh, 32px);
+}
+.tpj-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: clamp(14px, 1.8vw, 28px);
+}
+.tpj-card { display: flex; flex-direction: column; gap: 8px; }
+.tpj-card__img {
+  display: block; overflow: hidden; border-radius: 8px;
+  aspect-ratio: 4 / 5; background: var(--c-hair);
+}
+.tpj-card__img img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform var(--dur) var(--ease);
+}
+.tpj-card:hover .tpj-card__img img { transform: scale(1.04); }
+.tpj-card__title { font-weight: 500; color: var(--c-text); }
+@media (max-width: 860px) { .tpj-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .tpj-grid { grid-template-columns: 1fr; } }
+
+.prose {
+  max-width: 62ch;
+  display: flex; flex-direction: column; gap: clamp(20px, 3vh, 32px);
+}
+.prose .essay { color: var(--c-text); }
+
+.gallery {
+  margin-top: clamp(40px, 7vh, 88px);
+  column-count: 3;
+  column-gap: clamp(12px, 1.6vw, 24px);
+}
+.gallery img {
+  width: 100%; height: auto; display: block;
+  border-radius: 8px;
+  margin-bottom: clamp(12px, 1.6vw, 24px);
+  break-inside: avoid;
 }
 
-.footer__left {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+.narrative__out {
+  margin-top: clamp(48px, 8vh, 112px);
+  display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: center;
+  padding-top: clamp(28px, 4vh, 48px);
+  border-top: 1px solid var(--c-hair);
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: 'IBM Plex Sans', sans-serif; font-weight: 500;
+  font-size: 14px; letter-spacing: 0.04em;
+  padding: 13px 24px; border-radius: 4px;
+  background: var(--ink); color: var(--paper);
+  transition: opacity var(--dur-fast) var(--ease);
+}
+[data-theme="dark"] .btn { background: var(--paper); color: var(--ink); }
+.btn:hover { opacity: 0.82; }
+
+/* ============================================================
+   DESIGN DIRECTION — principles + branding showcase
+   ============================================================ */
+
+/* Movements — Leadership / Culture / Craft */
+.movement {
+  margin-top: clamp(48px, 8vh, 112px);
+  border-top: 1px solid var(--c-hair);
+  padding-top: clamp(28px, 4vh, 52px);
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.6fr);
+  gap: clamp(20px, 4vw, 72px);
+  align-items: start;
+}
+.movement__head { display: flex; flex-direction: column; gap: clamp(10px, 1.5vh, 18px); position: sticky; top: 96px; }
+.movement__label { color: var(--c-mid); }
+.movement__body { display: flex; flex-direction: column; gap: clamp(16px, 2.4vh, 28px); max-width: 60ch; }
+.movement__body .essay { color: var(--c-text); }
+@media (max-width: 860px) {
+  .movement { grid-template-columns: 1fr; gap: 20px; }
+  .movement__head { position: static; }
 }
 
-.footer__right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
+.principles {
+  margin-top: clamp(48px, 8vh, 104px);
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: clamp(24px, 3vw, 56px);
+  border-top: 1px solid var(--c-hair);
+  padding-top: clamp(32px, 4.5vh, 64px);
+}
+.principle { display: flex; flex-direction: column; gap: 12px; }
+.principle__name { color: var(--c-text); }
+.principle__body { color: var(--c-mid); max-width: 34ch; }
+
+.brand-section {
+  margin-top: clamp(56px, 9vh, 120px);
+  display: flex; flex-direction: column; gap: clamp(20px, 3vh, 32px);
+}
+.brand-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: clamp(12px, 1.6vw, 20px);
+}
+.brand-tile {
+  aspect-ratio: 4 / 3; overflow: hidden;
+  border: 1px solid var(--c-hair); border-radius: 8px;
+  background: #fff;
+}
+.brand-tile img { width: 100%; height: 100%; object-fit: cover; }
+.brand-tile--wide { grid-column: 1 / -1; aspect-ratio: 16 / 5; }
+.brand-note { max-width: 54ch; }
+
+@media (max-width: 860px) {
+  .principles { grid-template-columns: 1fr; gap: 32px; }
+  .brand-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .brand-grid { grid-template-columns: 1fr; }
+  .brand-tile--wide { aspect-ratio: 16 / 6; }
 }
 
-.footer__personal {
-  will-change: transform, opacity;
+/* ============================================================
+   CONTACT
+   ============================================================ */
+
+.contact {
+  min-height: 100svh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding-block: clamp(120px, 18vh, 200px);
 }
-
-.contact-block {
-  padding: clamp(120px, 18vh, 200px) 0 clamp(32px, 5vh, 56px);
-  margin-bottom: clamp(8px, 1vh, 16px);
-  display: flex;
-  flex-direction: column;
-  gap: clamp(24px, 4vh, 48px);
+.contact__prompt { max-width: 30ch; margin-top: clamp(18px, 2.5vh, 28px); color: var(--c-mid); }
+.contact__email {
+  display: inline-block;
+  margin-top: clamp(28px, 4vh, 48px);
+  font-family: 'Space Grotesk', sans-serif; font-weight: 500;
+  font-size: clamp(22px, 3vw, 44px); letter-spacing: -0.01em;
+  transition: color var(--dur-fast) var(--ease);
 }
+.contact__email:hover { color: var(--accent); }
 
-/* Zero out nested header/headline margins — gap handles all spacing */
-.contact-block .projects-header  { margin-bottom: 0; }
-.contact-block .projects-headline { margin-top: 0; margin-bottom: 0; }
-
-.contact-block__prompt {
-  color: var(--c-mid);
-}
-
-/* ---- Contact form ---- */
 .contact-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-width: 480px;
+  display: flex; flex-direction: column; gap: 14px;
+  max-width: 520px; margin-top: clamp(36px, 5vh, 60px);
 }
-
 .contact-form__field {
-  background: var(--paper);
-  border: 1px solid var(--paper);
-  border-radius: 4px;
-  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--c-hair);
+  border-radius: 4px; color: var(--ink);
   font-family: 'IBM Plex Sans', sans-serif;
-  font-size: clamp(14px, 1.1vw, 16px);
-  font-weight: 300;
-  padding: 12px 16px;
-  outline: none;
-  transition: box-shadow 0.2s ease;
-  width: 100%;
+  font-size: clamp(15px, 1.1vw, 17px); font-weight: 300;
+  padding: 14px 16px; outline: none; width: 100%;
+  transition: border-color var(--dur-fast) var(--ease);
 }
-
-.contact-form__field::placeholder {
-  color: rgba(17, 17, 17, 0.45);
-}
-
-.contact-form__field:focus {
-  box-shadow: 0 0 0 3px rgba(244, 242, 238, 0.5);
-}
-
-.contact-form__field--area { resize: vertical; min-height: 100px; }
-
+.contact-form__field::placeholder { color: rgba(17, 17, 17, 0.42); }
+.contact-form__field:focus { border-color: var(--ink); }
+.contact-form__field--area { resize: vertical; min-height: 120px; }
 .contact-form__submit {
   align-self: flex-start;
-  background: var(--paper);
-  border: none;
-  border-radius: 4px;
-  color: var(--ink);
+  background: var(--ink); border: none; border-radius: 4px;
+  color: var(--paper);
   font-family: 'IBM Plex Sans', sans-serif;
-  font-size: clamp(13px, 1vw, 15px);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  padding: 12px 24px;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
+  font-size: 14px; font-weight: 500; letter-spacing: 0.04em;
+  padding: 13px 28px; cursor: pointer; transition: opacity var(--dur-fast) var(--ease);
 }
-
-.contact-form__submit:hover  { opacity: 0.8; }
+.contact-form__submit:hover { opacity: 0.82; }
 .contact-form__submit:disabled { opacity: 0.45; cursor: default; }
+.contact-form__thanks { color: var(--c-mid); }
 
-.contact-form__thanks {
-  color: var(--c-mid);
+.links-row {
+  display: flex; flex-wrap: wrap; gap: 14px 28px;
+  margin-top: clamp(40px, 6vh, 72px);
 }
+.links-row a {
+  color: var(--c-mid); transition: color var(--dur-fast) var(--ease);
+  display: inline-flex; align-items: center; gap: 7px;
+}
+.links-row a:hover { color: var(--c-text); }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.footer { padding: clamp(56px, 9vh, 104px) var(--pad-x) clamp(40px, 6vh, 72px); }
+.footer__inner { max-width: var(--maxw); margin-inline: auto; }
+.footer__cols {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  border-top: 1px solid var(--c-hair); padding-top: clamp(24px, 3.5vh, 44px);
+}
+.footer__left, .footer__right { display: flex; flex-direction: column; gap: 6px; }
+.footer__right { align-items: flex-end; text-align: right; }
+.footer__personal { color: var(--c-mid); will-change: transform, opacity; }
+
+/* ============================================================
+   REVEAL — initial states (JS clears via animation)
+   ============================================================ */
+
+[data-reveal] { will-change: transform, opacity; }
 
 /* ============================================================
    RESPONSIVE
    ============================================================ */
 
-@media (min-width: 769px) {
-  .principle-body--narrow { max-width: 50vw; }
+@media (max-width: 860px) {
+  .about { grid-template-columns: 1fr; gap: 32px; }
+  .about__media img { aspect-ratio: 3 / 2; }
+  .facet {
+    grid-template-columns: 40px 1fr;
+    gap: 6px 20px;
+  }
+  .facet__desc { grid-column: 2; }
+  .pov, .pov__lead, .pov__body { max-width: none; }
+  .gallery { column-count: 2; }
+  .work-card--feature .work-card__media { aspect-ratio: 4 / 3; }
 }
 
-/* ============================================================
-   TOUCH / TABLET — structural overrides
-   Two conditions, either triggers the full touch treatment:
-   • max-width: 1024px  — phones + iPad Pro 12.9" portrait
-   • pointer: coarse    — any touch device regardless of width
-     (iPad landscape 1366px, Surface, touchscreen laptops)
-   These rules kill the sticky panel system that requires precise
-   mouse-scroll geometry, restore natural document flow, and ensure
-   all content is immediately visible without GSAP initial states.
-   ============================================================ */
-
-/* ============================================================
-   PHONE — structural overrides (≤768px only)
-   Tablets and iPads (>768px) get the full desktop treatment:
-   Lenis smooth scroll, GSAP scrub, sticky panels, animations.
-   Phones use native scroll, CSS bg transitions, document flow.
-   ============================================================ */
-
-@media (max-width: 768px) {
-
-  /* ─── No noise texture on mobile — prevents Chrome iOS strip artifact ─── */
+@media (max-width: 640px) {
   .noise { display: none; }
+  .nav { padding: 14px var(--pad-x); gap: 12px; }
+  .nav__name { font-size: 12px; letter-spacing: 0.08em; }
+  .nav__links { gap: 14px; }
+  .nav__links a { font-size: 10px; letter-spacing: 0.08em; }
 
-  /* ─── Kill sticky panel system on phones ─── */
-  .panel { height: auto !important; }
-
-  .panel__content {
-    position: relative !important;
-    height: auto !important;
-    overflow: visible !important;
-    min-height: 0 !important;
-  }
-
-  /* Hero stays full-height */
-  .panel--hero { height: 100svh !important; }
-  .panel__content--hero {
-    position: relative !important;
-    height: 100svh !important;
-    overflow: hidden !important;
-  }
-
-  /* color-buffer gives scroll room for the CSS bg transition to play */
-  .color-buffer { height: 1vh; }
-
-  /* ─── Typography — full width on phone ─── */
-  .principle-body--narrow,
-  .projects-headline { max-width: none !important; }
-
-  /* ─── HUD ─── */
-  .hud { padding: 14px var(--pad-x); }
-  .hud__role    { display: none; }
-  .hud__section { display: none; }
-
-}
-
-/* ============================================================
-   MOBILE — phone-specific layout overrides
-   768px and below: single-column layouts, component hiding,
-   larger touch targets, phone-scale padding.
-   ============================================================ */
-
-@media (max-width: 768px) {
-
-  /* Tighter horizontal padding — more text width on small screens */
-  :root { --pad-x: clamp(20px, 5.5vw, 32px); }
-
-  /* Phone vertical padding — slightly less than tablet since
-     phones are shorter; still more generous than the desktop value */
-  .panel__content {
-    padding-top:    clamp(80px, 13vh, 130px);
-    padding-bottom: clamp(80px, 13vh, 130px);
-  }
-
-  /* Principle headlines — display-s is vw-driven so clamps too small on 375px */
-  .display-s { font-size: clamp(24px, 6.4vw, 32px); }
-
-  /* Bigger body copy on phone */
-  .essay {
-    font-size: clamp(19px, 5vw, 21px);
-    line-height: 1.75;
-  }
-
-  .strip-cols {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .panel__content--leadership {
-    grid-template-columns: 1fr;
-    gap: 48px;
-  }
-
-  /* Leadership image — full-width landscape crop on phone */
-  .leadership-image-mask {
-    flex: none;
-    height: 58vw;
-    width: 100%;
-    margin-top: 32px;
-  }
-  .leadership-image {
-    height: 100%;
-  }
-
-  .beliefs-principles {
-    grid-template-columns: 1fr;
-    gap: 40px 0;
-  }
-
-  .beliefs-divider { display: none; }
-
-  .delivery-phase {
-    grid-template-columns: 32px 1fr;
-  }
-
-  .delivery-phase__intent { display: none; }
+  /* Headlines must fit the line width — line-mask clips any wrapped overflow */
+  .hero .display-l { font-size: clamp(26px, 8.2vw, 44px); letter-spacing: -0.02em; }
+  .hero__headline, .hero__sub { max-width: 100%; }
+  .page-head .display-l { font-size: clamp(30px, 10vw, 56px); }
 
   .project-row {
-    grid-template-columns: 44px 1fr 32px;
+    grid-template-columns: 40px 1fr 32px;
   }
-
   .project-row__desc { display: none; }
-
-  .footer__cols {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 24px;
-  }
-
-  .footer__right { align-items: flex-start; }
-
-  /* Gate tag too long for narrow columns */
-  .ai-m__gate-tag { display: none; }
-
-  /* Compression Map — wider so cells don't wrap mid-word */
-  .ai-matrix { min-width: 680px; }
-
-  .ai-m__ph {
-    padding: 10px 8px 12px;
-    gap: 3px;
-  }
-
-  .ai-m__cell { padding: 10px 8px; }
-  .ai-m__disc { padding: 10px 0; }
-
+  .gallery { column-count: 1; }
+  .work-grid { grid-template-columns: 1fr; gap: 36px; }
+  .marquee--top .marquee__item { height: clamp(200px, 56vw, 320px); }
+  .footer__cols { flex-direction: column; align-items: flex-start; gap: 24px; }
+  .footer__right { align-items: flex-start; text-align: left; }
 }
 
 /* ============================================================
-   TABLET — 769px to 1024px, natural-scroll touch layout
-   Sits between phone single-column and full desktop sticky.
-   AI Matrix: 5 columns fit without scroll at these widths but
-   cells are narrow — tighten label column + reduce type slightly
-   so text doesn't wrap mid-phrase.
-   ============================================================ */
-
-@media (min-width: 769px) and (max-width: 1024px) {
-
-  /* Narrower label column frees more space for 5 phase columns */
-  .ai-matrix {
-    grid-template-columns: 110px repeat(5, 1fr);
-    min-width: 0; /* let grid fill container, no forced scroll */
-  }
-
-  /* Slightly smaller type in cells — fits multi-word phrases
-     on one line at the narrower column widths (~100–140px) */
-  .ai-m__pnum  { font-size: 10px; }
-  .ai-m__pname { font-size: 11px; }
-  .ai-m__cell  { font-size: 12px; padding: 10px 10px; }
-  .ai-m__disc  { font-size: 11px; }
-
-  /* Gate tag stays visible on tablet — enough width to show it */
-  .ai-m__gate-tag { display: block; font-size: 10px; }
-
-  /* Leadership — maintain two-column at tablet, tighter gap */
-  .panel__content--leadership {
-    grid-template-columns: 5fr 7fr;
-    gap: clamp(32px, 4vw, 56px);
-  }
-
-  .leadership-image-mask {
-    flex: 1 1 0;
-    height: 0;
-    min-height: clamp(140px, 20vh, 280px);
-    margin-top: clamp(20px, 3vh, 36px);
-  }
-
-}
-
-/* ============================================================
-   SHORT VIEWPORT — 16:9 screens, Windows laptops, 1080p
-   Reduces vertical padding and spacing so sticky panels fit
-   without clipping. Desktop-only: touch devices (≤1024px or
-   coarse pointer) have natural-scroll panels that don't clip,
-   and landscape phones have short viewports that this block
-   would incorrectly override with desktop-sized padding.
-   ============================================================ */
-
-@media (max-height: 800px) and (min-width: 1025px) and (pointer: fine) {
-
-  /* Base panel padding — main driver of clip on short screens */
-  .panel__content {
-    padding-top: clamp(40px, 6vh, 80px);
-    padding-bottom: clamp(28px, 4vh, 60px);
-  }
-
-  /* Leadership — has its own overrides */
-  .panel__content--leadership {
-    padding-top: clamp(40px, 6vh, 80px);
-    padding-bottom: clamp(28px, 4vh, 56px);
-    gap: clamp(28px, 4vw, 64px);
-  }
-
-  .leadership-image-mask {
-    min-height: clamp(100px, 16vh, 220px);
-    margin-top: clamp(16px, 2.5vh, 32px);
-  }
-
-  .leadership-right {
-    gap: clamp(10px, 1.5vh, 18px);
-  }
-
-  /* Org intro — bottom-aligned, reduce bottom push */
-  .panel__content--org-intro {
-    padding-bottom: clamp(40px, 7vh, 96px);
-  }
-
-  /* Beliefs — reduce gap between header and grid */
-  .panel__content--beliefs-full {
-    gap: clamp(24px, 3.5vh, 48px);
-  }
-
-  /* Principle — top-aligned panels */
-  .panel__content--principle {
-    padding-top: clamp(40px, 7vh, 96px);
-  }
-
-  /* AI Matrix */
-  .ai-frame {
-    gap: clamp(14px, 2vh, 28px);
-  }
-
-  .ai-m__ph,
-  .ai-m__cell {
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-
-  /* Delivery table rows */
-  .delivery-phase {
-    padding-top: clamp(8px, 1.2vh, 16px);
-    padding-bottom: clamp(8px, 1.2vh, 16px);
-  }
-
-  /* Spacing between label → headline → body in principle panels */
-  .intro-label,
-  .org-label,
-  .principle-label {
-    margin-bottom: clamp(5px, 0.7vh, 10px);
-  }
-
-  .principle-headline {
-    margin-bottom: clamp(5px, 0.8vh, 12px);
-  }
-
-  .principle-headline--xl {
-    margin-bottom: clamp(6px, 0.9vh, 14px);
-  }
-
-  .principle-subhead {
-    margin-bottom: clamp(5px, 0.8vh, 12px);
-  }
-
-  .org-intro-note {
-    margin-top: clamp(6px, 0.9vh, 12px);
-  }
-
-  /* Strip rule gap in hero */
-  .strip-rule {
-    margin-bottom: clamp(6px, 0.9vh, 12px);
-  }
-
-  /* Color buffer — tighter on tablet portrait */
-  .color-buffer { height: 0.6vh; }
-}
-
-/* ============================================================
-   REDUCED MOTION — disable animations for users who prefer it
-   GSAP is also paused via JS when this preference is detected.
+   REDUCED MOTION
    ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
@@ -1266,51 +1004,13 @@ img { display: block; max-width: 100%; }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-
-  /* Ensure sticky panel content is always fully visible */
-  .panel__content {
-    opacity: 1 !important;
-    filter: none !important;
-    transform: none !important;
+  .line-mask span { transform: none !important; opacity: 1 !important; }
+  [data-reveal] { opacity: 1 !important; transform: none !important; }
+  [data-img] { clip-path: none !important; }
+  [data-img] img { transform: none !important; }
+  [data-cascade] > *, [data-cascade] .g-row > * {
+    clip-path: none !important; opacity: 1 !important; transition: none !important;
   }
-
-  /* Ensure line-mask content is always visible */
-  .line-mask span {
-    transform: none !important;
-    opacity: 1 !important;
-  }
-
-  /* Remove smooth scroll */
+  .marquee__track { transform: none !important; }
   html { scroll-behavior: auto; }
-}
-
-/* ============================================================
-   LANDSCAPE PHONES — hero rescue
-   max-height: 500px catches all landscape iPhones (375–430px tall)
-   without touching iPads (768px+ in landscape). No JS changes needed:
-   small iPhones (≤768px wide) are already on the mobile path;
-   large iPhones (iPhone 14+, 844–932px wide) hit the desktop path
-   with a 390px viewport — the vw-sized headline becomes ~100px/line
-   and crowds the strip. Switch to vh-capped sizing so the hero fits.
-   ============================================================ */
-
-@media (max-height: 500px) and (orientation: landscape) {
-
-  /* Headline: 12vw ≈ 101px on 844px landscape. Switch to vh so two lines
-     fit comfortably in ~390px. 11vh × 390 ≈ 43px/line → ~100px total. */
-  .display-xl {
-    font-size: clamp(28px, 11vh, 52px);
-  }
-
-  /* Tighten hero bottom padding and gap to reclaim vertical space */
-  .panel__content--hero {
-    padding-bottom: clamp(16px, 3.5vh, 28px);
-    gap: clamp(6px, 1vh, 10px);
-  }
-
-  /* Scale essay text down to match the compressed layout */
-  .hero-sub .essay {
-    font-size: clamp(12px, 1.6vh, 16px);
-    line-height: 1.45;
-  }
 }
