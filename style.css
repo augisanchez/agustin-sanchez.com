@@ -784,11 +784,44 @@ html.lightbox-open { overflow: hidden; }
   content: '·'; margin-left: 22px; color: var(--c-hair);
 }
 
+/* Detail-page media: standardized WIDE. Breaks out of the prose
+   column to min(92vw, 1760px), centered — larger than the wrap,
+   quieter than a full bleed. One scale for every case-study figure. */
 .narrative__lead {
-  margin-block: clamp(40px, 7vh, 96px);
+  --figw: min(92vw, 1760px);
+  width: var(--figw);
+  margin-left: calc(50% - var(--figw) / 2);
+  margin-block: clamp(44px, 8vh, 112px);
 }
 .narrative__lead img { width: 100%; height: auto; border-radius: 12px; display: block; }
-.narrative__lead figcaption { margin-top: 10px; }
+.narrative__lead figcaption { margin-top: 12px; max-width: 64ch; }
+
+/* ============================================================
+   MEDIA SKELETON — a quiet surface while an image loads.
+   JS drops .media-pending on the frame; removed on decode.
+   ============================================================ */
+
+.media-pending {
+  position: relative;
+  background: color-mix(in srgb, var(--ink) 6%, var(--paper));
+  min-height: 120px;
+}
+.media-pending::after {
+  content: '';
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(100deg, transparent 32%, rgba(255, 255, 255, 0.55) 50%, transparent 68%);
+  background-size: 250% 100%;
+  animation: media-sheen 1.5s var(--ease) infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+@keyframes media-sheen {
+  from { background-position: 130% 0; }
+  to   { background-position: -130% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .media-pending::after { animation: none; opacity: 0.25; }
+}
 
 /* ============================================================
    BLEED FIGURE — the editorial scale move. Full-viewport image

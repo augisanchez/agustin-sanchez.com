@@ -42,6 +42,21 @@ function decodedAll(imgs, timeout = MOTION.gateTimeout) {
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isMobile = window.matchMedia('(max-width: 640px)').matches;
 
+/* ── SKELETONS — every media frame shows a quiet loading surface until
+   its image decodes. The class lands on the frame, not the img, so it
+   works under clip reveals and object-fit crops alike. ── */
+{
+  const frameOf = (img) =>
+    img.closest('[data-img], .bleed-figure, .work-card__media, .tpj-card__img, .cov, .figure-pair > span') ||
+    (img.parentElement && img.parentElement.classList.contains('g-row') ? img : img.parentElement) || img;
+  document.querySelectorAll('img').forEach((img) => {
+    if (img.complete && img.naturalWidth) return;
+    const frame = frameOf(img);
+    frame.classList.add('media-pending');
+    decoded(img, 15000).then(() => frame.classList.remove('media-pending'));
+  });
+}
+
 /* Page entrance is handled by cross-document View Transitions (style.css).
    Browsers without support paint instantly; heroes carry their own entrance. */
 
@@ -152,23 +167,21 @@ if (!prefersReducedMotion) {
     });
   }
 
-  /* IMAGE REVEAL — clip-wipe on the frame + slow scale-settle on the img.
-     This is the betteroff-style "rise and settle."
+  /* IMAGE REVEAL — clip-wipe + slow scale-settle on the IMG (the frame
+     stays visible so its skeleton surface shows while media loads).
      Decode-gated: the wipe holds until the image has decoded, so the
      reveal never uncovers a loading frame. */
   gsap.utils.toArray('[data-img]').forEach((frame) => {
     const img = frame.querySelector('img');
-    gsap.set(frame, { clipPath: 'inset(0 0 100% 0)' });
-    if (img) gsap.set(img, { scale: 1.18 });
+    if (!img) return;
+    gsap.set(img, { clipPath: 'inset(0 0 100% 0)', scale: 1.18 });
     const play = () => {
-      gsap.to(frame, { clipPath: 'inset(0 0 0% 0)', duration: MOTION.wipe, ease: MOTION.ease });
-      if (img) {
-        gsap.to(img, {
-          scale: 1, duration: MOTION.settle, ease: MOTION.ease,
-          // clear the inline transform so CSS :hover zoom can take over
-          onComplete: () => gsap.set(img, { clearProps: 'transform' }),
-        });
-      }
+      gsap.to(img, { clipPath: 'inset(0 0 0% 0)', duration: MOTION.wipe, ease: MOTION.ease });
+      gsap.to(img, {
+        scale: 1, duration: MOTION.settle, ease: MOTION.ease,
+        // clear inline transforms so CSS :hover zoom can take over
+        onComplete: () => gsap.set(img, { clearProps: 'transform,clipPath' }),
+      });
     };
     ScrollTrigger.create({
       trigger: frame, start: 'top 85%', once: true,
