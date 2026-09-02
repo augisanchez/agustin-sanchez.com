@@ -182,6 +182,15 @@ if (!prefersReducedMotion) {
         // clear inline transforms so CSS :hover zoom can take over
         onComplete: () => gsap.set(img, { clearProps: 'transform,clipPath' }),
       });
+      /* Annotation marks draw on once the wipe has passed them, staggered
+         in source order. CSS owns the fade; JS only flips the switch. */
+      const shot = frame.closest('.shot');
+      if (shot) {
+        shot.querySelectorAll('.shot__mark').forEach((m, i) => {
+          m.style.setProperty('--mark-delay', i);
+        });
+        gsap.delayedCall(MOTION.wipe * 0.7, () => shot.classList.add('shot--in'));
+      }
     };
     ScrollTrigger.create({
       trigger: frame, start: 'top 85%', once: true,

@@ -932,6 +932,62 @@ html.lightbox-open { overflow: hidden; }
 }
 @media (max-width: 640px) { .figure-pair { grid-template-columns: 1fr; } }
 
+/* ============================================================
+   ANNOTATED SHOT — a screenshot with the point marked on it.
+   Text-dense product captures don't tell the reader where to
+   look, and a caption below the image can't point. .shot wraps
+   the image; each .shot__mark draws an accent rectangle over
+   the region that matters, and its data-label attaches a short
+   chip naming what it is. Coordinates are % of the image box,
+   so they hold at every width (the sources are a fixed 3:2).
+   Marks arrive after the image wipe — main.js adds .shot--in.
+   ============================================================ */
+
+.shot { position: relative; display: block; }
+.shot__mark {
+  position: absolute;
+  left: var(--x); top: var(--y); width: var(--w); height: var(--h);
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  /* paper halo: lets a 2px blue rect hold against light-grey UI */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--paper) 65%, transparent);
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+}
+.shot__mark::after {
+  content: attr(data-label);
+  position: absolute; left: -2px; bottom: calc(100% + 7px);
+  white-space: nowrap;
+  background: var(--accent); color: var(--paper);
+  padding: 5px 9px; border-radius: 5px;
+  /* .caption type, inlined so a mark needs no child element */
+  font-family: 'IBM Plex Sans', sans-serif; font-weight: 500;
+  font-size: var(--fs-caption);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+/* Chip placement escapes, for marks that sit near an image edge */
+.shot__mark--below::after { bottom: auto; top: calc(100% + 7px); }
+.shot__mark--right::after { left: auto; right: -2px; }
+.shot--in .shot__mark {
+  opacity: 1;
+  transition: opacity var(--dur) var(--ease) calc(var(--mark-delay, 0) * var(--stagger));
+}
+/* Phone: the figure is short enough that a chip hung outside the rect
+   can overflow the frame's overflow:hidden and get clipped. Tuck every
+   chip inside the rect's top-left corner instead — placement stops
+   depending on the coordinates, so no mark can clip at any --y. */
+@media (max-width: 640px) {
+  .shot__mark { border-width: 1.5px; box-shadow: 0 0 0 2px color-mix(in srgb, var(--paper) 65%, transparent); }
+  .shot__mark::after,
+  .shot__mark--below::after,
+  .shot__mark--right::after {
+    font-size: 10px; letter-spacing: 0.1em; padding: 3px 6px; border-radius: 4px;
+    top: 2px; bottom: auto; left: 2px; right: auto;
+  }
+}
+
 /* TPJ — currently featured essays */
 .tpj-featured {
   margin-top: clamp(48px, 8vh, 104px);
@@ -1181,6 +1237,7 @@ html.lightbox-open { overflow: hidden; }
   [data-reveal] { opacity: 1 !important; transform: none !important; }
   [data-img] { clip-path: none !important; }
   [data-img] img { transform: none !important; }
+  .shot__mark { opacity: 1 !important; transition: none !important; }
   [data-cascade] > *, [data-cascade] .g-row > * {
     clip-path: none !important; opacity: 1 !important; transition: none !important;
   }
