@@ -8,11 +8,18 @@
    DESIGN TOKENS
    ============================================================ */
 
+/* Kyoto, the display face. Licensed files go in /fonts/kyoto/ with these names.
+   Until they exist, the stack falls back to Space Grotesk at the same scale. */
+@font-face { font-family: 'Kyoto'; src: url('/fonts/kyoto/Kyoto-Medium.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Kyoto'; src: url('/fonts/kyoto/Kyoto-Semibold.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Kyoto'; src: url('/fonts/kyoto/Kyoto-Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+
 :root {
   --ink:    #111111;
   --paper:  #F2F2F2;
   --mid:    #57564F;   /* secondary text on paper — AAA */
   --hair:   rgba(17, 17, 17, 0.12);
+  --font-display: 'Kyoto', 'Space Grotesk', sans-serif;  /* Kyoto loads from /fonts/kyoto/ when the files are present */
   --accent: #0A63C2;   /* primary blue (Dakar livery) */
   --navy:   #0B2E63;   /* deep blue */
   --spark:  #E63326;   /* red */
@@ -217,25 +224,25 @@ html.is-pressing .cursor-dot::after  { transform: scale(1.4); }
    ============================================================ */
 
 .display-xl {
-  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-family: var(--font-display); font-weight: 700;
   font-size: var(--fs-display-xl);
   line-height: var(--lh-display); letter-spacing: var(--track-display);
   display: block;
 }
 .display-l {
-  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-family: var(--font-display); font-weight: 700;
   font-size: var(--fs-display-l);
   line-height: 1.0; letter-spacing: var(--track-display);
   display: block;
 }
 .display-m {
-  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-family: var(--font-display); font-weight: 700;
   font-size: var(--fs-display-m);
   line-height: var(--lh-tight); letter-spacing: var(--track-md);
   display: block;
 }
 .display-s {
-  font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+  font-family: var(--font-display); font-weight: 600;
   font-size: var(--fs-display-s);
   line-height: 1.08; letter-spacing: var(--track-tight);
 }
@@ -1119,7 +1126,7 @@ html.lightbox-open { overflow: hidden; }
 .contact__email {
   display: inline-block;
   margin-top: clamp(28px, 4vh, 48px);
-  font-family: 'Space Grotesk', sans-serif; font-weight: 500;
+  font-family: var(--font-display); font-weight: 500;
   font-size: clamp(22px, 3vw, 44px); letter-spacing: -0.01em;
   transition: color var(--dur-fast) var(--ease);
 }
