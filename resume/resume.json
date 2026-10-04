@@ -1,0 +1,145 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "basics": {
+    "name": "Agustin Sanchez",
+    "label": "Design Leader | Design Director",
+    "email": "hello@agustin-sanchez.com",
+    "url": "https://www.agustin-sanchez.com",
+    "summary": "Design leader with 20+ years in product design, user experience (UX) and design leadership across agencies, a startup I co-founded, and a software consultancy. I build and grow design teams, set the standard for the craft, and put design where the business decides what to build and how to sell it. Most recently I led a consultancy's design studio through a leadership change, wrote its design career framework, built an artificial intelligence (AI) fluency curriculum for designers, and led design on a healthcare product that shipped an AI coach. Looking for a Head of Design or Director of Product Design role in a product company.",
+    "location": {
+      "city": "Miami",
+      "region": "FL"
+    },
+    "profiles": [
+      {
+        "network": "LinkedIn",
+        "url": "https://www.linkedin.com/in/agustinsanchez"
+      }
+    ]
+  },
+  "work": [
+    {
+      "name": "8th Light",
+      "position": "Design Director",
+      "location": "Remote",
+      "startDate": "2025-01",
+      "highlights": [
+        "Led a four-person design team across the US and UK through the departure of its head of design: staffing, career growth, coaching and design standards. Placed every designer on client work within four weeks, matched to where each wanted to grow.",
+        "Authored a unified eight-level design career framework with competencies and an explicit AI expectation, replacing a ladder with no design leadership level. In review with the Chief People Officer and HR.",
+        "Designed a six-course AI capability curriculum for designers to build AI fluency across the team.",
+        "Led design in business development as client lead on design pursuits: proposals, pricing conversations, and live AI design demos to executive teams. Won two design-led engagements in two months, with a third client choosing us and the contract in progress.",
+        "Provided design leadership on nine client engagements in healthcare, education, financial services, sports and creative tools, often several at once. Stepped in to stabilize engagements that had lost their design lead.",
+        "Healing Track (digital health): led product design, with a senior designer, on a 0-to-1 chronic pain therapy product. First patient live in under six months. An AI coach I prototyped shipped as a product feature.",
+        "AllCampus (education benefits): reframed a customer relationship management (CRM) refresh into a platform restructure, delivering 20-30% more advisor calls and 25% faster advisor onboarding (client-reported). Set the conversation design rules for the company's AI career advisor."
+      ],
+      "summary": "Promoted from Principal Designer. Since Aug 2026, leading the design studio and carrying the head of design's responsibilities."
+    },
+    {
+      "name": "8th Light",
+      "position": "Principal Designer",
+      "location": "Remote",
+      "startDate": "2022-12",
+      "highlights": [
+        "Led user research, design strategy and design systems on client engagements, including a scalable design system for a youth sports platform and investor-facing roadmap prototypes for a real estate startup.",
+        "Mentored designers in the studio and on client teams, including a client's early-career designer who went on to present design work to her own leadership.",
+        "Design lead on the company website redesign. Created the brand for and spoke at the company conference, SparkConf 2023. Hosted the company podcast, The Fuse and the Flint."
+      ],
+      "endDate": "2025-01"
+    },
+    {
+      "name": "Wayfinder",
+      "position": "Director, Experience and Product Design",
+      "location": "Miami, FL",
+      "startDate": "2013-07",
+      "highlights": [
+        "Directed a team of 4-6 designers inside cross-functional teams that launched dozens of digital products across web and mobile, in health tech, youth sports, safety certification and regulation, and real estate.",
+        "Defined and enforced UX and user interface (UI) standards across the organization, and evolved the agency's brand and service offering.",
+        "Led clients through discovery, definition, design and validation, and contributed to business development and thought leadership."
+      ],
+      "endDate": "2022-12"
+    },
+    {
+      "name": "Collective Ray",
+      "position": "Co-Founder and Design Director",
+      "location": "Miami, FL",
+      "startDate": "2012-07",
+      "highlights": [
+        "Co-founded a design studio. Ran UX and design across clients and led business development through capability presentations and creative strategy."
+      ],
+      "endDate": "2013-06"
+    },
+    {
+      "name": "AgencyNet",
+      "position": "Design Director",
+      "location": "Fort Lauderdale, FL",
+      "startDate": "2006-11",
+      "highlights": [
+        "Promoted from Designer and Producer (2006) to Art Director (2008) to Design Director (2011).",
+        "Managed design resources across clients and led creative strategy in new business pitches for brands including Bacardi, Grey Goose, Nintendo, Warner Bros., Oxygen and Ruby Tuesday."
+      ],
+      "endDate": "2012-05"
+    },
+    {
+      "name": "The Photographic Journal",
+      "position": "Co-Founder and Publisher",
+      "location": "Remote",
+      "startDate": "2011-07",
+      "highlights": [
+        "Run an independent photography publication. Led its 2026 rebuild, cutting hosting costs from $92 to $7 a month and accessibility issues from 89 to 0."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Art Institute of Fort Lauderdale",
+      "studyType": "Bachelor of Science",
+      "area": "Interactive Media",
+      "endDate": "2004"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Leadership",
+      "keywords": [
+        "design leadership",
+        "team building",
+        "hiring",
+        "mentoring and coaching",
+        "career frameworks",
+        "design operations",
+        "staffing and resource allocation",
+        "executive and cross-functional partnership",
+        "stakeholder management",
+        "business development"
+      ]
+    },
+    {
+      "name": "Practice",
+      "keywords": [
+        "product design",
+        "product strategy",
+        "user experience (UX)",
+        "user research",
+        "service design",
+        "design systems",
+        "information architecture",
+        "interaction design",
+        "conversation design for AI products",
+        "prototyping",
+        "accessibility"
+      ]
+    },
+    {
+      "name": "Tools",
+      "keywords": [
+        "Figma",
+        "FigJam",
+        "HTML",
+        "CSS",
+        "React prototyping",
+        "AI-assisted design workflows",
+        "Jira"
+      ]
+    }
+  ]
+}
