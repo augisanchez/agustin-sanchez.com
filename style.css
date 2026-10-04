@@ -1251,3 +1251,8 @@ html.lightbox-open { overflow: hidden; }
   .marquee__track { transform: none !important; }
   html { scroll-behavior: auto; }
 }
+
+/* Work page tiers: 1 featured case study, 2 client work cards, 3 personal work as a quiet list */
+.tier-label { display: block; margin-bottom: clamp(14px, 2.2vh, 24px); }
+.projects--tertiary .project-row { padding: clamp(12px, 1.8vh, 20px) 0; }
+.projects--tertiary .project-row__name { font-weight: 500; }
