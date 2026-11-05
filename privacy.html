@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy · Agustin Sanchez</title>
+  <meta name="description" content="Privacy policy for Agustin Sanchez Reference Boards, a personal read-only Pinterest tool.">
+  <meta name="robots" content="noindex">
+
+  <link rel="canonical" href="https://agustin-sanchez.com/privacy.html">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&display=swap" rel="stylesheet">
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css?v=20260801.1">
+</head>
+<body>
+
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <svg class="noise" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <filter id="grain-filter" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="linearRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.68" numOctaves="4" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.33 0.33 0.33 0 0" in="noise"/>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#grain-filter)"/>
+  </svg>
+
+  <header class="nav">
+    <a class="nav__name" href="/index.html">Agustin Sanchez</a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="/index.html">Overview</a>
+      <a href="/work.html">Work</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <main id="main" class="wrap">
+    <div class="page-head">
+      <span class="caption page-head__label">Privacy</span>
+      <h1 class="display-l">Privacy policy</h1>
+    </div>
+    <div class="prose" style="margin-bottom:clamp(64px,10vh,120px)">
+      <p class="body-l"><strong>Agustin Sanchez Reference Boards.</strong> Last updated November 5, 2026.</p>
+      <p class="essay">This is a personal tool. I use it to read my own Pinterest account through the Pinterest API. It is not a public product and has no other users.</p>
+
+      <h2 class="display-s">Data accessed</h2>
+      <p class="essay">With my authorization, the tool uses read-only permissions (user_accounts:read, boards:read, pins:read) to read my own profile and account information, boards, and pins. It does not create, edit, publish, or delete content, and it does not access any other user&rsquo;s data.</p>
+
+      <h2 class="display-s">How data is used</h2>
+      <p class="essay">The data is used only to browse and reference my own boards and pins for personal design work.</p>
+
+      <h2 class="display-s">Storage and sharing</h2>
+      <p class="essay">Access tokens are stored only on my computer. Pinterest data is not sold, shared, or sent to third parties. The tool has no analytics or tracking.</p>
+
+      <h2 class="display-s">Revoking access</h2>
+      <p class="essay">Access can be revoked at any time in Pinterest under Settings, Security and permissions, Apps.</p>
+
+      <h2 class="display-s">Contact</h2>
+      <p class="essay">Send a note through the <a href="/contact.html">contact page</a>.</p>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="footer__cols">
+        <div class="footer__left">
+          <span class="body" style="font-weight:500;">Agustin Sanchez</span>
+          <span class="caption c-mid">Design Leader · Miami</span>
+        </div>
+        <div class="footer__right">
+          <p class="essay footer__personal">Most of the good stuff happened in the revision.</p>
+          <span class="caption c-mid">© 2026 · Made in Miami</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+  <script src="/main.js?v=20260801.1"></script>
+</body>
+</html>
